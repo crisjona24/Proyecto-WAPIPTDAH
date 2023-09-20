@@ -16,6 +16,7 @@ import { validarTamanoImagen } from '../../controles/alert_user';
 import { ResultadoIndividual, ResultadoEditar } from '../../api/resultado.api';
 import { SalaIndividual, SalaActualizar } from "../../api/sala.api"
 
+
 /* EDICION DE NIVEL*/
 export function FormularioEdicionNivel() {
     /* *** Form **** */
@@ -316,7 +317,7 @@ export function FormularioEdicion() {
 
 
 /* EDICION DE CONTENIDO */
-export function FormularioEdicionContenido() {
+export function FormularioEdicionContenido({ slugDominio }) {
     // Obtener el parametro de la URL
     let { slug } = useParams();
     /* *** Form **** */
@@ -346,8 +347,8 @@ export function FormularioEdicionContenido() {
                 // Realizar la petición de edicion
                 await confirmEdicion(formData);
             }
-        } catch (error) {
-            if (error.message === "NOT_AUTHENTICATED") {
+        } catch (err) {
+            if (err.message === "NOT_AUTHENTICATED") {
                 navigate('/');
             } else {
                 mostrarError('Error al editar contenido');
@@ -404,13 +405,13 @@ export function FormularioEdicionContenido() {
                 try {
                     await ContenidoEditar(datos.id, formData);
                     Swal.fire("Datos actualizados", "", "success");
-                    navigate('/contenido/all')
+                    navigate(`/contenido/all/${slugDominio}/`)
                 } catch (error) {
                     Swal.fire('Error al actualizar', '', 'error');
                 }
             } else if (result.isDenied) {
                 Swal.fire('Los cambios no se guardaron', '', 'info');
-                navigate('/contenido/all')
+                navigate(`/contenido/all/${slugDominio}/`)
             }
         });
     };
@@ -440,7 +441,7 @@ export function FormularioEdicionContenido() {
             <div className="form-group">
                 <label className='label' htmlFor="nombre">Nombre de contenido:</label>
                 <input className='form-control w-100' type="text" placeholder="Ingrese el nombre**" id="nombre"
-                    value={nombre_contenido} onChange={e => setNombreDominio(e.target.value)} />
+                    value={nombre_contenido} onChange={e => setNombreContenido(e.target.value)} />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="dominio">Tipo de contenido:</label>
@@ -472,7 +473,7 @@ export function FormularioEdicionContenido() {
 
 
 /* EDICION DE CONTENIDO INDIVIDUAL */
-export function FormularioEdicionIndividual() {
+export function FormularioEdicionIndividual({ slugContenido }) {
     // Obtener el parametro de la URL
     let { slug } = useParams();
     /* *** Form **** */
@@ -525,7 +526,8 @@ export function FormularioEdicionIndividual() {
             /* Flujo de contenido */
             const contI = await VerificarContenidoIndividual(slug);
             if (contI.data.success && contI.data.identificador) {
-                const datos__user = await ContenidoIndividual(contI.data.identificador);
+                const datos__user = await ContenidoDatosIndividual(contI.data.identificador);
+                console.log(datos__user.data)
                 setDatos(datos__user.data);
                 setDescripcion(datos__user.data.descripcion_individual);
                 setTipo(datos__user.data.tipo_contenido);
@@ -570,13 +572,13 @@ export function FormularioEdicionIndividual() {
                 try {
                     await ContenidoIndividualEditar(datos.id, formData);
                     Swal.fire("Datos actualizados", "", "success");
-                    navigate('/contenido/individual/all')
+                    navigate(`/contenido/individual/all/${slugContenido}/`)
                 } catch (error) {
                     Swal.fire('Error al actualizar', '', 'error');
                 }
             } else if (result.isDenied) {
                 Swal.fire('Los cambios no se guardaron', '', 'info');
-                navigate('/contenido/individual/all')
+                navigate(`/contenido/individual/all/${slugContenido}/`)
             }
         });
     };

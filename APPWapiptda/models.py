@@ -176,7 +176,7 @@ class Dominio(models.Model):
 # MODELO DE CONTENIDO
 class Contenido(models.Model):
     nombre = models.CharField(max_length=80, blank=False, null=True)
-    identificador_contenido = models.IntegerField(unique=True)
+    identificador_contenido = models.IntegerField(unique=True, blank=False, null=True)
     dominio_tipo = models.CharField(max_length=80, blank=False, null=True)
     fecha_registro_contenido = models.DateField(auto_now=True)
     estado_contenido = models.BooleanField(default=True)
@@ -211,6 +211,10 @@ class ContenidoIndividual(models.Model):
     contenido_individual = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
     portada_individual = models.ImageField(upload_to='samples/portada_contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
     respuesta = models.CharField(max_length=250, blank=False, null=True)
+    # Para seleccion de con imagenes
+    imagen1 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
+    imagen2 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
+    imagen3 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
     # Foranea
     contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE, blank=True, null=True)
 

@@ -1700,6 +1700,9 @@ def api_contenido_individual_register(request):
                     tipocontenido_ = request.POST.get('tipo_contenido')
                     respuesta_ = request.POST.get('respuesta')
                     contenido_ = request.FILES.get('contenido_individual')
+                    img1_ = request.FILES.get('img1')
+                    img2_ = request.FILES.get('img2')
+                    img3_ = request.FILES.get('img3')
                     portada_ = request.FILES.get('portada_individual')
                     pertenece_ = request.POST.get('conten')
                     nombre_nivel_ = request.POST.get('nombre_nivel')
@@ -1708,11 +1711,18 @@ def api_contenido_individual_register(request):
                     # Calculamos el identificador
                     identificador_ = generar_identificador_individual()
                     # Creamos el contenido
-                    if guardar_contenido_individual(descripcion_, identificador_, tipocontenido_, contenido_, 
-                                                    portada_, respuesta_, nombre_nivel_, contenido__ob):
-                        return JsonResponse({'success': True})
+                    if img1_ and img2_ and img3_:
+                        if guardar_contenido_individual_2(descripcion_, identificador_, tipocontenido_, contenido_, 
+                                                        portada_, respuesta_, nombre_nivel_, contenido__ob, img1_, img2_, img3_):
+                            return JsonResponse({'success': True})
+                        else:
+                            return JsonResponse({'error': 'Error al guardar el contenido individual'})
                     else:
-                        return JsonResponse({'error': 'Error al guardar el contenido individual'})
+                        if guardar_contenido_individual(descripcion_, identificador_, tipocontenido_, contenido_, 
+                                                    portada_, respuesta_, nombre_nivel_, contenido__ob):
+                            return JsonResponse({'success': True})
+                        else:
+                            return JsonResponse({'error': 'Error al guardar el contenido individual'})
                 else:
                     return JsonResponse({'error': 'Error al guardar el contenido'})
             else:
@@ -1729,6 +1739,27 @@ def guardar_contenido_individual(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8):
             identificador_individual=ob2,
             tipo_contenido=ob3,
             contenido_individual=ob4,
+            portada_individual=ob5,
+            respuesta=ob6,
+            nivel=ob7,
+            contenido=ob8
+        )
+        # Añadimos a contenido
+        contenido_individual.save()
+        return True
+    except Exception as e:
+        return False
+
+def guardar_contenido_individual_2(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, ob10, ob11):
+    try:
+        contenido_individual = ContenidoIndividual.objects.create(
+            descripcion_individual=ob1,
+            identificador_individual=ob2,
+            tipo_contenido=ob3,
+            contenido_individual=ob4,
+            imagen1=ob9,
+            imagen2=ob10,
+            imagen3=ob11,
             portada_individual=ob5,
             respuesta=ob6,
             nivel=ob7,
@@ -1949,6 +1980,12 @@ def contenido_individual(request, slug):
                     return JsonResponse(context)
                 elif (contenidoI__ob.tipo_contenido == 'cuento'):
                     context.update({'tipo': 'cuento'})
+                    return JsonResponse(context)
+                elif (contenidoI__ob.tipo_contenido == 'selecion_multiple_img'):
+                    url_c1 = cloudinary.CloudinaryImage(contenidoI__ob.imagen1.name).build_url()
+                    url_c2 = cloudinary.CloudinaryImage(contenidoI__ob.imagen2.name).build_url()
+                    url_c3 = cloudinary.CloudinaryImage(contenidoI__ob.imagen3.name).build_url()
+                    context.update({'tipo': 'selecion_multiple_img', 'url_c1': url_c1, 'url_c2': url_c2, 'url_c3': url_c3})
                     return JsonResponse(context)
 
             else:

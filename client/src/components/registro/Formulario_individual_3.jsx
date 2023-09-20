@@ -12,7 +12,7 @@ import Swal from "sweetalert2";
 // Metodos
 import { CrearResultadoNew } from "../../api/resultado.api"
 
-export function FormularioTres({ context, usuario }) {
+export function FormularioTres({ context, usuario, slugContenido }) {
     /* *** Valores recuperados *** */
     const {
         url__contenido, contenedor, descripcion__contenido,
@@ -159,7 +159,7 @@ export function FormularioTres({ context, usuario }) {
     const enviarForm = async (e) => {
         if (e) {
             e.preventDefault();
-        } 
+        }
         try {
             const datos__post = {
                 slug__,
@@ -173,7 +173,7 @@ export function FormularioTres({ context, usuario }) {
             if (response.data.success) {
                 // Redireccionar a la página principal de contenido individual
                 Swal.fire("Respuesta registrada", "", "success");
-                navigate('/contenido/individual/all');
+                navigate(`/contenido/individual/all/${slugContenido}/`);
             } else {
                 if (response.data.error) {
                     mostrarError(response.data.error);

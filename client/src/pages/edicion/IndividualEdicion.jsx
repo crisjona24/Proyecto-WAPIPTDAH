@@ -5,15 +5,58 @@ import { Button, Modal, Container, Row } from "react-bootstrap";
 // Componentes
 import { CabeceraRegister } from '../../components/partes/CabecerRegister'
 import { PieRegister } from '../../components/partes/PieRegister'
-import { Link } from 'react-router-dom';
-import React, { useState } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 // Metodos
 import { FormularioEdicionIndividual } from '../../components/edicion/Formularo_edicion'
+import { ObtenerSlugContenido } from '../../api/contenidoindividual.api';
+
 
 export function IndividualEdición() {
     const [show, setShow] = useState(false);
     const cerrar = () => setShow(false);
     const abrir = () => setShow(true);
+
+    // Slug
+    let { slug } = useParams();
+    // Slug del dominio
+    const [error, setError] = useState("");
+    const [slugContenido, setSlugContenido] = useState("");
+    const navigate = useNavigate();
+
+    // Funcion para mostrar errores
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
+
+    const cargarSlugContenido = async () => {
+        try {
+            const slugConte = await ObtenerSlugContenido(slug);
+            if (slugConte.data.success) {
+                setSlugContenido(slugConte.data.slug_contenido);
+            } else {
+                if (slugConte.data.success === false) {
+                    navigate('/login');
+                } else {
+                    mostrarError(slugConte.data.error);
+                }
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                mostrarError('Error al cargar identificador de dominio');
+            }
+        }
+    }
+
+    // Obtener tipo de usuario
+    useEffect(() => {
+        cargarSlugContenido();
+    }, []);
 
     return (
         <div style={{ width: '100%', height: '100%' }}>
@@ -66,7 +109,7 @@ export function IndividualEdición() {
                             </Button>
                         </div>
                         <div className='card-body col-md-2'>
-                            <Link to={'/contenido/individual/all'} className='btn btn-danger mt-2'>
+                            <Link to={`/individual/detalle/${slug}/`} className='btn btn-danger mt-2'>
                                 Cancelar
                             </Link>
                         </div>
@@ -75,7 +118,8 @@ export function IndividualEdición() {
                 <Container className='form container pb-1' style={{ border: '1px solid #333' }}>
                     <h6 className='pl-0 pt-3 pb-3'> Ingrese los datos solicitados</h6>
                     <div className='pb-2'>
-                        <FormularioEdicionIndividual />
+                        {error && <span>{error}</span>}
+                        <FormularioEdicionIndividual slugContenido={slugContenido} />
                     </div>
                 </Container>
             </Container>

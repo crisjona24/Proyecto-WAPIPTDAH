@@ -180,6 +180,14 @@
     grid-template-columns: 4fr;
 }
 
+.contenedor__cuerpo__division_t9 {
+    width: 110%;
+    max-width: 1200px;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 4fr;
+}
+
 .alineacion__etiquetas .span {
     text-align: left;
     font-family: 'Pacifico', cursive;
@@ -284,4 +292,40 @@
 .disabled {
     pointer-events: none;
     opacity: 0.65;
+}
+
+/* NUEVO CONTENIDO INDIVIDUAL */
+.contenedor-division_CI {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.card_CI {
+    border-radius: 10px;
+    min-height: 200px;
+    font-weight: bold;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+
+    /*Para la img de fondo*/
+    background-size: cover;
+    background-position: center center;
+
+    border: 1px solid #333;
+}
+
+.card_CI .textos__ {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.contenido-imagen{
+    margin-left: 25%;
+    margin-top: 5%;
 }

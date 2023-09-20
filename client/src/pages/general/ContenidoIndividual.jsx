@@ -18,6 +18,7 @@ import { ContenidoTipoTwo } from '../../components/contenido/Contenido_individua
 import { ContenidoTipoThree } from '../../components/contenido/Contenido_individual_ttres';
 import { ContenidoTipoFour } from '../../components/contenido/Contenido_individual_tcuatro';
 import { ContenidoTipoSeven } from '../../components/contenido/Contenido_individual_tsiete';
+import { ContenidoTipoNine } from '../../components/contenido/Contenido_individual_tnueve';
 import { CargarContenido, ObtenerSlugContenido } from "../../api/contenidoindividual.api";
 
 import { VerificarUsuario } from "../../api/usuario.api";
@@ -138,6 +139,9 @@ export function ContenidoIndividual() {
                 break;
             case 'cuento':
                 contenidoComponente = <ContenidoTipoSeven context={contenidosI} slugContenido={slugContenido} />;
+                break;
+            case 'selecion_multiple_img':
+                contenidoComponente = <ContenidoTipoNine context={contenidosI} slugContenido={slugContenido} />;
                 break;
             default:
                 contenidoComponente = <div>No se encontró contenido</div>;

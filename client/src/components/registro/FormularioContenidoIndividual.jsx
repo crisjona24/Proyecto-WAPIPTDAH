@@ -21,6 +21,9 @@ export function FormularioContenidoIndividual({ slug }) {
     const [descripcion_individual, setDescripcion] = useState("");
     const [tipo_contenido, setTipo] = useState("");
     const [contenido_individual, setContenido] = useState("");
+    const [img1, setImg1] = useState("");
+    const [img2, setImg2] = useState("");
+    const [img3, setImg3] = useState("");
     const [portada_individual, setPortada] = useState("");
     const [respuesta, setRespuesta] = useState("");
     const [error, setError] = useState("");
@@ -30,7 +33,7 @@ export function FormularioContenidoIndividual({ slug }) {
     const enviarFContenido = async (e) => {
         e.preventDefault();
         // Verificar campos vacíos
-        if (!isValidForm()) {
+        if (!camposValidos()) {
             Swal.fire("Por favor ingrese todos los campos", "", "warning");
             return;
         }
@@ -42,6 +45,9 @@ export function FormularioContenidoIndividual({ slug }) {
             formData.append('respuesta', respuesta);
             formData.append('nombre_nivel', nombre_nivel);
             formData.append('contenido_individual', contenido_individual);
+            formData.append('img1', img1);
+            formData.append('img2', img2);
+            formData.append('img3', img3);
             formData.append('portada_individual', portada_individual);
             formData.append('conten', conten);
             // Realizar la petición POST al servidor
@@ -104,7 +110,7 @@ export function FormularioContenidoIndividual({ slug }) {
     }, []);
 
     // Campos vacios
-    const isValidForm = () => {
+    const camposValidos = () => {
         if (
             descripcion_individual.trim() === "" ||
             tipo_contenido.trim() === "" ||
@@ -114,6 +120,9 @@ export function FormularioContenidoIndividual({ slug }) {
             !contenido_individual ||
             !portada_individual
         ) {
+            return false;
+        }
+        if (tipo_contenido === "selecion_multiple_img" && (!img1 || !img2 || !img3)) {
             return false;
         }
         return true;
@@ -158,13 +167,38 @@ export function FormularioContenidoIndividual({ slug }) {
                     <option value="seleccionar_imagen">Tipo 6 - Selección de Imágenes</option>
                     <option value="cuento">Tipo 7 - Lectura Comprensiva</option>
                     <option value="juego_simple">Tipo 8 - Juegos Simples</option>
+                    <option value="selecion_multiple_img">Tipo 9 - Selección Individual con imagen</option>
                 </select>
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="contenido_individual">Contenido:</label>
                 <input className='form-control w-100' type="file" id="contenido_individual"
-                    onChange={(e) => { setContenido(e.target.files[0]); validarTamanoImagen(e.target) }} name='contenido_individual' accept="image/*" />
+                    onChange={(e) => { setContenido(e.target.files[0]); validarTamanoImagen(e.target) }}
+                    name='contenido_individual' accept="image/*" />
             </div>
+            {
+                tipo_contenido === "selecion_multiple_img" &&
+                <>
+                    <div className="form-group">
+                        <label className='label' htmlFor="img1">Contenido de opción 2:</label>
+                        <input className='form-control w-100' type="file" id="img1"
+                            onChange={(e) => { setImg1(e.target.files[0]); validarTamanoImagen(e.target) }}
+                            name='img1' accept="image/*" />
+                    </div>
+                    <div className="form-group">
+                        <label className='label' htmlFor="img2">Contenido de opción 3:</label>
+                        <input className='form-control w-100' type="file" id="img2"
+                            onChange={(e) => { setImg2(e.target.files[0]); validarTamanoImagen(e.target) }}
+                            name='img2' accept="image/*" />
+                    </div>
+                    <div className="form-group">
+                        <label className='label' htmlFor="img3">Contenido de opción 4:</label>
+                        <input className='form-control w-100' type="file" id="img3"
+                            onChange={(e) => { setImg3(e.target.files[0]); validarTamanoImagen(e.target) }}
+                            name='img3' accept="image/*" />
+                    </div>
+                </>
+            }
             <div className="form-group">
                 <label className='label' htmlFor="conten">Pertenece a:</label>
                 <select className="form-control w-100" id="conten"

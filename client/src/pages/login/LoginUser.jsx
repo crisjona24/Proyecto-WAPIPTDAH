@@ -11,6 +11,7 @@ import { faFacebook, faLinkedin, faTwitter } from '@fortawesome/free-brands-svg-
 // Metodos
 import { LoginUsuario } from "../../api/login.api";
 import { cerrarSesion } from "../../controles/logout"
+import { VerificarInscripcion } from "../../api/curso.api"
 
 export function IniciarSesion() {
     const [username, setUsername] = useState("");
@@ -32,7 +33,13 @@ export function IniciarSesion() {
                 // Almacena el token en el almacenamiento local
                 cerrarSesion(response.token);
                 if (response.tipo === 'paciente') {
-                    navigate('/cursos/all');
+                    // Verificar si esta inscrito
+                    const inscrip = await VerificarInscripcion();
+                    if (inscrip.data.inscrito === "1") {
+                        navigate('/nivel/all');
+                    } else if (inscrip.data.inscrito === "0") {
+                        navigate('/cursos/all');
+                    }
                 } else {
                     navigate('/nivel/all');
                 }

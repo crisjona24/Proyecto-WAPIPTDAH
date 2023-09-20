@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 // Metodos
 import { CrearResultadoNew } from "../../api/resultado.api"
 
-export function Formulariocuatro({ context, usuario }) {
+export function Formulariocuatro({ context, usuario, slugContenido }) {
     /* *** Valores recuperados *** */
     const {
         url__contenido, descripcion__contenido, identificador,
@@ -149,7 +149,7 @@ export function Formulariocuatro({ context, usuario }) {
             if (response.data.success) {
                 // Redireccionar a la página principal de contenido individual
                 Swal.fire("Respuesta registrada", "", "success");
-                navigate('/contenido/individual/all');
+                navigate(`/contenido/individual/all/${slugContenido}/`);
             } else {
                 if (response.data.error) {
                     mostrarError(response.data.error);

@@ -62,7 +62,7 @@ export function ContenidoRegistro() {
                 <Container className='form container pb-1' style={{ border: '1px solid #333' }}>
                     <h6 className='pl-0 pt-3 pb-3'> Ingrese los datos solicitados</h6>
                     <div className='pb-2'>
-                        <FormularioContenido />
+                        <FormularioContenido slug={slug} />
                     </div>
                 </Container>
             </Container>

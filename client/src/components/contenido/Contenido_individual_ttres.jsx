@@ -106,7 +106,7 @@ export function ContenidoTipoThree({ context, slugContenido }) {
                 </div>
 
                 {/* Componente formulario */}
-                <FormularioTres context={context} usuario={tipoUsuario} />
+                <FormularioTres context={context} usuario={tipoUsuario} slugContenido={slugContenido} />
                 {/* Fin componente formulario */}
 
                 <div className="row col-md-12 mt-4 mb-2">

@@ -151,6 +151,7 @@ export function Contenido({ datos, slug }) {
     const [tipoUsuario, setTipo] = useState([]);
     // Slug del dominio
     const [slugDominio, setSlugDominio] = useState("");
+    const [error, setError] = useState("");
 
     // Obtener tipo de usuario
     const verificacion = async () => {
@@ -176,14 +177,22 @@ export function Contenido({ datos, slug }) {
                     mostrarError(slugDomi.data.error);
                 }
             }
-        } catch (error) {
-            if (error.message === "NOT_AUTHENTICATED") {
+        } catch (err) {
+            if (err.message === "NOT_AUTHENTICATED") {
                 navigate('/login');
             } else {
                 mostrarError('Error al cargar identificador de dominio');
             }
         }
     }
+
+    // Funcion para mostrar errores
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
 
     // Obtener tipo de usuario
     useEffect(() => {
@@ -204,7 +213,7 @@ export function Contenido({ datos, slug }) {
                     </div>
                 </div>
             </div>
-
+            {error && <span>{error}</span>}
             <div className="mt-5 align-items-center" style={{ height: '100vh', marginLeft: '20%' }}>
                 <Card className="mb-3" style={{ maxWidth: '75%' }}>
                     <Row >
@@ -272,7 +281,7 @@ export function Contenido({ datos, slug }) {
                                                                 if (result.isConfirmed) {
                                                                     await ContenidoEliminar(datos.id);
                                                                     Swal.fire("Eliminación exitosa", "", "success");
-                                                                    navigate('/contenido/all');
+                                                                    navigate(`/contenido/all/${slugDominio}/`);
                                                                 }
                                                             })
                                                         }}
@@ -303,6 +312,7 @@ export function Individual({ datos, slug }) {
     const [tipoUsuario, setTipo] = useState([]);
     // Slug del contenido
     const [slugContenido, setSlugContenido] = useState("");
+    const [error, setError] = useState("");
 
     // Obtener tipo de usuario
     const verificacion = async () => {
@@ -328,14 +338,22 @@ export function Individual({ datos, slug }) {
                     mostrarError(slugConte.data.error);
                 }
             }
-        } catch (error) {
-            if (error.message === "NOT_AUTHENTICATED") {
+        } catch (err) {
+            if (err.message === "NOT_AUTHENTICATED") {
                 navigate('/login');
             } else {
                 mostrarError('Error al cargar identificador de dominio');
             }
         }
     }
+
+    // Funcion para mostrar errores
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
 
     // Obtener tipo de usuario
     useEffect(() => {
@@ -387,7 +405,7 @@ export function Individual({ datos, slug }) {
                     </div>
                 </div>
             </div>
-
+            {error && <span>{error}</span>}
             <div className="mt-5 align-items-center" style={{ height: '100vh', marginLeft: '20%' }}>
                 <Card className="mb-3" style={{ maxWidth: '75%' }}>
                     <Row >
@@ -463,7 +481,7 @@ export function Individual({ datos, slug }) {
                                                                 if (result.isConfirmed) {
                                                                     await IndividualEliminar(datos.id);
                                                                     Swal.fire("Eliminación exitosa", "", "success");
-                                                                    navigate('/contenido/individual/all');
+                                                                    navigate(`/contenido/individual/all/${slugContenido}/`);
                                                                 }
                                                             })
                                                         }}

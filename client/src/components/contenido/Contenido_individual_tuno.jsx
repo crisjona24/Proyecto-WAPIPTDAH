@@ -107,7 +107,7 @@ export function ContenidoTipoOne({ context, slugContenido }) {
                     </div>
                 </div>
                 {/* Componente formulario */}
-                <FormularioUno context={context} usuario={tipoUsuario} />
+                <FormularioUno context={context} usuario={tipoUsuario} slugContenido={slugContenido} />
                 <div className="row col-md-12 mt-4 mb-2">
 
                     <>

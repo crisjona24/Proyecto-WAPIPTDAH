@@ -9,14 +9,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import { faBackward, faQuestion, fa1, fa2, fa3, fa4, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 // Metodos
-import { FormularioDos } from '../registro/Formulario_individual_2'
+import { FormularioNueve } from '../registro/Formulario_individual_9'
 import { VerificarUsuario } from "../../api/usuario.api"
 
-export function ContenidoTipoTwo({ context, slugContenido }) {
+export function ContenidoTipoNine({ context, slugContenido }) {
     /* *** Valores recuperados */
     const {
         nombre__contenido,
     } = context;
+
     // Verificacion de usuario
     const [tipoUsuario, setTipo] = useState([]);
     const navigate = useNavigate();
@@ -82,6 +83,7 @@ export function ContenidoTipoTwo({ context, slugContenido }) {
                 </div>
                 <div className="almacen__niveles row col-md-12">
                     <div className="contenedor__niveles mt-4 mb-4">
+
                         <>
                             {
                                 tipoUsuario.tipo === "paciente" &&
@@ -101,12 +103,13 @@ export function ContenidoTipoTwo({ context, slugContenido }) {
                                 </div>
                             }
                         </>
+
                     </div>
                 </div>
                 {/* Componente formulario */}
-                <FormularioDos context={context} usuario={tipoUsuario} slugContenido={slugContenido} />
-                {/* Fin componente formulario */}
+                <FormularioNueve context={context} usuario={tipoUsuario} slugContenido={slugContenido} />
                 <div className="row col-md-12 mt-4 mb-2">
+
                     <>
                         {
                             tipoUsuario.tipo === "paciente" &&
@@ -127,7 +130,9 @@ export function ContenidoTipoTwo({ context, slugContenido }) {
                             </div>
                         }
                     </>
+
                 </div>
+
             </div>
         </div>
     )

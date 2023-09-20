@@ -5,7 +5,7 @@ import { Button, Modal, Container, Row } from "react-bootstrap";
 // Componentes
 import { CabeceraRegister } from '../../components/partes/CabecerRegister'
 import { PieRegister } from '../../components/partes/PieRegister'
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import React, { useState } from 'react';
 // Metodos
 import { FormularioEdicion } from '../../components/edicion/Formularo_edicion'
@@ -14,6 +14,9 @@ export function DominioEdición() {
     const [show, setShow] = useState(false);
     const cerrar = () => setShow(false);
     const abrir = () => setShow(true);
+
+    // Obtener el parametro de la URL
+    let { slug } = useParams();
 
     return (
         <div style={{ width: '100%', height: '100%' }}>
@@ -51,7 +54,7 @@ export function DominioEdición() {
                             </Button>
                         </div>
                         <div className='card-body col-md-2'>
-                            <Link to={'/contenido/all'} className='btn btn-danger mt-2'>
+                            <Link to={`/dominio/detalle/${slug}/`} className='btn btn-danger mt-2'>
                                 Cancelar
                             </Link>
                         </div>

@@ -88,7 +88,7 @@ export function Actividad() {
 
 
 /* FORMULARIO CONTENIDO */
-export function FormularioContenido() {
+export function FormularioContenido({ slug }) {
     /* *** Form **** */
     const [nombre, setNombre] = useState("");
     const [dominio_tipo, setDominio] = useState("");
@@ -128,7 +128,7 @@ export function FormularioContenido() {
             const response = await CrearContenidoNew(formData);
             if (response.data.success) {
                 // Redireccionar a la página principal si el inicio de sesión es exitoso
-                navigate('/contenido/all');
+                navigate(`/contenido/all/${slug}/`);
             } else {
                 if (response.data.error) {
                     Swal.fire(response.data.error, '', 'error')

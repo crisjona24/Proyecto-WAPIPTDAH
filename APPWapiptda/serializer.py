@@ -55,7 +55,8 @@ class ContenidIndividualSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContenidoIndividual
         fields = ('id', 'descripcion_individual', 'respuesta', 'identificador_individual', 'slug_contenido_individual',
-                  'portada_individual', 'nivel', 'tipo_contenido', 'contenido_individual', 'contenido')
+                  'portada_individual', 'nivel', 'tipo_contenido', 'contenido_individual', 'imagen1', 'contenido',
+                  'imagen2', 'imagen3')
 
 
 class ResultadoSerializer(serializers.ModelSerializer):
