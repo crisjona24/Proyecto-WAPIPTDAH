@@ -163,7 +163,7 @@ class ListaSoloContenidosView(viewsets.ModelViewSet):
     queryset = Contenido.objects.all()
     serializer_class = ContenidoSerializer
 
-""" List """
+""" Listados personalizados """
 
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
@@ -189,6 +189,7 @@ def lista_cotenido_dominio(ob1):
         return []
 
 
+
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -211,6 +212,7 @@ def lista_actividades_contenido(ob1):
         return []
     except ContenidoIndividual.DoesNotExist:
         return []
+
 
 
 # PROTECCION CON JWT
@@ -242,6 +244,7 @@ def lista_actividades_nombreNi(ob1, ob2):
         return []
 
 
+
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -267,6 +270,7 @@ def reporte_de_usuario(id_usuario):
         return []
 
 
+
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -275,7 +279,8 @@ class PeticionListViewNo(generics.ListAPIView):
     pagination_class = Paginacion
     def get_queryset(self):
         return Peticion.objects.filter(estado_revision=False)
-    
+
+
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -285,6 +290,8 @@ class PeticionListViewSi(generics.ListAPIView):
     def get_queryset(self):
         return Peticion.objects.filter(estado_revision=True)
 
+
+
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -293,6 +300,7 @@ class PeticionUCListView(generics.ListAPIView):
     pagination_class = Paginacion
     def get_queryset(self):
         return Peticion.objects.filter(usuario_comun=self.kwargs['id'], estado_revision=True)
+
 
 
 # PROTECCION CON JWT
@@ -317,6 +325,7 @@ def pacientes_list(id_curso):
     except DetalleInscripcionCurso.DoesNotExist:
         return []
 
+
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -331,6 +340,8 @@ class ResultadodePacienteListView(generics.ListAPIView):
         # Filtrar resultados por paciente
         resultados = Resultado.objects.filter(paciente__in=pacientes)
         return resultados
+
+
 
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
@@ -425,6 +436,8 @@ def usuario_salas_list(usuario_comun):
     except DetalleSala.DoesNotExist:
         return []
 
+
+
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -451,6 +464,8 @@ def usuario_salas_list_a(usuario_comun):
         return []
     except DetalleSala.DoesNotExist:
         return []
+
+
 
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
@@ -483,6 +498,8 @@ def usuario_cursos_list(request):
             return []
     except UsuarioComun.DoesNotExist:
         return []
+
+
 
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
@@ -550,6 +567,7 @@ def nombre_contenido_exist(nombre):
     return False
 
 
+
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -574,6 +592,8 @@ def nombre_curso_exist(nombre):
     except Curso.DoesNotExist:
         return False
     return False
+
+
 
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
