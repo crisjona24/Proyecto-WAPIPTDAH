@@ -197,3 +197,6 @@ EMAIL_USE_SSL = False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
+
+# DOMINIO   
+SITE_URL = "http://aprender-wapiptdah.com"

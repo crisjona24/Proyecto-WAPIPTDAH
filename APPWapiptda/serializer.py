@@ -13,21 +13,21 @@ class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
         fields = ('nombre_usuario', 'apellido_usuario', 'email_usuario',
-                  'username_usuario', 'celular', 'fecha_nacimiento', 'user')
+                  'username_usuario', 'celular', 'fecha_nacimiento', 'is_activo', 'user')
 
 
 class PacienteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Paciente
         fields = ( 'id', 'nombre_usuario', 'apellido_usuario', 'email_usuario', 'username_usuario',
-                  'celular', 'contacto_emergencia', 'fecha_nacimiento', 'direccion', 'edad', 'user')
+                  'celular', 'contacto_emergencia', 'fecha_nacimiento', 'direccion', 'edad', 'is_activo', 'user')
 
 
 class ComunSerializer(serializers.ModelSerializer):
     class Meta:
         model = UsuarioComun
         fields = ('nombre_usuario', 'apellido_usuario', 'email_usuario', 'username_usuario',
-                  'celular', 'genero', 'fecha_nacimiento', 'area_estudio', 'edad', 'user')
+                  'celular', 'genero', 'fecha_nacimiento', 'area_estudio', 'edad', 'is_activo', 'user')
 
 
 class GraditoTDAHSerializer(serializers.ModelSerializer):

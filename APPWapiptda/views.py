@@ -6,7 +6,9 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import viewsets, generics
 from django.contrib.auth import authenticate, login, logout
 import re
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
+from django.urls import reverse
+
 # from django.views.decorators.csrf import csrf_exempt
 import json
 import cloudinary
@@ -22,17 +24,8 @@ from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from django.conf import settings
 from django.core.mail import send_mail
 
-### PAGINACION ###
-from rest_framework.pagination import PageNumberPagination
-
-class Paginacion(PageNumberPagination):
-    page_size = 8
-
-class Paginacion2(PageNumberPagination):
-    page_size = 6
-
-# Create your views here.
-
+# Token de verificacion de cuenta
+from django.core.signing import Signer, BadSignature
 
 
 ## METODOS VARIOS ###
@@ -139,36 +132,51 @@ def api_login(request):
             if user is not None:
                 if user.is_authenticated:
                     login(request, user)
-                    """token, _ = Token.objects.get_or_create(user=user)
-                    context = {
-                        'success': True,
-                        'token': token.key,
-                    }"""
                     refresh=RefreshToken.for_user(user)
                     access_token = str(refresh.access_token)
                     # Verificamos el tipo de usuario
                     if is_paciente(user):
-                        context = {
-                            'success': True,
-                            'tipo': 'paciente',
-                            'token': access_token,
-                        }
-                        # Response({'token': token.key})
-                        return JsonResponse(context)
+                        user_ob = Paciente.objects.get(user=user)
+                        if user_ob.is_activo:
+                            context = {
+                                'success': True,
+                                'tipo': 'paciente',
+                                'token': access_token,
+                            }
+                            return JsonResponse(context)
+                        else:
+                            context = {
+                                'error': 'El usuario no esta activo',
+                            }
+                            return JsonResponse(context, status=401)
                     elif is_tecnico(user):
-                        context = {
-                            'success': True,
-                            'tipo': 'tecnico',
-                            'token': access_token,
-                        }
-                        return JsonResponse(context)
+                        user_ob = Usuario.objects.get(user=user)
+                        if user_ob.is_activo:
+                            context = {
+                                'success': True,
+                                'tipo': 'tecnico',
+                                'token': access_token,
+                            }
+                            return JsonResponse(context)
+                        else:
+                            context = {
+                                'error': 'El usuario no esta activo',
+                            }
+                            return JsonResponse(context, status=401)
                     elif is_comun(user):
-                        context = {
-                            'success': True,
-                            'tipo': 'comun',
-                            'token': access_token,
-                        }
-                        return JsonResponse(context)
+                        user_ob = UsuarioComun.objects.get(user=user)
+                        if user_ob.is_activo:
+                            context = {
+                                'success': True,
+                                'tipo': 'comun',
+                                'token': access_token,
+                            }
+                            return JsonResponse(context)
+                        else:
+                            context = {
+                                'error': 'El usuario no esta activo',
+                            }
+                            return JsonResponse(context, status=401)
                 else:
                     context = {
                         'error': 'Usuario o contraseña incorrectos',
@@ -675,6 +683,7 @@ def existe__registro(ob1, ob2):
         return False
     return False
 
+
 def username_exist(ob1):
     try:
         if Paciente.objects.filter(username_usuario__iexact=ob1).exists():
@@ -690,6 +699,69 @@ def username_exist(ob1):
     except Usuario.DoesNotExist:
         return False
     return False
+
+
+def validar_correo_link(_email):
+    try:
+        signer = Signer()
+        token_firmado = signer.sign(_email)
+        # Email
+        subject = 'Confirmación de cuenta'
+        #message = f'Haz clic en el siguiente enlace para verificar tu cuenta: {settings.SITE_URL}/verificar/{token_firmado}'
+        message = f'Copia y pega el siguiente código especial para verificar tu cuenta: {token_firmado}'
+        from_email = settings.EMAIL_HOST_USER
+        receiver_email = [_email]
+        send_mail(subject, message, from_email, receiver_email, fail_silently=False)
+        return True
+    except Exception as e:
+        print(f"Error enviando el correo: {e}")
+        return False
+
+@api_view(['POST'])
+def verificar_email_firmado(request):
+    try:
+        if request.method == 'POST':
+            data = json.loads(request.body)
+            token = data.get('tokenVerificacion')
+            signer = Signer()
+            email_original = signer.unsign(token)
+            user_ob = User.objects.get(email=email_original)
+            if is_tecnico(user_ob):
+                usuario__ob = Usuario.objects.get(user=user_ob)
+                if verificado_correo(usuario__ob):
+                    return JsonResponse({'error': 'El usuario ya esta activo'})
+                usuario__ob.is_activo = True
+                usuario__ob.save()
+                return JsonResponse({'success': True})
+            elif is_paciente(user_ob):
+                paciente__ob = Paciente.objects.get(user=user_ob)
+                if verificado_correo(paciente__ob):
+                    return JsonResponse({'error': 'El usuario ya esta activo'})
+                paciente__ob.is_activo = True
+                paciente__ob.save()
+                return JsonResponse({'success': True})
+            elif is_comun(user_ob):
+                comun__ob = UsuarioComun.objects.get(user=user_ob)
+                if verificado_correo(comun__ob):
+                    return JsonResponse({'error': 'El usuario ya esta activo'})
+                comun__ob.is_activo = True
+                comun__ob.save()
+                return JsonResponse({'success': True})
+            else:
+                return JsonResponse({'error': 'Código de verificación inválido o ha expirado'})
+        else: 
+            return JsonResponse({'error': 'Código de verificación inválido o ha expirado'})
+    except BadSignature:
+       return JsonResponse({'error': 'Código de verificación inválido o ha expirado'})
+
+
+def verificado_correo(ob1):
+    # verificar si el objeto usuario esta activo
+    if ob1.is_activo:
+        return True
+    else:
+        return False
+
 
 # METODO DE REGISTRO DE USUARIO
 @api_view(['POST'])
@@ -717,6 +789,9 @@ def api_user_register(request):
                 if username_exist(username_):
                     return JsonResponse({'error': 'El nombre de usuario ya existe'})
                 else:
+                    # Verificar confirmacion de cuenta
+                    if not validar_correo_link(email_):
+                        return JsonResponse({'error': 'El correo es invalido o no existe'})
                     # Creamos el usuario
                     user = User.objects.create(
                         first_name=first_name_,
@@ -775,6 +850,9 @@ def api_paciente_register(request):
                 if username_exist(username_):
                     return JsonResponse({'error': 'El nombre de usuario ya existe'})
                 else:
+                    # Verificar confirmacion de cuenta
+                    if not validar_correo_link(email_):
+                        return JsonResponse({'error': 'El correo es invalido o no existe'})
                     # Creamos el usuario
                     user_new = User.objects.create(
                         first_name=first_name_,
@@ -835,6 +913,9 @@ def api_comun_register(request):
                 if username_exist(username_):
                     return JsonResponse({'error': 'El nombre de usuario ya existe'})
                 else:
+                    # Verificar confirmacion de cuenta
+                    if not validar_correo_link(email_):
+                        return JsonResponse({'error': 'El correo es invalido o no existe'})
                     # Creamos el usuario
                     user = User.objects.create(
                         first_name=first_name_,

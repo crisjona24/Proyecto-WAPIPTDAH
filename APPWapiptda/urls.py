@@ -29,6 +29,8 @@ router.register('contenidos', ListaSoloContenidosView)
 
 urlpatterns = [
     path('aplicacion/', include(router.urls)),
+    # Token
+    path('verificar/cuenta/', verificar_email_firmado, name='verificar-cuenta'),
     ### LISTADOS PERSONALIZADOS ###
     path('contenidos/<str:slug>/', ContenidoListView.as_view(), name='contenidos-list'),
     path('contenidos/individuales/<str:slug>/', ContenidoIndividualListView.as_view(), name='contenidos-individuales-list'),

@@ -71,6 +71,7 @@ export function FormularioUsuario() {
         const response = await UsuarioCrearNuevo(datos__post);
         // Confirmar operación
         if (response.data.success) {
+            Swal.fire("Visite su correo electrónco y use el código de verificación", "", "success");
             navigate('/login');
         } else {
             if (response.data.error) {
@@ -295,6 +296,7 @@ export function FormularioComun() {
         const response = await CrearComunNew(datos__post);
         // Confirmar operación
         if (response.data.success) {
+            Swal.fire("Visite su correo electrónco y use el código de verificación", "", "success");
             navigate('/login');
         } else {
             if (response.data.error) {
@@ -541,6 +543,7 @@ export function FormularioPaciente() {
         const response = await CrearPaciente(datos__post);
         // Confirmar operación
         if (response.data.success) {
+            Swal.fire("Visite su correo electrónco y use el código de verificación", "", "success");
             navigate('/login');
         } else {
             if (response.data.error) {

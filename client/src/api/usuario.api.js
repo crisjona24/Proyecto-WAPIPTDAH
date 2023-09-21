@@ -288,4 +288,7 @@ export const InscripcionCurso = (id) => {
     }
 };
 
-
+// Verificacion de cuenta
+export const VerificarCuenta = async (datos__post) => {
+    return await baseurl.post('verificar/cuenta/', datos__post);
+};

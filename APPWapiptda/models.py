@@ -32,6 +32,7 @@ class Usuario(models.Model):
     slug_usuario = models.SlugField(unique=True, blank=True)
     fecha_registro_usuario = models.DateField(auto_now=True)
     is_tecnico = models.BooleanField(default=True)
+    is_activo = models.BooleanField(default=False)
     # Correo
     confirmation_token = models.CharField(max_length=40, blank=True)
     # Correo
@@ -75,6 +76,7 @@ class Paciente(models.Model):
     slug_usuario = models.SlugField(unique=True, blank=True)
     fecha_registro_usuario = models.DateField(auto_now=True)
     is_paciente = models.BooleanField(default=True)
+    is_activo = models.BooleanField(default=False)
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, blank=True, null=True)
     
@@ -109,6 +111,7 @@ class UsuarioComun(models.Model):
     slug_usuario = models.SlugField(unique=True, blank=True)
     fecha_registro_usuario = models.DateField(auto_now=True)
     is_comun = models.BooleanField(default=True)
+    is_activo = models.BooleanField(default=False)
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, blank=True, null=True)
 

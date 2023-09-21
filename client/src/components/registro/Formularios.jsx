@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 // Metodos
 import { info__nivel, info__dominio } from '../../controles/controlador_registro';
 import { CrearCurso } from '../../api/curso.api';
+import { VerificarCuenta } from '../../api/usuario.api';
 import { CrearNivelNew } from '../../api/grado.api';
 import { CrearPeticion, AtenderPeticion } from '../../api/peticion.api';
 import { validarTamanoImagen } from '../../controles/alert_user';
@@ -919,6 +920,104 @@ export function FormularioPeticionRevision() {
                 </select>
             </div>
             <Button type="submit" variant="success">Enviar</Button>
+        </form>
+    )
+
+}
+
+
+// Formulario de confirmacion de cuenta
+export function FormularioConfirmacion() {
+    /* *** Form **** */
+    const [tokenVerificacion, setToken] = useState("");
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
+
+    // Operacion de guardado
+    const enviarFConfirmacion = async (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (!valoresValidos()) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Flujo normal
+        try {
+            // Obtenemos los datos
+            const datos__post = {
+                tokenVerificacion
+            };
+            // Funcion de registro
+            await confirmGuardado(datos__post);
+        } catch (err) {
+            mostrarError('Error al verificar cuenta');
+        }
+    };
+
+    // Campos vacios
+    const valoresValidos = () => {
+        if (
+            tokenVerificacion.trim() === ""
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    // Mostrar error
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
+
+    // Registro de sala
+    const confirmGuardado = async (datos__post) => {
+        return Swal.fire({
+            title: '¿Desea verificar el registro de cuenta?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Verificar',
+            denyButtonText: 'No verificar',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    // Realizar la petición POST al servidor
+                    const response = await VerificarCuenta(datos__post);
+                    if (response.data.success) {
+                        // Redireccionar a la página principal si el inicio de sesión es exitoso
+                        Swal.fire("Verificación registrada correctamente", "", "success");
+                        navigate('/login');
+                    } else {
+                        if (response.data.error) {
+                            Swal.fire(response.data.error, '', 'error');
+                            navigate('/login')
+                        } else {
+                            Swal.fire('Error al verificar', '', 'error');
+                            navigate('/login')
+                        }
+                    }
+                } catch (err) {
+                    Swal.fire('Error al verificar', '', 'error');
+                    navigate('/login')
+                }
+            } else if (result.isDenied) {
+                Swal.fire('La verificación no se ha enviado', '', 'info');
+                navigate('/login')
+            }
+        });
+    };
+
+    return (
+        <form onSubmit={enviarFConfirmacion}>
+            {error && <span>{error}</span>}
+            <div className="form-group">
+                <label className='label' htmlFor="codigo">Ingrese el código proporcionado :</label>
+                <input className='form-control w-100' type="text" placeholder="Ingrese el código**" id="codigo"
+                    name="codigo" value={tokenVerificacion} onChange={e => setToken(e.target.value)} />
+            </div>
+            <Button type="submit" variant="success">Verificar</Button>
         </form>
     )
 

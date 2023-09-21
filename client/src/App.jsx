@@ -1,6 +1,6 @@
 // REALIZAR IMPORTACIONES
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { UsuarioRegistro } from "./pages/registro/UsuarioRegistro";
+import { UsuarioRegistro, ConfirmacionCuenta } from "./pages/registro/UsuarioRegistro";
 import { IniciarSesion } from "./pages/login/LoginUser";
 import { NivelPrincipalAll } from "./pages/general/NivelPrincipalAll";
 import { DominioPrincipalAll } from "./pages/general/DominioPrincipalAll";
@@ -47,6 +47,7 @@ function App() {
         {/* LOGIN */}
         <Route path="/login" element={<IniciarSesion />} />
         {/* RUTA DE REGISTRO */}
+        <Route path="/verificar/cuenta" element={<ConfirmacionCuenta />} />
         <Route path="/registro" element={<SeleccionActividad />} />
         <Route path="/usuario/paciente/registro" element={<UsuarioPacienteRegistro />} />
         <Route path="/usuario/comun/registro" element={<UsuarioComunRegistro />} />
