@@ -78,6 +78,8 @@ export function FormularioUsuario() {
             } else if (response.data.clave) {
                 Swal.fire(response.data.clave, '', 'error');
                 mostrarError('La clave debe tener mínimo 8 caracteres que incluye una letra mayúscula, un número y un símbolo');
+            } else if (response.data.correo) {
+                Swal.fire(response.data.correo, '', 'error');
             } else {
                 mostrarError('Datos no válidos');
             }
@@ -300,6 +302,8 @@ export function FormularioComun() {
             } else if (response.data.clave) {
                 Swal.fire(response.data.clave, '', 'error');
                 mostrarError('La clave debe tener mínimo 8 caracteres que incluye una letra mayúscula, un número y un símbolo');
+            } else if (response.data.correo) {
+                Swal.fire(response.data.correo, '', 'error');
             } else {
                 mostrarError('Datos no válidos');
             }
@@ -544,6 +548,8 @@ export function FormularioPaciente() {
             } else if (response.data.clave) {
                 Swal.fire(response.data.clave, '', 'error');
                 mostrarError('La clave debe tener mínimo 8 caracteres que incluye una letra mayúscula, un número y un símbolo');
+            } else if (response.data.correo) {
+                Swal.fire(response.data.correo, '', 'error');
             } else {
                 mostrarError('Datos no válidos');
             }

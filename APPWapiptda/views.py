@@ -36,6 +36,12 @@ class Paginacion2(PageNumberPagination):
 
 
 ## METODOS VARIOS ###
+def es_correo_valido(correo):
+    er = r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])"
+    if re.match(er, correo) is not None:
+        return True
+    else:
+        return False
 
 def validar_clave(ob1):
     """
@@ -698,6 +704,10 @@ def api_user_register(request):
             password_ = data.get('password_usuario')
             celular_ = data.get('celular')
             fecha_ = data.get('fecha_nacimiento')
+            # Veriicar correo valido
+            if es_correo_valido(email_) == False:
+                return JsonResponse({'correo': 'Correo invalido'})
+            # Verificar clave
             if validar_clave(password_) == False:
                 return JsonResponse({'clave': 'Clave sin requisitos mínimos'})
             # Verificar si el usuario ya existe
@@ -752,6 +762,10 @@ def api_paciente_register(request):
             fecha_ = data.get('fecha_nacimiento')
             contacto_emergencia_ = data.get('contacto_emergencia')
             direccion_ = data.get('direccion')
+            # Veriicar correo valido
+            if es_correo_valido(email_) == False:
+                return JsonResponse({'correo': 'Correo invalido'})
+            # Verificar clave
             if validar_clave(password_) == False:
                 return JsonResponse({'clave': 'Clave sin requisitos mínimos'})
             # Verificar si el usuario ya existe
@@ -808,6 +822,10 @@ def api_comun_register(request):
             fecha_ = data.get('fecha_nacimiento')
             genero_ = data.get('genero')
             area_ = data.get('area_estudio')
+            # Veriicar correo valido
+            if es_correo_valido(email_) == False:
+                return JsonResponse({'correo': 'Correo invalido'})
+            # Verificar clave
             if validar_clave(password_) == False:
                 return JsonResponse({'clave': 'Clave sin requisitos mínimos'})
             # Verificar si el usuario ya existe
