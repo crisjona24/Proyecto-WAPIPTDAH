@@ -121,8 +121,6 @@ export function FormularioUsuario() {
     useEffect(() => {
         if (token) {
             obtenerDatosUsuario();
-        } else {
-            navigate('/login');
         }
     }, []);
 
