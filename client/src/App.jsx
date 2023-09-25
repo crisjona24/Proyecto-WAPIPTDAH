@@ -1,42 +1,52 @@
 // REALIZAR IMPORTACIONES
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { UsuarioRegistro, ConfirmacionCuenta } from "./pages/registro/UsuarioRegistro";
+{/* Login */ }
 import { IniciarSesion } from "./pages/login/LoginUser";
+
+{/* Perfil  - Tarjetas de datos */ }
+import { Perfil_User } from "./pages/general/Perfil"
+
+{/* Registro */ }
+import { UsuarioRegistro, ConfirmacionCuenta } from "./pages/registro/UsuarioRegistro";
+import { UsuarioPacienteRegistro } from "./pages/registro/UsuarioPacienteRegistro";
+import { UsuarioComunRegistro } from "./pages/registro/UsuarioComunRegistro";
+import { DominioRegistro } from "./pages/registro/DominioRegistro";
+import { ContenidoRegistro } from "./pages/registro/ContenidoRegistro";
+import { NivelRegistro } from "./pages/registro/NivelRegistro";
+import { IndividualRegistro } from "./pages/registro/ContenidoIndividualRegistro";
+import { CursoRegistro } from "./pages/registro/CursoRegistro";
+import { PeticionRegistro } from "./pages/registro/PeticionRegistro";
+import { SalaRegistro, RevisionPeticionRegistro } from "./pages/registro/SalaRegistro";
+
+{/* Listado */ }
 import { NivelPrincipalAll } from "./pages/general/NivelPrincipalAll";
 import { DominioPrincipalAll } from "./pages/general/DominioPrincipalAll";
 import { ContenidoPrincipalAll } from "./pages/general/ContenidoPrincipalAll";
 import { IndividualPrincipalAll } from "./pages/general/IndividualPrincipalAll";
 import { CursosALL } from "./pages/general/CursosAll";
-import { DominioRegistro } from "./pages/registro/DominioRegistro";
-import { ContenidoRegistro } from "./pages/registro/ContenidoRegistro";
-import { NivelRegistro } from "./pages/registro/NivelRegistro";
-import { IndividualRegistro } from "./pages/registro/ContenidoIndividualRegistro";
-import { ContenidoIndividual } from "./pages/general/ContenidoIndividual"
-import { SeleccionActividad } from "./pages/registro/SeleccionActividad"
-import { UsuarioPacienteRegistro } from "./pages/registro/UsuarioPacienteRegistro"
-import { UsuarioComunRegistro } from "./pages/registro/UsuarioComunRegistro"
-import { Perfil_User } from "./pages/general/Perfil"
-import { CursoRegistro } from "./pages/registro/CursoRegistro"
-import { PeticionRegistro } from "./pages/registro/PeticionRegistro"
-import { Peticionall, PeticionAllAtendida, PeticionUC } from "./pages/general/PeticionAll"
-import { PacientesALL } from "./pages/general/PacientesAll"
-import { Resultadoall } from "./pages/general/ResultadosAll"
-import { SalasALL, SalasPaciente, SalasAtendidasALL } from "./pages/general/SalasAll"
-import { SalaRegistro, RevisionPeticionRegistro } from "./pages/registro/SalaRegistro"
-import { ReportesALL } from "./pages/general/ReportesAll"
-{/* Informacion */ }
-import { InformacionDominio, InformacionContenido, InformacionIndividual, InformacionPaciente } from "./pages/general/InformacionDatos"
-{/* Edicion  */ }
-import { ContenidoEdición } from "./pages/edicion/ContenidoEdicion"
-import { DominioEdición } from "./pages/edicion/DominioEdicion"
-import { IndividualEdición } from "./pages/edicion/IndividualEdicion"
-import { NivelEdición } from "./pages/edicion/NivelEdicion"
-import { CursoEdicion } from "./pages/edicion/CursoEdicion"
-import { ResultadoEdicion } from "./pages/edicion/ResultadoEdicion"
-import { SalasEdicion } from "./pages/edicion/SalaEdicion"
-import { Probando } from "./pages/general/Probando"
+import { ContenidoIndividual } from "./pages/general/ContenidoIndividual";
+import { SeleccionActividad } from "./pages/registro/SeleccionActividad";
+import { Peticionall, PeticionAllAtendida, PeticionUC } from "./pages/general/PeticionAll";
+import { PacientesALL } from "./pages/general/PacientesAll";
+import { Resultadoall } from "./pages/general/ResultadosAll";
+import { SalasALL, SalasPaciente, SalasAtendidasALL } from "./pages/general/SalasAll";
+import { ReportesALL } from "./pages/general/ReportesAll";
 
+{/* Edicion  */ }
+import { ContenidoEdición } from "./pages/edicion/ContenidoEdicion";
+import { DominioEdición } from "./pages/edicion/DominioEdicion";
+import { IndividualEdición } from "./pages/edicion/IndividualEdicion";
+import { NivelEdición } from "./pages/edicion/NivelEdicion";
+import { CursoEdicion } from "./pages/edicion/CursoEdicion";
+import { ResultadoEdicion } from "./pages/edicion/ResultadoEdicion";
+import { SalasEdicion } from "./pages/edicion/SalaEdicion";
+import { Probando } from "./pages/general/Probando"
+{/* Informacion */ }
 import { Ver, VerPeticion } from "./pages/general/Verpdf"
+import {
+  InformacionDominio, InformacionContenido, InformacionIndividual,
+  InformacionPaciente
+} from "./pages/general/InformacionDatos";
 
 function App() {
   return (
