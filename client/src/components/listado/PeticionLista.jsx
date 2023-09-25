@@ -67,7 +67,7 @@ export function PeticionLista() {
                     <div className="row">
                         <div className="col-md-12">
                             <h4 className="display-7 mt-2">
-                                Peticiones
+                                Peticiones - Pendientes
                             </h4>
                         </div>
                     </div>
@@ -144,7 +144,7 @@ export function PeticionListaAtendi() {
                     <div className="row">
                         <div className="col-md-12">
                             <h4 className="display-7 mt-2">
-                                Peticiones
+                                Peticiones - Atendidas
                             </h4>
                         </div>
                     </div>

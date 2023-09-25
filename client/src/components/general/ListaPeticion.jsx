@@ -70,7 +70,7 @@ export function ListaPeticion({ peticiones, page, setPage, numeroPag }) {
                                                                         showCancelButton: true,
                                                                         confirmButtonColor: '#3085d6',
                                                                         cancelButtonColor: '#d33',
-                                                                        confirmButtonText: 'Sí, enviar'
+                                                                        confirmButtonText: 'Sí, eliminar'
                                                                     }).then(async (result) => {
                                                                         if (result.isConfirmed) {
                                                                             await PeticionEliminar(peticion.id);
@@ -137,7 +137,7 @@ export function ListaPeticion({ peticiones, page, setPage, numeroPag }) {
                                         <FontAwesomeIcon icon={faBackward} />
                                     </Link>
                                 </div>
-                                <div className="col-sm-7 col-xs-7">Información - Peticiones</div>
+                                <div className="col-sm-7 col-xs-7">Información - Peticiones Pendientes</div>
                                 <div className="pagination-controls col-sm-4 col-xs-4">
                                     <Button onClick={anterior} disabled={page === 1}
                                         className="separacion--boton" title="Atrás">
@@ -210,7 +210,7 @@ export function ListaPeticionAtendida({ peticiones, page, setPage, numeroPag }) 
                                                                         showCancelButton: true,
                                                                         confirmButtonColor: '#3085d6',
                                                                         cancelButtonColor: '#d33',
-                                                                        confirmButtonText: 'Sí, enviar'
+                                                                        confirmButtonText: 'Sí, eliminar'
                                                                     }).then(async (result) => {
                                                                         if (result.isConfirmed) {
                                                                             await PeticionEliminar(peticion.id);
