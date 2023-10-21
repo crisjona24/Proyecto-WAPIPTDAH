@@ -159,7 +159,7 @@ export function Navbar_T() {
                     <Link to={'/resultado/all'} title='Resultados'> <FontAwesomeIcon icon={faPenToSquare} style={{ marginRight: '4%' }} />Resultados</Link>
                 </li>
                 <li>
-                    <Link> <FontAwesomeIcon icon={faMessage} style={{ marginRight: '4%' }} />Contact</Link>
+                    <Link to={'/registro/contacto'} title='Contacto'> <FontAwesomeIcon icon={faMessage} style={{ marginRight: '4%' }} />Contacto</Link>
                 </li>
                 <hr />
                 <li>
@@ -354,7 +354,7 @@ export function Navbar_C() {
                     <Link to={'/reporte/all'}><FontAwesomeIcon icon={faFile} style={{ marginRight: '4%' }} />Reportes</Link>
                 </li>
                 <li>
-                    <Link> <FontAwesomeIcon icon={faMessage} style={{ marginRight: '4%' }} />Contact</Link>
+                    <Link to={'/registro/contacto'} title='Contacto'> <FontAwesomeIcon icon={faMessage} style={{ marginRight: '4%' }} />Contacto</Link>
                 </li>
                 <hr />
                 <li>
@@ -558,7 +558,7 @@ export function Navbar_Paci() {
                     </ul>
                 </li>
                 <li>
-                    <Link> <FontAwesomeIcon icon={faMessage} style={{ marginRight: '4%' }} />Contacto</Link>
+                    <Link to={'/registro/contacto'} title='Contacto'> <FontAwesomeIcon icon={faMessage} style={{ marginRight: '4%' }} />Contacto</Link>
                 </li>
                 <hr />
                 <li>
@@ -661,7 +661,7 @@ export function Navbar_Defect() {
                     </ul>
                 </li>
                 <li>
-                    <Link> <FontAwesomeIcon icon={faMessage} style={{ marginRight: '4%' }} />Contact</Link>
+                    <Link to={'/registro/contacto'} title='Contacto'> <FontAwesomeIcon icon={faMessage} style={{ marginRight: '4%' }} />Contacto</Link>
                 </li>
                 <hr />
                 <li>
