@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 import { info__nivel, info__dominio } from '../../controles/controlador_registro';
 import { CrearCurso } from '../../api/curso.api';
 import { VerificarCuenta } from '../../api/usuario.api';
-import { CrearNivelNew } from '../../api/grado.api';
+import { CrearNivelNew, EnviarCorreo } from '../../api/grado.api';
 import { CrearPeticion, AtenderPeticion } from '../../api/peticion.api';
 import { validarTamanoImagen } from '../../controles/alert_user';
 import { CrearDominioNew } from '../../api/dominio.api';
@@ -22,6 +22,7 @@ export function Actividad() {
     /* *** Form **** */
     const [actividad, setActividad] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -32,6 +33,7 @@ export function Actividad() {
             return;
         }
         // Flujo normal
+        setHabilitado(true);
         try {
             if (actividad === "Tecnico") {
                 // Redireccionar a la página principal si el inicio de sesión es exitoso
@@ -49,6 +51,7 @@ export function Actividad() {
         } catch (err) {
             mostrarError('Error al seleccionar actividad');
         }
+        setHabilitado(false);
     };
 
     // Mostrar error
@@ -82,7 +85,9 @@ export function Actividad() {
                     <option value="Comun">Común</option>
                 </select>
             </div>
-            <button type='submit' className='btn btn-success'>Seleccionar</button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Seleccionando...' : 'Seleccionar'}
+            </Button>
         </form>
     )
 }
@@ -96,6 +101,7 @@ export function FormularioContenido({ slug }) {
     const [portada, setPortada] = useState("");
     const [dominios, setDominios] = useState([]);
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
 
     const enviar = async (e) => {
@@ -106,6 +112,7 @@ export function FormularioContenido({ slug }) {
             return;
         }
         //Flujo normal
+        setHabilitado(true);
         try {
             const formData = new FormData(); // Crear un objeto FormData
             formData.append('nombre', nombre);
@@ -120,6 +127,7 @@ export function FormularioContenido({ slug }) {
                 mostrarError('Error al registrar contenido');
             }
         }
+        setHabilitado(false);
     };
 
     // Funcion para guardar datos
@@ -212,8 +220,8 @@ export function FormularioContenido({ slug }) {
                     onChange={e => { setPortada(e.target.files[0]); validarTamanoImagen(e.target) }}
                     name='portada_contenido' accept="image/*" />
             </div>
-            <Button type='submit' className='btn btn-success' >
-                Guardar
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Guardando...' : 'Guardar'}
             </Button>
         </form>
     )
@@ -226,6 +234,7 @@ export function FormularioCurso() {
     const [nombre_curso, setNombreCurso] = useState("");
     const [descripcion, setDescripcionCurso] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
 
     // Operacion de guardado
@@ -237,6 +246,7 @@ export function FormularioCurso() {
             return;
         }
         // Flujo normal
+        setHabilitado(true);
         try {
             // Obtenemos los datos
             const datos__post = {
@@ -252,6 +262,7 @@ export function FormularioCurso() {
                 mostrarError('Error al registrar curso');
             }
         }
+        setHabilitado(false);
     };
 
     // Funcion para guardar
@@ -304,7 +315,9 @@ export function FormularioCurso() {
                 <input className='form-control w-100' type="text" placeholder="Ingrese una descripción corta**" id="descripcion"
                     value={descripcion} onChange={e => setDescripcionCurso(e.target.value)} />
             </div>
-            <Button type="submit" variant="success">Guardar</Button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Guardando...' : 'Guardar'}
+            </Button>
         </form>
     );
 
@@ -319,6 +332,7 @@ export function FormularioNivel() {
     const [numero_categorias, setNumeroCategorias] = useState(0);
     const [grado_dificultad, setGradoDificultad] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
 
     const enviarN = async (e) => {
@@ -329,6 +343,7 @@ export function FormularioNivel() {
             return;
         }
         //Flujo normal
+        setHabilitado(true);
         try {
             // Obtenemos los datos
             const datos__post = {
@@ -347,6 +362,7 @@ export function FormularioNivel() {
                 mostrarError('Error al registrar nivel');
             }
         }
+        setHabilitado(false);
     };
 
     // Funcion para guardar
@@ -423,7 +439,9 @@ export function FormularioNivel() {
                     <option value="Moderado">Nivel moderado</option>
                 </select>
             </div>
-            <Button type="submit" variant="success">Guardar</Button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Guardando...' : 'Guardar'}
+            </Button>
         </form>
     );
 }
@@ -436,6 +454,7 @@ export function FormularioDominio() {
     const [descripcion, setDescripcion] = useState("");
     const [portada_dominio, setPortada] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
 
     // Operacion de guardado
@@ -447,6 +466,7 @@ export function FormularioDominio() {
             return;
         }
         //Flujo normal
+        setHabilitado(true);
         try {
             const formData = new FormData(); // Crear un objeto FormData
             formData.append('nombre', nombre);
@@ -461,6 +481,7 @@ export function FormularioDominio() {
                 mostrarError('Error al registrar dominio');
             }
         }
+        setHabilitado(false);
     };
 
     // Funcion para guardar
@@ -524,7 +545,9 @@ export function FormularioDominio() {
                 <input className='form-control w-100' type="file" id="portada_dominio"
                     onChange={e => { setPortada(e.target.files[0]); validarTamanoImagen(e.target) }} name='portada_dominio' accept="image/*" />
             </div>
-            <Button type="submit" variant="success">Guardar</Button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Guardando...' : 'Guardar'}
+            </Button>
         </form>
     )
 }
@@ -537,6 +560,7 @@ export function FormularioPeticion() {
     const [tipo, setTipo] = useState("");
     const [peticion_cuerpo, setPeticionCuerpo] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
 
     // Operacion de guardado
@@ -548,6 +572,7 @@ export function FormularioPeticion() {
             return;
         }
         //Flujo normal
+        setHabilitado(true);
         try {
             const formData = new FormData(); // Crear un objeto FormData
             formData.append('motivo', motivo);
@@ -562,6 +587,7 @@ export function FormularioPeticion() {
                 mostrarError('Error al registrar petición');
             }
         }
+        setHabilitado(false);
     };
 
     // Funcion para guardar 
@@ -640,7 +666,9 @@ export function FormularioPeticion() {
                     value={peticion_cuerpo} onChange={e => setPeticionCuerpo(e.target.value)}
                     name='peticion_cuerpo' />
             </div>
-            <Button type="submit" variant="success">Guardar</Button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Guardando...' : 'Guardar'}
+            </Button>
         </form>
     )
 }
@@ -656,6 +684,7 @@ export function FormularioSala() {
     const [nombre_paciente, setNombrePaciente] = useState("");
     const [error, setError] = useState("");
     const [entradaValida, setEntradavaldia] = useState(true);
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
 
     // Operacion de guardado
@@ -672,6 +701,7 @@ export function FormularioSala() {
             return;
         }
         // Flujo normal
+        setHabilitado(true);
         try {
             // Obtenemos los datos
             const datos__post = {
@@ -690,6 +720,7 @@ export function FormularioSala() {
                 mostrarError('Error al registrar sala');
             }
         }
+        setHabilitado(false);
     };
 
     // Campos vacios
@@ -800,8 +831,9 @@ export function FormularioSala() {
                 <input className='form-control w-100' type="text" placeholder="Ingrese el nombre ejm: Luis Chavez**" id="paciente"
                     name="paciente" value={nombre_paciente} onChange={cambioEntrada} />
             </div>
-
-            <Button type="submit" variant="success">Guardar</Button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Guardando...' : 'Guardar'}
+            </Button>
         </form>
     )
 
@@ -814,6 +846,7 @@ export function FormularioPeticionRevision() {
     const [vereficto, setVeredicto] = useState("");
     const [estadoR, setEstadoR] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
     // Capturamos el id de la url
     let { slug } = useParams();
@@ -827,6 +860,7 @@ export function FormularioPeticionRevision() {
             return;
         }
         // Flujo normal
+        setHabilitado(true);
         try {
             // Obtenemos los datos
             const datos__post = {
@@ -843,6 +877,7 @@ export function FormularioPeticionRevision() {
                 mostrarError('Error al registrar revisión de sala');
             }
         }
+        setHabilitado(false);
     };
 
     // Campos vacios
@@ -919,7 +954,9 @@ export function FormularioPeticionRevision() {
                     <option value="Rechazado">Rechazado</option>
                 </select>
             </div>
-            <Button type="submit" variant="success">Enviar</Button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Enviando...' : 'Enviar'}
+            </Button>
         </form>
     )
 
@@ -931,6 +968,7 @@ export function FormularioConfirmacion() {
     /* *** Form **** */
     const [tokenVerificacion, setToken] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
 
     // Operacion de guardado
@@ -942,6 +980,7 @@ export function FormularioConfirmacion() {
             return;
         }
         // Flujo normal
+        setHabilitado(true);
         try {
             // Obtenemos los datos
             const datos__post = {
@@ -952,6 +991,7 @@ export function FormularioConfirmacion() {
         } catch (err) {
             mostrarError('Error al verificar cuenta');
         }
+        setHabilitado(false);
     };
 
     // Campos vacios
@@ -1017,8 +1057,117 @@ export function FormularioConfirmacion() {
                 <input className='form-control w-100' type="text" placeholder="Ingrese el código**" id="codigo"
                     name="codigo" value={tokenVerificacion} onChange={e => setToken(e.target.value)} />
             </div>
-            <Button type="submit" variant="success">Verificar</Button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Verificando...' : 'Verificar'}
+            </Button>
         </form>
     )
 
+}
+
+// Contacto
+export function FormularioContacto() {
+    /* *** Form **** */
+    const [motivo, setMotivo] = useState("");
+    const [cuerpo, setCuerpo] = useState("");
+    const [correo, setCorreo] = useState("");
+    const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
+    const navigate = useNavigate();
+
+    const enviarContacto = async (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (!isValidForm()) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        //Flujo normal
+        setHabilitado(true);
+        try {
+            // Obtenemos los datos
+            const datos__post = {
+                motivo,
+                cuerpo,
+                correo
+            };
+            // Realizar la petición POST al servidor
+            await guardar(datos__post);
+        } catch (err) {
+            if (err.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                mostrarError('Error al enviar correo de contacto');
+            }
+        }
+        setHabilitado(false);
+    };
+
+    // Funcion para guardar
+    const guardar = async (datos__post) => {
+        try {
+            const response = await EnviarCorreo(datos__post);
+            if (response.data.success) {
+                // Redireccionar a la página principal si el inicio de sesión es exitoso
+                Swal.fire("Correo enviado correctamente", "", "success");
+                navigate('/nivel/all');
+            } else {
+                if (response.data.error) {
+                    Swal.fire(response.data.error, '', 'error')
+                } else {
+                    mostrarError('Error al enviar el correo');
+                }
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                mostrarError('Error al enviar el correo');
+            }
+        }
+    }
+
+    // Campos vacios
+    const isValidForm = () => {
+        if (
+            motivo.trim() === "" ||
+            cuerpo.trim() === "" ||
+            correo.trim() === ""
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    // Mostrar error
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
+
+    return (
+        <form onSubmit={enviarContacto}>
+            {error && <span>{error}</span>}
+            <div className="form-group">
+                <label className='label' htmlFor="correo">Correo personal:</label>
+                <input className='form-control w-100' type="email" placeholder="Ingrese su correo**" id="correo"
+                    value={correo} onChange={e => setCorreo(e.target.value)} />
+            </div>
+            <div className="form-group">
+                <label className='label' htmlFor="motivo">Motivo de contacto:</label>
+                <input className='form-control w-100' type="text" placeholder="Ingrese el motivo del contacto**" id="motivo"
+                    value={motivo} onChange={e => setMotivo(e.target.value)} />
+            </div>
+            <div className="form-group">
+                <label className='label' htmlFor="cuerpo">Mensaje:</label>
+                <textarea className='form-control w-100 h-100' type="text" placeholder="Ingrese el mensaje**" id="cuerpo"
+                    value={cuerpo} onChange={e => setCuerpo(e.target.value)} />
+            </div>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Enviando...' : 'Enviar'}
+            </Button>
+        </form>
+    );
 }

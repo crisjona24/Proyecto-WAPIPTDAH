@@ -11,7 +11,7 @@ import { Dominio } from "./general__tarjeta/TarjetaGeneral";
 import { VerificarContenido, ContenidoIndividual } from "../../api/contenido.api";
 import { Contenido } from "./general__tarjeta/TarjetaGeneral";
 import { VerificarContenidoIndividual, ContenidoDatosIndividual } from "../../api/contenidoindividual.api";
-import { Individual, Peticion, Paciente } from "./general__tarjeta/TarjetaGeneral";
+import { Individual, Peticion, Paciente, Aplicacion } from "./general__tarjeta/TarjetaGeneral";
 import { PacienteIndividual } from "../../api/usuario.api";
 
 
@@ -277,7 +277,7 @@ export function TarjetaPeticion() {
         </div>
     )
 
-} 
+}
 
 // Tarjeta paciente
 export function TarjetaPaciente() {
@@ -303,7 +303,7 @@ export function TarjetaPaciente() {
             }
         }
     }
-    
+
     // Use effect
     useEffect(() => {
         if (!token) {
@@ -333,6 +333,15 @@ export function TarjetaPaciente() {
                 }
                 <Paciente datosPaciente={datosPaciente} />
             </>
+        </div>
+    )
+}
+
+// Tarjeta de aplicacion
+export function TarjetaAplicacion() {
+    return (
+        <div>
+            <Aplicacion />
         </div>
     )
 }

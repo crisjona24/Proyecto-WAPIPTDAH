@@ -29,6 +29,7 @@ export function FormularioUsuario() {
     const [celular, setCelular] = useState("");
     const [fecha_nacimiento, setFecha] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
     // Mostrar clave
     const [verClave, setVerClave] = useState(false);
@@ -44,6 +45,7 @@ export function FormularioUsuario() {
             return;
         }
         // Flujo normal
+        setHabilitado(true);
         try {
             if (token) {
                 const datos__edit = {
@@ -75,6 +77,7 @@ export function FormularioUsuario() {
         } catch (error) {
             mostrarError('Error al registrar usuario');
         }
+        setHabilitado(false);
     };
 
     // Funcion para guardar datos
@@ -275,7 +278,9 @@ export function FormularioUsuario() {
                         value={fecha_nacimiento} onChange={e => setFecha(e.target.value)} />
                 </div>
             </div>
-            <button type='submit' className='btn btn-success'>Guardar</button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Guardando...' : 'Guardar'}
+            </Button>
         </form>
     )
 }
@@ -297,6 +302,7 @@ export function FormularioComun() {
     const [genero, setGenero] = useState("");
     const [area_estudio, setAreaEstudio] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
     // Mostrar clave
     const [verClave, setVerClave] = useState(false);
@@ -313,6 +319,7 @@ export function FormularioComun() {
         }
 
         // Flujo normal
+        setHabilitado(true);
         try {
             if (token) {
                 const datos__edit = {
@@ -349,6 +356,7 @@ export function FormularioComun() {
         } catch (error) {
             mostrarError('Error al registrar usuario');
         }
+        setHabilitado(false);
     };
 
     // Guardar datos
@@ -573,7 +581,9 @@ export function FormularioComun() {
                     </select>
                 </div>
             </div>
-            <button type='submit' className='btn btn-success'>Guardar</button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Guardando...' : 'Guardar'}
+            </Button>
         </form>
     )
 
@@ -595,6 +605,7 @@ export function FormularioPaciente() {
     const [fecha_nacimiento, setFecha] = useState("");
     const [contacto_emergencia, setContactoEmergencia] = useState("");
     const [direccion, setDireccion] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
     // Mostrar clave
@@ -611,6 +622,7 @@ export function FormularioPaciente() {
             return;
         }
         // Flujo normal
+        setHabilitado(true);
         try {
             if (token) {
                 const datos__edit = {
@@ -648,6 +660,7 @@ export function FormularioPaciente() {
         } catch (error) {
             mostrarError('Error al registrar usuario');
         }
+        setHabilitado(false);
     };
 
     // Guardar datos
@@ -867,7 +880,9 @@ export function FormularioPaciente() {
                     />
                 </div>
             </div>
-            <button type='submit' className='btn btn-success'>Guardar</button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Guardando...' : 'Guardar'}
+            </Button>
         </form>
     )
 }

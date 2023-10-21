@@ -757,3 +757,61 @@ export function Paciente({ datosPaciente }) {
         </div>
     );
 }
+
+// Aplicacion
+export function Aplicacion () {
+    return (
+        <div>
+            <div className="cabeza__Nivel">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-md-12">
+                            <h4 className="display-7 mt-2">
+                                Información Principal
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-5 align-items-center" style={{ height: '100vh', marginLeft: '20%' }}>
+                <Card className="mb-3" style={{ maxWidth: '75%' }}>
+                    <Row >
+                        <Col md={4}>
+                            <Image
+                                className="img-fluid"
+                                style={{ borderRadius: '10px', height: '60%', marginTop: '50%' }}
+                                src="/img/tarjeta-paciente.png"
+                                alt="Sample"
+                                fluid
+                            />
+                        </Col>
+                        <Col md={8}>
+                            <Card.Body>
+                                <Card.Title className="titulo-peticion">Conoce acerca de WAPIPTDAH</Card.Title>
+                                <Row className="mb-2">
+                                <Card.Title style={{ fontSize: '1rem' }}>Nombres :</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            <p>
+                                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Assumenda, soluta expedita inventore aut aperiam tenetur odit nam exercitationem esse saepe optio, ut consequuntur eaque sunt culpa sit dolor? Voluptatem, eius.
+                                            </p>
+                                        </Card.Text>
+                                </Row>
+                                <hr />
+
+                                <Card.Text>
+                                    <small className="text-muted" style={{ fontFamily: 'Roboto' }}>Acciones</small>
+                                    <div className='d-flex justify-content-between align-items-center'>
+                                        <Link to={'/nivel/all'} title="Regresar" className="btn btn-primary">
+                                            <FontAwesomeIcon icon={faBackward} />
+                                        </Link>
+                                    </div>
+                                </Card.Text>
+                            </Card.Body>
+                        </Col>
+                    </Row>
+                </Card>
+            </div>
+        </div>
+    );
+}

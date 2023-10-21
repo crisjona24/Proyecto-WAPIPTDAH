@@ -17,6 +17,7 @@ import { IndividualRegistro } from "./pages/registro/ContenidoIndividualRegistro
 import { CursoRegistro } from "./pages/registro/CursoRegistro";
 import { PeticionRegistro } from "./pages/registro/PeticionRegistro";
 import { SalaRegistro, RevisionPeticionRegistro } from "./pages/registro/SalaRegistro";
+import { Contacto } from "./pages/registro/Contacto";
 
 {/* Listado */ }
 import { NivelPrincipalAll } from "./pages/general/NivelPrincipalAll";
@@ -45,7 +46,7 @@ import { Probando } from "./pages/general/Probando"
 import { Ver, VerPeticion } from "./pages/general/Verpdf"
 import {
   InformacionDominio, InformacionContenido, InformacionIndividual,
-  InformacionPaciente
+  InformacionPaciente, InformacionAPP
 } from "./pages/general/InformacionDatos";
 
 function App() {
@@ -70,6 +71,7 @@ function App() {
         <Route path="/peticion/registro" element={<PeticionRegistro />} />
         <Route path="/sala/registro" element={<SalaRegistro />} />
         <Route path="/peticion/registro/revision/:slug" element={<RevisionPeticionRegistro />} />
+        <Route path="/registro/contacto" element={<Contacto />} />
         {/* RUTA DE CONSULTA */}
         <Route path="/pacientes/all/:slug" element={<PacientesALL />} />
         <Route path="/dominio/all" element={<DominioPrincipalAll />} />
@@ -93,6 +95,7 @@ function App() {
         <Route path="/individual/detalle/:slug" element={<InformacionIndividual />} />
         <Route path="/ver/peticion/:id" element={<VerPeticion />} />
         <Route path="/ver/paciente/:id" element={<InformacionPaciente />} />
+        <Route path="/ver/datos" element={<InformacionAPP />} />
         <Route path="/ver" element={<Ver />} />
         {/* RUTA DE EDICION DE INFORMACION */}
         <Route path="/dominio/editar/:slug" element={<DominioEdición />} />

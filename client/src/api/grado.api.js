@@ -136,3 +136,21 @@ export const NivelEliminar = (id) => {
         throw new Error("No se puede eliminar el nivel: " + error.message);
     }
 }
+
+// Contacto
+export const EnviarCorreo = async (datos__post) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.post('wapiptdah/contacto/', datos__post, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+                //'Authorization': `Token ${token}`
+            }
+        });
+    } catch (error) {
+        throw new Error("No se pudo enviar el correo: " + error.message);
+    }
+}

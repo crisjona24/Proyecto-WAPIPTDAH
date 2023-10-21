@@ -15,9 +15,8 @@ export function CabeceraRegister() {
             </div>
             <div className="right-section">
                 <ul className="menu">
-                    <li><Link to="/dominio"> Inicio </Link></li>
-                    <li><Link to="/dominio">Conocenos</Link></li>
-                    <li><Link to="/dominio">Contactanos</Link></li>
+                    <li><Link to="/ver/datos">Conocenos</Link></li>
+                    <li><Link to="/registro/contacto">Contactanos</Link></li>
                 </ul>
             </div>
         </header>

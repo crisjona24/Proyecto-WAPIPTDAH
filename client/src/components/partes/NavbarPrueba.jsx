@@ -6,7 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import { Button, Modal } from 'react-bootstrap';
 // Componentes
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
     faAdjust, faGear, faMessage, faUser, faHome, faBell, faCamera, faPenNib,
     faPen, faBook, faPenToSquare, faBrush, faFile
@@ -24,6 +24,7 @@ import Swal from 'sweetalert2';
 
 // Navbar de Tecnico
 export function Navbar_T() {
+    const navigate = useNavigate();
     // Menu
     const [expandedMenu, setExpandedMenu] = useState(null);
     const toggleMenu = (menuName) => {
@@ -218,6 +219,8 @@ export function Navbar_T() {
 
 // Navbar de Comun
 export function Navbar_C() {
+    const navigate = useNavigate();
+
     // Menu
     const token = localStorage.getItem('token');
     const [expandedMenu, setExpandedMenu] = useState(null);
@@ -427,6 +430,7 @@ export function Navbar_C() {
 
 // Navbar de Paciente
 export function Navbar_Paci() {
+    const navigate = useNavigate();
     const [verificacion, setVerificacion] = useState([]);
     const [expandedMenu, setExpandedMenu] = useState(null);
     const token = localStorage.getItem('token');

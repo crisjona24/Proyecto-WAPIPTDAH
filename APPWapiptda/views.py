@@ -2397,3 +2397,67 @@ def obtener_slug_conte(ob1):
     except Contenido.DoesNotExist:
         return False
     
+
+## ENVIAR CORREO DE CONTACTO
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def api_enviar_contacto(request):
+    if request.user.is_authenticated:
+        # Obtenemos el token
+        try:
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+        except Exception as e:
+            return JsonResponse({'error': 'El usuario no está autenticado'})
+        
+        # Verificar metodo permitido
+        if request.method != 'POST':
+            return JsonResponse({'error': 'Método no permitido'})
+
+        # Encontrar al usuario relacionado al user
+        usuario__ob = encontrar_usuario(user)
+        if usuario__ob:
+            if request.method == 'POST':
+                data = json.loads(request.body)
+                asunto_ = data.get('motivo')
+                mensaje_ = data.get('cuerpo')
+                if enviar_correo(usuario__ob, asunto_, mensaje_):
+                    return JsonResponse({'success': True})
+                else:
+                    error_message = "Error al enviar el correo."
+                    context = {'error': error_message}
+                    return JsonResponse(context)
+            else:
+                return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
+        else:
+            return JsonResponse({'error': 'Usuario no encontrado'})
+    else:
+        return JsonResponse({'error': 'El usuario no está autenticado'})
+
+def encontrar_usuario(ob1):
+    # Orden de los modelos a verificar
+    modelos = [UsuarioComun, Paciente, Usuario]
+
+    for modelo in modelos:
+        try:
+            # Intenta obtener el usuario de cada modelo
+            usuario_ob = modelo.objects.get(user=ob1)
+            return usuario_ob
+        except modelo.DoesNotExist:
+            # Si el usuario no existe en ese modelo, sigue con el siguiente
+            continue
+
+    # Si ninguno de los modelos contiene el usuario, retorna False
+    return False
+
+def enviar_correo(ob1, ob2, ob3):
+    # Capturamos los datos para el email
+    subject = ob2
+    message = ob3
+    from_email = ob1.email_usuario
+    print(ob1.email_usuario)
+    receiver_email = [settings.EMAIL_HOST_USER]
+
+    send_mail(subject, message, from_email, receiver_email, fail_silently=False)
+    return True

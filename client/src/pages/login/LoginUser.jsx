@@ -73,79 +73,82 @@ export function IniciarSesion() {
     }
 
     return (
-        <div className='login-page'>
-            <main>
-                <div className="login-block">
-                    <Image className='imagen-login' src='/img/Fondo1.jpg' fluid />
-                    <h1>Iniciar sesión</h1>
-                    {error &&
-                        <div id="alert" className="alert alert-success" role="alert">
-                            <h5 className="alert-heading">!Atención!</h5>
-                            <p className="mb-0">{error}</p>
-                        </div>
-                    }
-                    <div className="row">
-                        <div className="col-md-12 mx-auto">
-                            <form onSubmit={enviar}>
-                                <div className="form-group">
-                                    <div className="input-group">
-                                        <span className="input-group-addon">
-                                            <FontAwesomeIcon className='ubi' icon={faUser} />
-                                        </span>
-                                        <input className='form-control' type="text" placeholder="Nombre de usuario" value={username} onChange={e => setUsername(e.target.value)} />
-                                    </div>
-                                </div>
-                                <hr className='hr-xs' />
-                                <div className="form-group">
-                                    <div className="input-group">
-                                        <span className="input-group-addon mt-3">
-                                            <FontAwesomeIcon className='ubi' icon={faLock} />
-                                        </span>
-                                        <div className='form-row row'>
-                                            <div className='form-group col-md-11'>
-                                                <input className='form-control' type={verClave ? "text" : "password"} placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} />
-                                            </div>
-                                            <div className="form-group col-md-1 mt-3 d-flex justify-content-center">
-                                                <Button variant="success" onClick={observarClave}>
-                                                    <FontAwesomeIcon icon={faEye} />
-                                                </Button>
-                                            </div>
+        <div className="card" style={{ backgroundColor: '#e5e7ed', width: '100%', height: '100%', borderColor: '#e5e7ed' }}>
+            <div className='login-page'>
+                <main>
+                    <div className="login-block">
+                        <Image className='imagen-login' src='/img/Fondo1.jpg' fluid />
+                        <h1>Iniciar sesión</h1>
+                        {error &&
+                            <div id="alert" className="alert alert-success" role="alert">
+                                <h5 className="alert-heading">!Atención!</h5>
+                                <p className="mb-0">{error}</p>
+                            </div>
+                        }
+                        <div className="row">
+                            <div className="col-md-12 mx-auto">
+                                <form onSubmit={enviar}>
+                                    <div className="form-group">
+                                        <div className="input-group">
+                                            <span className="input-group-addon">
+                                                <FontAwesomeIcon className='ubi' icon={faUser} />
+                                            </span>
+                                            <input className='form-control' type="text" placeholder="Nombre de usuario" value={username} onChange={e => setUsername(e.target.value)} />
                                         </div>
-
                                     </div>
-                                </div>
-                                <button type="submit" className='my-success-button'>Iniciar sesión</button>
-                                <Link className="btn btn-primary mt-2 w-100" to='/verificar/cuenta'>Verificar cuenta</Link>
-                                <div className='login-footer'>
-                                    <li style={{ listStyle: 'none', marginTop: '1%' }} >
-                                        <Link style={{ textDecoration: 'none' }} to="/registro"><h6>¿No tienes una cuenta?. CLIC AQUÍ..</h6></Link>
-                                    </li>
-                                </div>
-                                <div className="login-footer">
-                                    <h6>Registrate con</h6>
-                                    <ul className="social-icons">
-                                        <li>
-                                            <Link className="facebook" to="/login">
-                                                <FontAwesomeIcon icon={faFacebook} />
-                                            </Link>
+                                    <hr className='hr-xs' />
+                                    <div className="form-group">
+                                        <div className="input-group">
+                                            <span className="input-group-addon mt-3">
+                                                <FontAwesomeIcon className='ubi' icon={faLock} />
+                                            </span>
+                                            <div className='form-row row'>
+                                                <div className='form-group col-md-11'>
+                                                    <input className='form-control' type={verClave ? "text" : "password"} placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} />
+                                                </div>
+                                                <div className="form-group col-md-1 mt-3 d-flex justify-content-center">
+                                                    <Button variant="success" onClick={observarClave}>
+                                                        <FontAwesomeIcon icon={faEye} />
+                                                    </Button>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <button type="submit" className='my-success-button'>Iniciar sesión</button>
+                                    <Link className="btn btn-primary mt-2 w-100" to='/verificar/cuenta'>Verificar cuenta</Link>
+                                    <div className='login-footer'>
+                                        <li style={{ listStyle: 'none', marginTop: '1%' }} >
+                                            <Link style={{ textDecoration: 'none' }} to="/registro"><h6>¿No tienes una cuenta?. CLIC AQUÍ..</h6></Link>
                                         </li>
-                                        <li>
-                                            <Link className="facebook" to="/login">
-                                                <FontAwesomeIcon icon={faTwitter} />
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link className="facebook" to="/login">
-                                                <FontAwesomeIcon icon={faLinkedin} />
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </form>
+                                    </div>
+                                    <div className="login-footer">
+                                        <h6>Registrate con</h6>
+                                        <ul className="social-icons">
+                                            <li>
+                                                <Link className="facebook" to="/login">
+                                                    <FontAwesomeIcon icon={faFacebook} />
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <Link className="facebook" to="/login">
+                                                    <FontAwesomeIcon icon={faTwitter} />
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <Link className="facebook" to="/login">
+                                                    <FontAwesomeIcon icon={faLinkedin} />
+                                                </Link>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </main>
+                </main>
+            </div>
+
         </div>
     )
 }

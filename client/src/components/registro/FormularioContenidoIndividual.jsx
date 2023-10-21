@@ -27,6 +27,7 @@ export function FormularioContenidoIndividual({ slug }) {
     const [portada_individual, setPortada] = useState("");
     const [respuesta, setRespuesta] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
 
@@ -38,6 +39,7 @@ export function FormularioContenidoIndividual({ slug }) {
             return;
         }
         //Flujo normal
+        setHabilitado(true);
         try {
             const formData = new FormData(); // Crear un objeto FormData
             formData.append('descripcion_individual', descripcion_individual);
@@ -59,6 +61,7 @@ export function FormularioContenidoIndividual({ slug }) {
                 mostrarError('Error al registrar contenido');
             }
         }
+        setHabilitado(false);
     };
 
     // Funcion para guardar
@@ -227,8 +230,8 @@ export function FormularioContenidoIndividual({ slug }) {
                     </>
                 </select>
             </div>
-            <Button type='submit' className='btn btn-success' >
-                Guardar
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Guardando...' : 'Guardar'}
             </Button>
         </form>
     )
