@@ -5,6 +5,9 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'
 import Swal from "sweetalert2";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye } from '@fortawesome/free-solid-svg-icons';
+import { Button } from "react-bootstrap";
 // Metodos
 import {
     UsuarioCrearNuevo, VerificarUsuario, UsuarioIndividual, UsuarioEditar,
@@ -22,17 +25,21 @@ export function FormularioUsuario() {
     const [email_usuario, setEmail] = useState("");
     const [username_usuario, setUsername] = useState("");
     const [password_usuario, setPassword] = useState("");
+    const [password_usuario_2, setPassword2] = useState("");
     const [celular, setCelular] = useState("");
     const [fecha_nacimiento, setFecha] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    // Mostrar clave
+    const [verClave, setVerClave] = useState(false);
+    const [verClave2, setVerClave2] = useState(false);
 
     // OPERACIONES
     const enviarFT = async (e) => {
         e.preventDefault();
         // Verificar campos vacíos
         if (isEmptyField(nombre_usuario, apellido_usuario, email_usuario, username_usuario,
-            password_usuario, celular, fecha_nacimiento)) {
+            password_usuario, celular, fecha_nacimiento, password_usuario_2)) {
             Swal.fire("Por favor ingrese todos los campos", "", "warning");
             return;
         }
@@ -58,6 +65,10 @@ export function FormularioUsuario() {
                     celular,
                     fecha_nacimiento
                 };
+                if (!compararClave(password_usuario, password_usuario_2)) {
+                    Swal.fire("Las claves no coinciden", "", "warning");
+                    return;
+                }
                 // Realizar la petición POST al servidor
                 guardar(datos__post);
             }
@@ -161,6 +172,23 @@ export function FormularioUsuario() {
         }, 9000); // 8 segundos
     };
 
+    // Visibilidad de la clave
+    const observarClave = () => {
+        setVerClave(!verClave);
+    }
+    const observarClave2 = () => {
+        setVerClave2(!verClave2);
+    }
+
+    // Comparar claves
+    const compararClave = (clave1, clave2) => {
+        if (clave1 === clave2) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
     return (
         <form onSubmit={enviarFT}>
             <>
@@ -194,12 +222,38 @@ export function FormularioUsuario() {
             <>
                 {
                     !datos?.tipo &&
-                    <div className='form-group'>
-                        <label className='label' htmlFor="password">Clave:</label>
-                        <input className='form-control w-100' type="password"
-                            placeholder="Mínimo 8 caracteres con una letra mayúscula, un número y un símbolo**"
-                            name='password' id="password"
-                            value={password_usuario} onChange={e => setPassword(e.target.value)} />
+                    <div className='form-row row'>
+                        <div className='form-group col-md-11'>
+                            <label className='label' htmlFor="password">Clave:</label>
+                            <input className='form-control w-100'
+                                type={verClave ? "text" : "password"}
+                                placeholder="8 caracteres con una letra mayúscula, un número y un símbolo**"
+                                name='password' id="password"
+                                value={password_usuario} onChange={e => setPassword(e.target.value)} />
+                        </div>
+                        <div className="form-group col-md-1 mt-4 d-flex justify-content-center">
+                            <Button variant="success" onClick={observarClave}>
+                                <FontAwesomeIcon icon={faEye} />
+                            </Button>
+                        </div>
+                    </div>
+                }
+                {
+                    !datos?.tipo &&
+                    <div className='form-row row'>
+                        <div className='form-group col-md-11'>
+                            <label className='label' htmlFor="password2">Confirmar clave:</label>
+                            <input className='form-control w-100'
+                                type={verClave2 ? "text" : "password"}
+                                placeholder="Vuelve a escribir la clave**"
+                                name='password2' id="password2"
+                                value={password_usuario_2} onChange={e => setPassword2(e.target.value)} />
+                        </div>
+                        <div className="form-group col-md-1 mt-4 d-flex justify-content-center">
+                            <Button variant="success" onClick={observarClave2}>
+                                <FontAwesomeIcon icon={faEye} />
+                            </Button>
+                        </div>
                     </div>
                 }
             </>
@@ -237,19 +291,23 @@ export function FormularioComun() {
     const [email_usuario, setEmail] = useState("");
     const [username_usuario, setUsername] = useState("");
     const [password_usuario, setPassword] = useState("");
+    const [password_usuario_2, setPassword2] = useState("");
     const [celular, setCelular] = useState("");
     const [fecha_nacimiento, setFecha] = useState("");
     const [genero, setGenero] = useState("");
     const [area_estudio, setAreaEstudio] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    // Mostrar clave
+    const [verClave, setVerClave] = useState(false);
+    const [verClave2, setVerClave2] = useState(false);
 
     // Operacion de guardar datos
     const enviarFComun = async (e) => {
         e.preventDefault();
         // Verificar campos vacíos
         if (isEmptyField(nombre_usuario, apellido_usuario, email_usuario, username_usuario,
-            password_usuario, celular, fecha_nacimiento, genero, area_estudio)) {
+            password_usuario, celular, fecha_nacimiento, genero, area_estudio, password_usuario_2)) {
             Swal.fire("Por favor ingrese todos los campos", "", "warning");
             return;
         }
@@ -281,6 +339,10 @@ export function FormularioComun() {
                     genero,
                     area_estudio
                 };
+                if (!compararClave(password_usuario, password_usuario_2)) {
+                    Swal.fire("Las claves no coinciden", "", "warning");
+                    return;
+                }
                 // Realizar la petición POST al servidor
                 guardar(datos__post);
             }
@@ -386,6 +448,24 @@ export function FormularioComun() {
         }, 9000); // 8 segundos
     };
 
+    // Visibilidad de la clave
+    const observarClave = () => {
+        setVerClave(!verClave);
+    }
+    const observarClave2 = () => {
+        setVerClave2(!verClave2);
+    }
+
+    // Comparar claves
+    const compararClave = (clave1, clave2) => {
+        if (clave1 === clave2) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+
     return (
         <form onSubmit={enviarFComun}>
             <>
@@ -419,12 +499,38 @@ export function FormularioComun() {
             <>
                 {
                     !datos?.tipo &&
-                    <div className='form-group'>
-                        <label className='label' htmlFor="password">Clave:</label>
-                        <input className='form-control w-100' type="password"
-                            placeholder="Mínimo 8 caracteres con una letra mayúscula, un número y un símbolo**"
-                            name='password' id="password"
-                            value={password_usuario} onChange={e => setPassword(e.target.value)} />
+                    <div className='form-row row'>
+                        <div className='form-group col-md-11'>
+                            <label className='label' htmlFor="password">Clave:</label>
+                            <input className='form-control w-100'
+                                type={verClave ? "text" : "password"}
+                                placeholder="8 caracteres con una letra mayúscula, un número y un símbolo**"
+                                name='password' id="password"
+                                value={password_usuario} onChange={e => setPassword(e.target.value)} />
+                        </div>
+                        <div className="form-group col-md-1 mt-4 d-flex justify-content-center">
+                            <Button variant="success" onClick={observarClave}>
+                                <FontAwesomeIcon icon={faEye} />
+                            </Button>
+                        </div>
+                    </div>
+                }
+                {
+                    !datos?.tipo &&
+                    <div className='form-row row'>
+                        <div className='form-group col-md-11'>
+                            <label className='label' htmlFor="password2">Confirmar clave:</label>
+                            <input className='form-control w-100'
+                                type={verClave2 ? "text" : "password"}
+                                placeholder="Vuelve a escribir la clave**"
+                                name='password2' id="password2"
+                                value={password_usuario_2} onChange={e => setPassword2(e.target.value)} />
+                        </div>
+                        <div className="form-group col-md-1 mt-4 d-flex justify-content-center">
+                            <Button variant="success" onClick={observarClave2}>
+                                <FontAwesomeIcon icon={faEye} />
+                            </Button>
+                        </div>
                     </div>
                 }
 
@@ -484,19 +590,23 @@ export function FormularioPaciente() {
     const [email_usuario, setEmail] = useState("");
     const [username_usuario, setUsername] = useState("");
     const [password_usuario, setPassword] = useState("");
+    const [password_usuario_2, setPassword2] = useState("");
     const [celular, setCelular] = useState("");
     const [fecha_nacimiento, setFecha] = useState("");
     const [contacto_emergencia, setContactoEmergencia] = useState("");
     const [direccion, setDireccion] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    // Mostrar clave
+    const [verClave, setVerClave] = useState(false);
+    const [verClave2, setVerClave2] = useState(false);
 
     // Operacion de guardar datos
     const enviarFP = async (e) => {
         e.preventDefault();
         // Verificar campos vacíos
         if (isEmptyField(nombre_usuario, apellido_usuario, email_usuario, username_usuario,
-            password_usuario, celular, fecha_nacimiento, contacto_emergencia, direccion)) {
+            password_usuario, celular, fecha_nacimiento, contacto_emergencia, direccion, password_usuario_2)) {
             Swal.fire("Por favor ingrese todos los campos", "", "warning");
             return;
         }
@@ -528,6 +638,10 @@ export function FormularioPaciente() {
                     contacto_emergencia,
                     direccion
                 };
+                if (!compararClave(password_usuario, password_usuario_2)) {
+                    Swal.fire("Las claves no coinciden", "", "warning");
+                    return;
+                }
                 // Realizar la petición POST al servidor
                 guardar(datos__post);
             }
@@ -632,6 +746,23 @@ export function FormularioPaciente() {
         }, 9000);
     };
 
+    // Visibilidad de la clave
+    const observarClave = () => {
+        setVerClave(!verClave);
+    }
+    const observarClave2 = () => {
+        setVerClave2(!verClave2);
+    }
+
+    // Comparar claves
+    const compararClave = (clave1, clave2) => {
+        if (clave1 === clave2) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
     return (
         <form onSubmit={enviarFP}>
             <>
@@ -665,12 +796,38 @@ export function FormularioPaciente() {
             <>
                 {
                     !datos?.tipo &&
-                    <div className='form-group'>
-                        <label className='label' htmlFor="password">Clave:</label>
-                        <input className='form-control w-100' type="password"
-                            placeholder="Mínimo 8 caracteres con una letra mayúscula, un número y un símbolo**"
-                            name='password' id="password"
-                            value={password_usuario} onChange={e => setPassword(e.target.value)} />
+                    <div className='form-row row'>
+                        <div className='form-group col-md-11'>
+                            <label className='label' htmlFor="password">Clave:</label>
+                            <input className='form-control w-100'
+                                type={verClave ? "text" : "password"}
+                                placeholder="8 caracteres con una letra mayúscula, un número y un símbolo**"
+                                name='password' id="password"
+                                value={password_usuario} onChange={e => setPassword(e.target.value)} />
+                        </div>
+                        <div className="form-group col-md-1 mt-4 d-flex justify-content-center">
+                            <Button variant="success" onClick={observarClave}>
+                                <FontAwesomeIcon icon={faEye} />
+                            </Button>
+                        </div>
+                    </div>
+                }
+                {
+                    !datos?.tipo &&
+                    <div className='form-row row'>
+                        <div className='form-group col-md-11'>
+                            <label className='label' htmlFor="password2">Confirmar clave:</label>
+                            <input className='form-control w-100'
+                                type={verClave2 ? "text" : "password"}
+                                placeholder="Vuelve a escribir la clave**"
+                                name='password2' id="password2"
+                                value={password_usuario_2} onChange={e => setPassword2(e.target.value)} />
+                        </div>
+                        <div className="form-group col-md-1 mt-4 d-flex justify-content-center">
+                            <Button variant="success" onClick={observarClave2}>
+                                <FontAwesomeIcon icon={faEye} />
+                            </Button>
+                        </div>
                     </div>
                 }
             </>

@@ -22,7 +22,7 @@ export function UsuarioComunRegistro() {
                         <div className="card-body col-md-9">
                             <h4 style={{ padding: '10px' }}> Registro de usuario</h4>
                         </div>
-                        <div className='card-body col-md-2'>
+                        <div className='card-body col-md-1'>
                             <>
                                 {
                                     token ? (

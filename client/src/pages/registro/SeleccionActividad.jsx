@@ -18,7 +18,7 @@ export function SeleccionActividad() {
                         <div className="card-body col-md-9">
                             <h4 style={{ padding: '10px' }}> Selección de actividad</h4>
                         </div>
-                        <div className='card-body col-md-2'>
+                        <div className='card-body col-md-1'>
                             <Link to={'/login'} className='btn btn-danger mt-2'>
                                 Cancelar
                             </Link>

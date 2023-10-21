@@ -1,9 +1,14 @@
-body{
+body {
     margin: 0;
     background-color: #e5e7ed;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+main {
+    background-color: #e5e7ed;
+}
+
 .imagen-login {
     width: 125px;
     height: 125px;
@@ -243,7 +248,7 @@ body{
     font-size: 1rem;
     line-height: 1.5;
     border-radius: .25rem;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
 .my-success-button:hover {
@@ -252,7 +257,8 @@ body{
     border-color: #1e7e34;
 }
 
-.my-success-button:focus, .my-success-button.focus {
+.my-success-button:focus,
+.my-success-button.focus {
     color: #fff;
     background-color: #218838;
     border-color: #1e7e34;
@@ -288,6 +294,7 @@ body{
     outline: 0;
     box-shadow: 0 0 0 .2rem rgba(0, 123, 255, .25);
 }
+
 .form-group {
     margin-bottom: 1rem;
 }
@@ -300,6 +307,6 @@ body{
     width: 100%;
 }
 
-.ubi{
+.ubi {
     padding-top: 75%;
 }

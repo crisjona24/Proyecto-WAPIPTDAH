@@ -5,9 +5,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Image } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUser, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faLock, faEye } from '@fortawesome/free-solid-svg-icons';
 import { Link } from "react-router-dom";
-import { faFacebook, faLinkedin, faTwitter } from '@fortawesome/free-brands-svg-icons'
+import { faFacebook, faLinkedin, faTwitter } from '@fortawesome/free-brands-svg-icons';
+import { Button } from "react-bootstrap";
 // Metodos
 import { LoginUsuario } from "../../api/login.api";
 import { cerrarSesion } from "../../controles/logout"
@@ -18,6 +19,8 @@ export function IniciarSesion() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    // Mostrar clave
+    const [verClave, setVerClave] = useState(false);
 
     // Funcion para enviar los datos del formulario
     const enviar = async (e) => {
@@ -64,6 +67,11 @@ export function IniciarSesion() {
         }, 5000); // 5 segundos
     };
 
+    // Visibilidad de la clave
+    const observarClave = () => {
+        setVerClave(!verClave);
+    }
+
     return (
         <div className='login-page'>
             <main>
@@ -90,10 +98,20 @@ export function IniciarSesion() {
                                 <hr className='hr-xs' />
                                 <div className="form-group">
                                     <div className="input-group">
-                                        <span className="input-group-addon">
+                                        <span className="input-group-addon mt-3">
                                             <FontAwesomeIcon className='ubi' icon={faLock} />
                                         </span>
-                                        <input className='form-control' type="password" placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} />
+                                        <div className='form-row row'>
+                                            <div className='form-group col-md-11'>
+                                                <input className='form-control' type={verClave ? "text" : "password"} placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} />
+                                            </div>
+                                            <div className="form-group col-md-1 mt-3 d-flex justify-content-center">
+                                                <Button variant="success" onClick={observarClave}>
+                                                    <FontAwesomeIcon icon={faEye} />
+                                                </Button>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                                 <button type="submit" className='my-success-button'>Iniciar sesión</button>

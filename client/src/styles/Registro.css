@@ -151,3 +151,14 @@ form {
     /* Establece el color del borde de la barra superior */
     width: auto;
 }
+
+.cuerpo_general{
+    width: 100%;
+    height: 100%;
+}
+
+.cuerpo_form{
+    width: 35%;
+    margin-top: 90px;
+    margin-Bottom: 90px;
+}
