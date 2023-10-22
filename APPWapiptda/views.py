@@ -2461,3 +2461,56 @@ def enviar_correo(ob1, ob2, ob3):
 
     send_mail(subject, message, from_email, receiver_email, fail_silently=False)
     return True
+
+
+
+## GENERAR REPORTE ##
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def generar_reporte_resultado(request, id):
+    try: 
+        # Decodifica el token
+        token = request.headers.get('Authorization').split(" ")[1]
+        user = get_user_from_token_jwt(token)
+        # Verificar existencia del usuario
+        if user and token:
+            if request.method == 'GET':
+                id_resultado_ = id
+                # Guardar Reporte
+                if guardar_reporte(id_resultado_, user):
+                    return JsonResponse({'success': True})
+                else:
+                    error_message = "Error al generar el reporte...."
+                    context = {'error': error_message}
+                    return JsonResponse(context)
+            else:
+                return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
+        else:
+            return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
+    except Exception as e:
+        return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+
+def guardar_reporte(ob1, ob2):
+    try:
+        #Obtenemos el objeto resultado
+        resultado_ob = Resultado.objects.get(id=ob1)
+        # Obtenemos datos necesarios para el reporte
+        paciente_ob = resultado_ob.paciente
+        contenido_individual_ob = resultado_ob.contenido_individual
+        usuario_comun_ob = UsuarioComun.objects.get(user=ob2)
+        print("LLLego aqui")
+        # Creamos el reporte
+        reporte_ob = Reporte.objects.create(
+            titulo_reporte = "Reporte de Resultado",
+            descripcion_reporte = "Reporte de Resultado nuevo",
+            usuario_comun = usuario_comun_ob,
+            contenido_individual = contenido_individual_ob,
+            paciente = paciente_ob,
+            resultado = resultado_ob
+        )
+        print("LLLego aqui x2")
+        reporte_ob.save()
+        return True
+    except Exception as e:
+        return False

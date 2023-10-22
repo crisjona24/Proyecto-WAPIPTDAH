@@ -61,13 +61,13 @@ export const ReporteCrear = (reporte) => {
     }
 };
 
-export const CrearReporteNuevo = async (datos__post) => {
+export const CrearReporteNuevo = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.post('wapiptdah/registro_reporte/', datos__post,
+        return baseurl.get(`wapiptdah/registro/reporte/${id}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`

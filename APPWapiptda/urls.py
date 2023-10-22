@@ -65,6 +65,7 @@ urlpatterns = [
     path('registro_resultado/', save_resultado, name='registro-resultado'),
     path('registro_sala/', api_sala_register, name='registro-sala'),
     path('contacto/', api_enviar_contacto, name='enviar-contacto'),
+    path('registro/reporte/<int:id>/', generar_reporte_resultado, name='registro-reporte'),
 
     ### OBTENER DATOS ###
     path('datos/usuario/', datos_usuario, name='datos_usuario'),

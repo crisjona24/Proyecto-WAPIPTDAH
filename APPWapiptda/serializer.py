@@ -119,7 +119,42 @@ class DetalleSalaSerializer(serializers.ModelSerializer):
         fields = ('id', 'fecha_detalle_sala', 'estado_detalle_sala', 'sala', 'usuario_comun')
 
 class ReporteSerializer(serializers.ModelSerializer):
+    # Datos de paciente
+    nombre_paciente = serializers.SerializerMethodField()
+    apellido_paciente = serializers.SerializerMethodField()
+    correo_paciente = serializers.SerializerMethodField()
+    # Datos de contenido individual
+    descripcion_individual = serializers.SerializerMethodField()
+    respuesta = serializers.SerializerMethodField()
+    tipo_contenido = serializers.SerializerMethodField()
+    # Datos Resultado
+    tiempo_m_ = serializers.SerializerMethodField()
+    tiempo_s_ = serializers.SerializerMethodField()
+    observacion_ = serializers.SerializerMethodField()
+
     class Meta:
         model = Reporte
         fields = ('id', 'titulo_reporte', 'descripcion_reporte', 'slug_reporte', 'estado_reporte', 
-                  'usuario_comun', 'contenido')
+                  'usuario_comun', 'contenido_individual', 'paciente', 'resultado',
+                  'nombre_paciente', 'apellido_paciente', 'correo_paciente', 'descripcion_individual',
+                  'respuesta', 'tipo_contenido', 'tiempo_m_', 'tiempo_s_', 'observacion_')
+    
+    def get_nombre_paciente(self, obj):
+        return obj.paciente.nombre_usuario
+    def get_apellido_paciente(self, obj):
+        return obj.paciente.apellido_usuario
+    def get_correo_paciente(self, obj):
+        return obj.paciente.email_usuario
+    def get_descripcion_individual(self, obj):
+        return obj.contenido_individual.descripcion_individual
+    def get_respuesta(self, obj):
+        return obj.contenido_individual.respuesta
+    def get_tipo_contenido(self, obj):
+        return obj.contenido_individual.tipo_contenido
+    def get_tiempo_m_(self, obj):
+        return obj.resultado.tiempo_m
+    def get_tiempo_s_(self, obj):
+        return obj.resultado.tiempo_s
+    def get_observacion_(self, obj):
+        return obj.resultado.observacion
+    

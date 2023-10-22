@@ -360,17 +360,19 @@ class DetalleSala(models.Model):
 
 #MODELO DE REPORTES
 class Reporte(models.Model):
-    titulo_reporte = models.CharField(max_length=200)
-    descripcion_reporte = models.TextField()
-    slug_reporte = models.SlugField(unique=True, blank=True)
+    titulo_reporte = models.CharField(max_length=200, blank=False, null=True)
+    descripcion_reporte = models.TextField(blank=False, null=True)
+    slug_reporte = models.SlugField(unique=True, blank=False, null=True)
     fecha_registro_reporte = models.DateField(auto_now=True)
     estado_reporte = models.BooleanField(default=True)
     # Foraneas
-    usuario_comun = models.ForeignKey(UsuarioComun, on_delete=models.CASCADE, related_name='reportes', blank=True, null=True)
-    contenido_f = models.ForeignKey(ContenidoIndividual, on_delete=models.SET_NULL, related_name='reportes_contenido', blank=True, null=True)
+    usuario_comun = models.ForeignKey(UsuarioComun, on_delete=models.SET_NULL, related_name='reportes', blank=True, null=True)
+    contenido_individual = models.ForeignKey(ContenidoIndividual, on_delete=models.SET_NULL, related_name='reportes_contenido', blank=True, null=True)
+    paciente = models.ForeignKey(Paciente, on_delete=models.SET_NULL, related_name='reportes_paciente', blank=True, null=True)
+    resultado = models.ForeignKey(Resultado, on_delete=models.SET_NULL, related_name='reportes_resultado', blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        self.slug_reporte = slugify(self.titulo + '-' + self.descripcion)
+        self.slug_reporte = slugify(self.titulo_reporte + '-' + self.descripcion_reporte)
         super(Reporte, self).save(*args, **kwargs)
 
     def __str__(self):

@@ -11,7 +11,7 @@ import React from 'react';
 import Swal from "sweetalert2";
 // Metodos
 import { SalaEliminar, AtenderSala } from "../../api/sala.api"
-import { ReporteEliminar } from "../../api/reporte.api"
+import { ReporteEliminar, CrearReporteNuevo } from "../../api/reporte.api"
 import { ResultadoEliminar } from "../../api/resultado.api"
 
 
@@ -274,6 +274,7 @@ export function ListadodeSalaPaciente({ salas, page, setPage, numeroPag }) {
 
 // Lista de resultados
 export function ListadodeResultado({ resultados, usuario, page, setPage, numeroPag }) {
+    const navigate = useNavigate();
     // Paginacion siguente
     const anterior = () => {
         setPage(prevPage => (prevPage > 1 ? prevPage - 1 : prevPage));
@@ -335,12 +336,18 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                                                         confirmButtonText: 'Sí, generar'
                                                                     }).then(async (result) => {
                                                                         if (result.isConfirmed) {
-                                                                            Swal.fire(
-                                                                                '¡Reporte generado!',
-                                                                                'El reporte ha sido generado.',
-                                                                                'success'
-                                                                            )
-                                                                            //await generarReporte(resultado.id);
+                                                                            const response = await CrearReporteNuevo(resultado.id);
+                                                                            if (response.data.success) {
+                                                                                console.log(response.data);
+                                                                                Swal.fire("Reporte generado de forma exitosa", "", "success");
+                                                                                navigate('/reporte/all');
+                                                                            } else {
+                                                                                if (response.data.error) {
+                                                                                    Swal.fire(response.data.error, '', 'error');
+                                                                                } else {
+                                                                                    Swal.fire('Reporte fallido', '', 'error');
+                                                                                }
+                                                                            }
                                                                         }
                                                                     })
                                                                 }}
@@ -462,9 +469,9 @@ export function ListadodeReportes({ reportes, usuario, page, setPage, numeroPag 
                                         {
                                             reportes.map((reporte) => (
                                                 <tr key={reporte.id}>
-                                                    <td>{reporte.titulo_reporte}</td>
-                                                    <td>{reporte.estado_reporte}</td>
-                                                    <td>{reporte.descripcion_reporte}</td>
+                                                    <td>{reporte.nombre_paciente}</td>
+                                                    <td>{reporte.apellido_paciente}</td>
+                                                    <td>{reporte.tiempo_m_}</td>
                                                     <td>
                                                         <ul className="action-list">
                                                             <Button title="Eliminar reporte" variant="danger" className="separacion--boton h"
