@@ -1,4 +1,4 @@
-/* Edicion */
+/* EDICION */
 .contenedor__edicion {
     width: 35%;
     margin-top: 90px;
@@ -16,6 +16,12 @@
     font-size: 0.9rem;
 }
 
+
+.borde__CE{
+    border: 1px solid #333;
+}
+
+/* TARJETA DE APLICACION */
 .tamnio_descripcion {
     font-size: 0.9rem;
 }

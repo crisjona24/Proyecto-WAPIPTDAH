@@ -1054,8 +1054,12 @@ export function FormularioConfirmacion() {
             {error && <span>{error}</span>}
             <div className="form-group">
                 <label className='label' htmlFor="codigo">Ingrese el código proporcionado :</label>
-                <input className='form-control w-100' type="text" placeholder="Ingrese el código**" id="codigo"
-                    name="codigo" value={tokenVerificacion} onChange={e => setToken(e.target.value)} />
+                <textarea class="form-control w-100" placeholder="Ingrese el código**"
+                    id="codigo" required
+                    name="codigo"
+                    value={tokenVerificacion}
+                    onChange={e => setToken(e.target.value)}>
+                </textarea>
             </div>
             <Button type="submit" variant="success" disabled={habilitado}>
                 {habilitado ? 'Verificando...' : 'Verificar'}

@@ -24,8 +24,8 @@ export function DominioRegistro() {
                     </Modal.Header>
                     <Modal.Body>
                         <h6>Sección: Portada</h6>
-                        <p style={{color: '#333', textAlign: 'justify', fontSize: '1rem'}}>
-                            Se debe elegir una imagen con el nombre plasmado en ella. 
+                        <p style={{ color: '#333', textAlign: 'justify', fontSize: '1rem' }}>
+                            Se debe elegir una imagen con el nombre plasmado en ella.
                             Imagina que es un rotulador en ella que representa el nombre
                             del Dominio.</p>
                     </Modal.Body>
@@ -42,7 +42,7 @@ export function DominioRegistro() {
                 <Container className='barraSup mt-5' >
                     <Row className='col-md-12'>
                         <div className="card-body col-md-7">
-                            <h4 style={{ padding: '10px', fontSize: '1.5rem', paddingTop: '15px' }}> Registro de Dominio</h4>
+                            <h4 className="titulo__CE"> Registro de Dominio</h4>
                         </div>
                         <div className='card-body col-md-2 pt-1'>
                             <Button variant="success" onClick={abrir} className='mt-2'>
@@ -56,7 +56,7 @@ export function DominioRegistro() {
                         </div>
                     </Row>
                 </Container>
-                <Container className='form container pb-1' style={{ border: '1px solid #333' }}>
+                <Container className='form container pb-1 borde__CE'>
                     <h6 className='pl-0 pt-3 pb-3'> Ingrese los datos solicitados</h6>
                     <div className='pb-2'>
                         <FormularioDominio />

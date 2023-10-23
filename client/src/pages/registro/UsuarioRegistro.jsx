@@ -1,5 +1,6 @@
 // Estilos
 import "../../styles/Registro.css"
+import "../../styles/Varios.css"
 import "bootstrap/dist/css/bootstrap.min.css";
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -40,7 +41,7 @@ export function UsuarioRegistro() {
                         </div>
                     </Row>
                 </Container>
-                <Container className='form container pb-1' style={{ border: '1px solid #333' }}>
+                <Container className='form container pb-1 borde__CE'>
                     <h6 className='pl-0 pt-3 pb-3'> Ingrese los datos solicitados</h6>
                     <div className='pb-2'>
                         <FormularioUsuario />
@@ -71,7 +72,7 @@ export function ConfirmacionCuenta() {
                         </div>
                     </Row>
                 </Container>
-                <Container className='form container pb-1' style={{ border: '1px solid #333'}}>
+                <Container className='form container pb-1 borde__CE'>
                     <h6 className='pl-0 pt-3 pb-3'> Ingrese los datos solicitados</h6>
                     <div className='pb-2'>
                         < FormularioConfirmacion />

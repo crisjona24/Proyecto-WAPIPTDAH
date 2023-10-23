@@ -42,11 +42,11 @@ export function DominioEdición() {
             </>
             {/* FIN MODAL */}
             <CabeceraRegister />
-            <Container className='mb-5' style={{ width: '35%' }}>
+            <Container className="contenedor__edicion">
                 <Container className='barraSup mt-5' >
                     <Row className='col-md-12'>
                         <div className="card-body col-md-7">
-                            <h4 style={{ padding: '10px', fontSize: '1.4rem' }}> Edición de dominio</h4>
+                            <h4 className="titulo__CE"> Edición de dominio</h4>
                         </div>
                         <div className='card-body col-md-2'>
                             <Button variant="success" onClick={abrir} className='mt-2'>
@@ -60,7 +60,7 @@ export function DominioEdición() {
                         </div>
                     </Row>
                 </Container>
-                <Container className='form container pb-1' style={{ border: '1px solid #333' }}>
+                <Container className='form container pb-1 borde__CE'>
                     <h6 className='pl-0 pt-3 pb-3'> Ingrese los datos solicitados</h6>
                     <div className='pb-2'>
                         <FormularioEdicion />

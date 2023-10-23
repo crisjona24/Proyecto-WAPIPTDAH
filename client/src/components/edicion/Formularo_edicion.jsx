@@ -186,6 +186,7 @@ export function FormularioEdicionNivel() {
 }
 
 
+
 /* EDICION DE DOMINIO */
 export function FormularioEdicion() {
     // Obtener el parametro de la URL
@@ -325,6 +326,7 @@ export function FormularioEdicion() {
         </form>
     )
 }
+
 
 
 /* EDICION DE CONTENIDO */
@@ -484,6 +486,7 @@ export function FormularioEdicionContenido({ slugDominio }) {
         </form>
     )
 }
+
 
 
 /* EDICION DE CONTENIDO INDIVIDUAL */
@@ -832,6 +835,7 @@ export function FormularioEdicionCurso() {
 }
 
 
+
 /* EDICION DE RESULTADO */
 export function FormularioEdicionResultado() {
     // Obtener el parametro de la URL
@@ -944,9 +948,11 @@ export function FormularioEdicionResultado() {
             {error && <p>{error}</p>}
             <div className="form-group">
                 <label className='label' htmlFor="resultado">Observación de resultado:</label>
-                <input className='form-control w-100' type="text" placeholder="Ingrese las observaciones**"
+                <textarea class="form-control" placeholder="Ingrese las observaciones**"
                     id="resultado" required
-                    value={observacion} onChange={e => setObservacion(e.target.value)} />
+                    value={observacion}
+                    onChange={e => setObservacion(e.target.value)}>
+                </textarea>
             </div>
             <Button type="submit" variant="success" disabled={habilitado}>
                 {habilitado ? 'Actualizando...' : 'Actualizar'}
@@ -1088,6 +1094,8 @@ export function FormularioEdicionSala() {
     )
 
 }
+
+
 
 /* EDICION DE REPORTE */
 export function FormularioEdicionReporte() {
