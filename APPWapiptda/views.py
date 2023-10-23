@@ -2502,7 +2502,7 @@ def guardar_reporte(ob1, ob2):
         # Creamos el reporte
         reporte_ob = Reporte.objects.create(
             titulo_reporte = "Reporte de Resultado",
-            descripcion_reporte = "Reporte de Resultado nuevo",
+            descripcion_reporte = "No hay una descripción, debe ser agregada.",
             usuario_comun = usuario_comun_ob,
             contenido_individual = contenido_individual_ob,
             paciente = paciente_ob,

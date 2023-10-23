@@ -1,5 +1,6 @@
 // Estilos
 import "../../../styles/Perfil.css"
+import "../../../styles/Varios.css"
 import "bootstrap/dist/css/bootstrap.min.css"
 import { Card, Col, Row, Image, Button } from 'react-bootstrap';
 // Componentes
@@ -841,6 +842,9 @@ export function Reporte({ datosReporte }) {
         verificacionUser();
     }, []);
 
+    // Control de tiempo
+    const ctrTiempo = datosReporte.tiempo_m_ * 60 + datosReporte.tiempo_s_;
+
     return (
         <div>
             <div className="cabeza__Nivel">
@@ -907,17 +911,42 @@ export function Reporte({ datosReporte }) {
                                     {datosReporte.fecha_registro_resultado_}
                                 </span>
                             </div>
+                            <div class="p-2 d-flex flex-column">
+                                <span>
+                                    <strong style={{ fontSize: '0.8rem' }}>Actividad</strong>
+                                </span>
+                                <span style={{ fontSize: '0.8rem' }}>
+                                    {datosReporte.identificador_contenido}
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <Row >
                         <Col md={3}>
-                            <Image
-                                className="img-fluid"
-                                style={{ borderRadius: '10px', height: '50%', marginTop: '70%' }}
-                                src="/img/tarjeta-paciente.png"
-                                alt="Sample"
-                                fluid
-                            />
+                            <div className="d-flex flex-column">
+                                <Image
+                                    className="img-fluid img__descripcion"
+                                    src={
+                                        ctrTiempo > (40 * 60) ? "/img/alerta - rojo.jpg" :
+                                            (ctrTiempo > 0 ? "/img/alerta - amarillo.png" : "")
+                                    }
+                                    alt="Sample"
+                                    fluid
+                                />
+                                <div className="d-flex flex-column mt-2 w-100">
+                                    <span className="texto__descripcion">
+                                        Descripción de estado
+                                    </span>
+                                    <Card.Text className="texto-peticion tamnio_descripcion mt-2">
+                                        {datosReporte.descripcion_reporte}
+                                    </Card.Text>
+                                    <Link to={`/editar/reporte/${datosReporte.id}/`} title="Agregar descripción"
+                                        className="btn btn-success separacion--boton h mt-2">
+                                        <FontAwesomeIcon icon={faPencil} />
+                                    </Link>
+                                </div>
+                            </div>
+
                         </Col>
                         <Col md={9}>
                             <Card.Body>
@@ -966,10 +995,18 @@ export function Reporte({ datosReporte }) {
                                 </Row>
                                 <hr />
                                 <Row className="mb-1">
-                                    <Card.Title style={{ fontSize: '1rem' }}>Observación de actividad realizada:</Card.Title>
-                                    <Card.Text className="texto-peticion">
-                                        {datosReporte.observacion_}
-                                    </Card.Text>
+                                    <Col md={8}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Observación de actividad realizada:</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosReporte.observacion_}
+                                        </Card.Text>
+                                    </Col>
+                                    <Col md={4}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Respuesta:</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosReporte.respuesta}
+                                        </Card.Text>
+                                    </Col>
                                 </Row>
                                 <hr />
                                 <Row className="mb-1">

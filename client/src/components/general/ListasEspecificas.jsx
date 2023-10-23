@@ -467,7 +467,7 @@ export function ListadodeReportes({ reportes, usuario, page, setPage, numeroPag 
                                         <th>Paciente</th>
                                         <th>Tiempo</th>
                                         <th>Correo</th>
-                                        <th>Opciones</th>
+                                        <th className="d-flex justify-content-center">Opciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -479,7 +479,7 @@ export function ListadodeReportes({ reportes, usuario, page, setPage, numeroPag 
                                                     <td>{reporte.tiempo_m_} m con {reporte.tiempo_s_} s</td>
                                                     <td>{reporte.correo_paciente}</td>
                                                     <td>
-                                                        <ul className="action-list">
+                                                        <ul className="action-list d-flex justify-content-center">
                                                             <Button title="Eliminar reporte" variant="danger" className="separacion--boton h"
                                                                 onClick={() => {
                                                                     Swal.fire({
@@ -511,13 +511,10 @@ export function ListadodeReportes({ reportes, usuario, page, setPage, numeroPag 
                                                             >
                                                                 <FontAwesomeIcon icon={faTrash} />
                                                             </Button>
-                                                            {
-                                                                usuario.tipo === "comun" &&
-                                                                <Link to={`/ver/reporte/${reporte.id}/`} title="Ver reporte"
-                                                                    className="btn btn-primary separacion--boton h">
-                                                                    <FontAwesomeIcon icon={faEye} />
-                                                                </Link>
-                                                            }
+                                                            <Link to={`/ver/reporte/${reporte.id}/`} title="Ver reporte"
+                                                                className="btn btn-primary separacion--boton h">
+                                                                <FontAwesomeIcon icon={faEye} />
+                                                            </Link>
                                                         </ul>
                                                     </td>
                                                 </tr>

@@ -15,6 +15,7 @@ import { info__nivel, info__dominio, info__contenido, info__contenido__respuesta
 import { validarTamanoImagen } from '../../controles/alert_user';
 import { ResultadoIndividual, ResultadoEditar } from '../../api/resultado.api';
 import { SalaIndividual, SalaActualizar } from "../../api/sala.api"
+import { ReporteIndividual, ReporteEditar } from "../../api/reporte.api"
 
 
 /* EDICION DE NIVEL*/
@@ -29,6 +30,7 @@ export function FormularioEdicionNivel() {
     const [numero_categorias, setNumeroCategorias] = useState(0);
     const [grado_dificultad, setGradoDificultad] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
 
     // Datos
@@ -70,6 +72,7 @@ export function FormularioEdicionNivel() {
             return;
         }
         //Flujo normal
+        setHabilitado(true);
         try {
             if (token) {
                 // Obtenemos los datos
@@ -89,6 +92,7 @@ export function FormularioEdicionNivel() {
                 mostrarError('Error al editar nivel');
             }
         }
+        setHabilitado(false);
     };
 
     // Use effect
@@ -174,7 +178,9 @@ export function FormularioEdicionNivel() {
                     <option value="Moderado">Nivel moderado</option>
                 </select>
             </div>
-            <button type="submit" className='btn btn-success'>Guardar</button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Actualizando...' : 'Actualizar'}
+            </Button>
         </form>
     )
 }
@@ -190,6 +196,7 @@ export function FormularioEdicion() {
     const [nombre_dominio, setNombreDominio] = useState("");
     const [descripcion_dominio, setDescripcionDominio] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
 
     // Editar dominio
@@ -201,6 +208,7 @@ export function FormularioEdicion() {
             return;
         }
         //Flujo normal
+        setHabilitado(true);
         try {
             if (token) {
                 //Flujo normal
@@ -217,6 +225,7 @@ export function FormularioEdicion() {
                 mostrarError('Error al editar dominio');
             }
         }
+        setHabilitado(false);
     };
 
     // Datos
@@ -310,7 +319,9 @@ export function FormularioEdicion() {
                 <input onClick={info__dominio} className='form-control w-100' type="text" placeholder="Ingrese una descripción corta**" id="descripcion"
                     value={descripcion_dominio} onChange={e => setDescripcionDominio(e.target.value)} />
             </div>
-            <button type="submit" className='btn btn-success'>Guardar</button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Actualizando...' : 'Actualizar'}
+            </Button>
         </form>
     )
 }
@@ -327,6 +338,7 @@ export function FormularioEdicionContenido({ slugDominio }) {
     const [dominio_tipo, setTipo] = useState("");
     const [portada, setPortada] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
 
     // Envio de datos
@@ -338,6 +350,7 @@ export function FormularioEdicionContenido({ slugDominio }) {
             return;
         }
         //Flujo normal
+        setHabilitado(true);
         try {
             if (token) {
                 // Flujo normal
@@ -354,6 +367,7 @@ export function FormularioEdicionContenido({ slugDominio }) {
                 mostrarError('Error al editar contenido');
             }
         }
+        setHabilitado(false);
     };
 
     // Datos
@@ -464,8 +478,8 @@ export function FormularioEdicionContenido({ slugDominio }) {
                     </div>
                 }
             </>
-            <Button type='submit' className='btn btn-success' >
-                Guardar
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Actualizando...' : 'Actualizar'}
             </Button>
         </form>
     )
@@ -487,6 +501,7 @@ export function FormularioEdicionIndividual({ slugContenido }) {
     const [portada_individual, setPortada] = useState("");
     const [respuesta, setRespuesta] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
 
     // Envio de datos
@@ -498,6 +513,7 @@ export function FormularioEdicionIndividual({ slugContenido }) {
             return;
         }
         //Flujo normal
+        setHabilitado(true);
         try {
             if (token) {
                 const formData = new FormData(); // Crear un objeto FormData
@@ -515,6 +531,7 @@ export function FormularioEdicionIndividual({ slugContenido }) {
                 mostrarError('Error al editar contenido individual');
             }
         }
+        setHabilitado(false);
     };
 
     // Datos
@@ -665,8 +682,8 @@ export function FormularioEdicionIndividual({ slugContenido }) {
                     </>
                 </select>
             </div>
-            <Button type='submit' className='btn btn-success' >
-                Guardar
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Actualizando...' : 'Actualizar'}
             </Button>
         </form>
     )
@@ -683,6 +700,7 @@ export function FormularioEdicionCurso() {
     const [nombre_curso, setNombreCurso] = useState("");
     const [descripcion_curso, setDescripcionCurso] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
 
     // Datos
@@ -753,6 +771,7 @@ export function FormularioEdicionCurso() {
             return;
         }
         //Flujo normal
+        setHabilitado(true);
         try {
             if (token) {
                 // Obtenemos los datos
@@ -770,6 +789,7 @@ export function FormularioEdicionCurso() {
                 mostrarError('Error al editar curso');
             }
         }
+        setHabilitado(false);
     };
 
     // Campos vacios
@@ -804,7 +824,9 @@ export function FormularioEdicionCurso() {
                 <input className='form-control w-100' type="text" placeholder="Ingrese una descripción corta**" id="descripcion"
                     value={descripcion_curso} onChange={e => setDescripcionCurso(e.target.value)} />
             </div>
-            <Button type="submit" variant="success">Guardar</Button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Actualizando...' : 'Actualizar'}
+            </Button>
         </form>
     );
 }
@@ -819,6 +841,7 @@ export function FormularioEdicionResultado() {
     const [datosResultado, setDatosResultado] = useState([]);
     const [observacion, setObservacion] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
 
     // Datos
@@ -854,6 +877,7 @@ export function FormularioEdicionResultado() {
             return;
         }
         //Flujo normal
+        setHabilitado(true);
         try {
             if (token) {
                 // Obtenemos los datos
@@ -870,6 +894,7 @@ export function FormularioEdicionResultado() {
                 mostrarError('Error al editar resultado');
             }
         }
+        setHabilitado(false);
     };
 
     // Funcion para mostrar errores
@@ -923,7 +948,9 @@ export function FormularioEdicionResultado() {
                     id="resultado" required
                     value={observacion} onChange={e => setObservacion(e.target.value)} />
             </div>
-            <Button type="submit" variant="success">Guardar</Button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Actualizando...' : 'Actualizar'}
+            </Button>
         </form>
     );
 }
@@ -939,6 +966,7 @@ export function FormularioEdicionSala() {
     const [nombre_sala, setNombre] = useState("");
     const [anotaciones, setAnotaciones] = useState("");
     const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
 
     // Datos
@@ -974,6 +1002,8 @@ export function FormularioEdicionSala() {
             Swal.fire("Por favor ingrese todos los campos", "", "warning");
             return;
         }
+        //Flujo normal
+        setHabilitado(true);
         try {
             if (token) {
                 // Obtenemos los datos
@@ -991,6 +1021,7 @@ export function FormularioEdicionSala() {
                 mostrarError('Error al actualizar sala');
             }
         }
+        setHabilitado(false);
     };
 
     // Campos vacios
@@ -1050,8 +1081,135 @@ export function FormularioEdicionSala() {
                     value={anotaciones} onChange={e => setAnotaciones(e.target.value)}
                     name='anotacion' />
             </div>
-            <Button type="submit" variant="success">Actualizar</Button>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Actualizando...' : 'Actualizar'}
+            </Button>
         </form>
     )
 
+}
+
+/* EDICION DE REPORTE */
+export function FormularioEdicionReporte() {
+    // Obtener el parametro de la URL
+    let { id } = useParams();
+    // Parametros de form
+    const token = localStorage.getItem('token');
+    const [datosReporte, setDatosReporte] = useState([]);
+    const [descripcion_reporte, setDescripcionReporte] = useState("");
+    const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
+    const navigate = useNavigate();
+
+    // Datos
+    const obtenerDatosReporte = async () => {
+        try {
+            const datos__reporte = await ReporteIndividual(id);
+            setDatosReporte(datos__reporte.data);
+            setDescripcionReporte(datos__reporte.data.descripcion_reporte);
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                mostrarError('Error al mostrar datos de reporte');
+            }
+        }
+    }
+
+    // Use effect
+    useEffect(() => {
+        if (!token) {
+            navigate('/login');
+        } else {
+            obtenerDatosReporte();
+        }
+    }, []);
+
+    // Envio de datos
+    const enviarFormReporte = async (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (!isValidForm()) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        //Flujo normal
+        setHabilitado(true);
+        try {
+            if (token) {
+                // Obtenemos los datos
+                const datos__post = {
+                    descripcion_reporte
+                };
+                // Llamamos a la función de editar nivel
+                await confirmEdicion(datos__post);
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                mostrarError('Error al editar el reporte');
+            }
+        }
+        setHabilitado(false);
+    };
+
+    // Funcion para mostrar errores
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
+
+    // Edicion
+    const confirmEdicion = async (datos__post) => {
+        return Swal.fire({
+            title: '¿Desea guardar los cambios en el reporte?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Actualizar',
+            denyButtonText: 'No guardar',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await ReporteEditar(datosReporte.id, datos__post);
+                    Swal.fire("Datos actualizados", "", "success");
+                    navigate(`/ver/reporte/${id}/`)
+                } catch (error) {
+                    Swal.fire('Error al actualizar', '', 'error');
+                }
+            } else if (result.isDenied) {
+                Swal.fire('Los cambios no se guardaron', '', 'info');
+                navigate(`/ver/reporte/${id}/`)
+            }
+        });
+    };
+
+    // Campos vacios
+    const isValidForm = () => {
+        if (
+            descripcion_reporte.trim() === ""
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    return (
+        <form onSubmit={enviarFormReporte}>
+            {error && <p>{error}</p>}
+            <div className="form-group">
+                <label className='label' htmlFor="reporte">Observación de reporte:</label>
+                <textarea class="form-control" placeholder="Ingrese las observaciones**"
+                    id="reporte" required
+                    value={descripcion_reporte}
+                    onChange={e => setDescripcionReporte(e.target.value)}>
+                </textarea>
+            </div>
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Actualizando...' : 'Actualizar'}
+            </Button>
+        </form>
+    );
 }

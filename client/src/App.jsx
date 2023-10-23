@@ -41,6 +41,7 @@ import { NivelEdición } from "./pages/edicion/NivelEdicion";
 import { CursoEdicion } from "./pages/edicion/CursoEdicion";
 import { ResultadoEdicion } from "./pages/edicion/ResultadoEdicion";
 import { SalasEdicion } from "./pages/edicion/SalaEdicion";
+import { ReporteEdicion } from "./pages/edicion/ReporteEdicion";
 import { Probando } from "./pages/general/Probando"
 {/* Informacion */ }
 import { Ver, VerPeticion } from "./pages/general/Verpdf"
@@ -106,6 +107,7 @@ function App() {
         <Route path="/curso/editar/:slug" element={<CursoEdicion />} />
         <Route path="/resultado/editar/:id" element={<ResultadoEdicion />} />
         <Route path="/sala/editar/:id" element={<SalasEdicion />} />
+        <Route path="/editar/reporte/:id" element={<ReporteEdicion />} />
         {/*OTRA RUTA */}
       </Routes>
     </BrowserRouter>

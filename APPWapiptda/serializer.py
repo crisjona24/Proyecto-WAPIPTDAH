@@ -73,10 +73,12 @@ class ResultadoSerializer(serializers.ModelSerializer):
     def get_apellido_paciente(self, obj):
         return obj.paciente.apellido_usuario
 
+
 class ResultadoSerializerOnly(serializers.ModelSerializer):
     class Meta:
         model = Resultado
         fields = ('id', 'observacion')
+
 
 class CursoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -98,6 +100,7 @@ class PeticionSerializer(serializers.ModelSerializer):
         fields = ('id', 'motivo_peticion', 'tipo_peticion', 'slug_peticion',
                   'estado_revision', 'peticion_cuerpo', 'usuario_comun')
 
+
 class DetallePeticionSerializer(serializers.ModelSerializer):
     #usuario_tecnico = serializers.SerializerMethodField()
     usuario_tecnico = serializers.CharField(source='usuario_tecnico.nombre_usuario', read_only=True)
@@ -107,16 +110,19 @@ class DetallePeticionSerializer(serializers.ModelSerializer):
         fields = ('id', 'motivo_peticion', 'fecha_detalle_peticion', 'estado_detalle_revision',
                   'peticion', 'usuario_tecnico')
         
+
 class SalaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sala
         fields = ('id', 'nombre_sala', 'anotaciones', 'codigo_identificador', 'slug_sala', 'estado_sala', 
                   'sala_atendida', 'paciente')
 
+
 class DetalleSalaSerializer(serializers.ModelSerializer):
     class Meta:
         model = DetalleSala
         fields = ('id', 'fecha_detalle_sala', 'estado_detalle_sala', 'sala', 'usuario_comun')
+
 
 class ReporteSerializer(serializers.ModelSerializer):
     # Datos de paciente
@@ -130,6 +136,7 @@ class ReporteSerializer(serializers.ModelSerializer):
     descripcion_individual = serializers.SerializerMethodField()
     respuesta = serializers.SerializerMethodField()
     tipo_contenido = serializers.SerializerMethodField()
+    identificador_contenido = serializers.SerializerMethodField()
     # Datos Resultado
     tiempo_m_ = serializers.SerializerMethodField()
     tiempo_s_ = serializers.SerializerMethodField()
@@ -142,7 +149,7 @@ class ReporteSerializer(serializers.ModelSerializer):
                   'usuario_comun', 'contenido_individual', 'paciente', 'resultado', 'fecha_registro_reporte',
                   'nombre_paciente', 'apellido_paciente', 'correo_paciente', 'descripcion_individual',
                   'respuesta', 'tipo_contenido', 'tiempo_m_', 'tiempo_s_', 'observacion_', 'celular_paciente',
-                  'fecha_registro_resultado_', 'edad_paciente', 'direccion_paciente')
+                  'fecha_registro_resultado_', 'edad_paciente', 'direccion_paciente', 'identificador_contenido')
     
     def get_nombre_paciente(self, obj):
         return obj.paciente.nombre_usuario
@@ -162,6 +169,8 @@ class ReporteSerializer(serializers.ModelSerializer):
         return obj.contenido_individual.respuesta
     def get_tipo_contenido(self, obj):
         return obj.contenido_individual.tipo_contenido
+    def get_identificador_contenido(self, obj):
+        return obj.contenido_individual.identificador_individual
     def get_tiempo_m_(self, obj):
         return obj.resultado.tiempo_m
     def get_tiempo_s_(self, obj):
