@@ -15,6 +15,8 @@ import { IndividualEliminar, ObtenerSlugDominio, ObtenerSlugContenido } from '..
 import { VerificarUsuario } from "../../../api/usuario.api";
 //import { AtenderPeticion } from "../../../api/peticion.api"
 import { ObtenerSlugCurso } from "../../../api/curso.api"
+import { ReporteEliminar, ModificarEstadoResultado } from "../../../api/reporte.api"
+
 
 // Dominio
 export function Dominio({ datos }) {
@@ -759,7 +761,7 @@ export function Paciente({ datosPaciente }) {
 }
 
 // Aplicacion
-export function Aplicacion () {
+export function Aplicacion() {
     return (
         <div>
             <div className="cabeza__Nivel">
@@ -790,12 +792,12 @@ export function Aplicacion () {
                             <Card.Body>
                                 <Card.Title className="titulo-peticion">Conoce acerca de WAPIPTDAH</Card.Title>
                                 <Row className="mb-2">
-                                <Card.Title style={{ fontSize: '1rem' }}>Nombres :</Card.Title>
-                                        <Card.Text className="texto-peticion">
-                                            <p>
-                                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Assumenda, soluta expedita inventore aut aperiam tenetur odit nam exercitationem esse saepe optio, ut consequuntur eaque sunt culpa sit dolor? Voluptatem, eius.
-                                            </p>
-                                        </Card.Text>
+                                    <Card.Title style={{ fontSize: '1rem' }}>Nombres :</Card.Title>
+                                    <Card.Text className="texto-peticion">
+                                        <p>
+                                            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Assumenda, soluta expedita inventore aut aperiam tenetur odit nam exercitationem esse saepe optio, ut consequuntur eaque sunt culpa sit dolor? Voluptatem, eius.
+                                        </p>
+                                    </Card.Text>
                                 </Row>
                                 <hr />
 
@@ -805,6 +807,214 @@ export function Aplicacion () {
                                         <Link to={'/nivel/all'} title="Regresar" className="btn btn-primary">
                                             <FontAwesomeIcon icon={faBackward} />
                                         </Link>
+                                    </div>
+                                </Card.Text>
+                            </Card.Body>
+                        </Col>
+                    </Row>
+                </Card>
+            </div>
+        </div>
+    );
+}
+
+// Reporte 
+export function Reporte({ datosReporte }) {
+    const navigate = useNavigate();
+    /* *** Control de tipo de usuario *** */
+    const [tipoUsuario, setTipo] = useState([]);
+
+    // Obtener tipo de usuario
+    const verificacionUser = async () => {
+        try {
+            let cont = await VerificarUsuario();
+            setTipo(cont.data);
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            }
+        }
+    }
+
+    // Obtener tipo de usuario
+    useEffect(() => {
+        verificacionUser();
+    }, []);
+
+    return (
+        <div>
+            <div className="cabeza__Nivel">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-md-12">
+                            <h4 className="display-7 mt-2">
+                                Reporte - WAPIPTDAH
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-3 align-items-center" style={{ height: '100vh', marginLeft: '10%', marginRight: '10%' }}>
+                <Card className="mb-3" style={{ maxWidth: '100%' }}>
+                    <div className="d-flex">
+                        <div className="container d-flex justify-content-left">
+                            <img src="/img/tarjeta-paciente.png" style={{ width: '6%' }} />
+                            <h6 className="mt-3">
+                                WAPIPTDAH - Cuidamos de nuestros niños
+                            </h6>
+                        </div>
+                    </div>
+                    <hr />
+                    <div className="d-flex flex-column">
+                        <div className="pt-1 pl-2 texto-reporte" >
+                            Aplicación web de ayuda para niños con TDAH
+                        </div>
+                        <div className="pt-1 pl-2 texto-reporte">
+                            Universidad Nacional de Loja
+                        </div>
+                        <div className="pt-1 pl-2 texto-reporte" >
+                            Loja-Ecuador-La Argelia
+                        </div>
+
+                    </div>
+                    <div className="d-flex flex-column fecha-reportes">
+                        <div className="mt-3" style={{ fontSize: '0.8rem' }}>
+                            Fecha de realización de reporte
+                        </div>
+                        <div className="d-flex flex-row">
+                            <div class="p-2 d-flex flex-column">
+                                <span>
+                                    <strong style={{ fontSize: '0.8rem' }}>Fecha de inicio:</strong>
+                                </span>
+                                <span style={{ fontSize: '0.8rem' }}>
+                                    {datosReporte.fecha_registro_reporte}
+                                </span>
+                            </div>
+                            <div class="p-2 d-flex flex-column">
+                                <span>
+                                    <strong style={{ fontSize: '0.8rem' }}>Fecha de finalización</strong>
+                                </span>
+                                <span style={{ fontSize: '0.8rem' }}>
+                                    {datosReporte.fecha_registro_reporte}
+                                </span>
+                            </div>
+                            <div class="p-2 d-flex flex-column">
+                                <span>
+                                    <strong style={{ fontSize: '0.8rem' }}>Fecha de resultado</strong>
+                                </span>
+                                <span style={{ fontSize: '0.8rem' }}>
+                                    {datosReporte.fecha_registro_resultado_}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <Row >
+                        <Col md={3}>
+                            <Image
+                                className="img-fluid"
+                                style={{ borderRadius: '10px', height: '50%', marginTop: '70%' }}
+                                src="/img/tarjeta-paciente.png"
+                                alt="Sample"
+                                fluid
+                            />
+                        </Col>
+                        <Col md={9}>
+                            <Card.Body>
+                                <Card.Title className="titulo-peticion">Informe de estado</Card.Title>
+                                <Row className="mb-1">
+                                    <Col md={5}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Nombres:</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosReporte.nombre_paciente} {datosReporte.apellido_paciente}
+                                        </Card.Text>
+                                    </Col>
+                                    <Col md={3}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Edad:</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosReporte.edad_paciente} años
+                                        </Card.Text>
+                                    </Col>
+                                    <Col md={4}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Contacto:</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosReporte.celular_paciente}
+                                        </Card.Text>
+                                    </Col>
+                                </Row>
+                                <hr />
+                                <Row className="mb-1">
+                                    <Col md={8}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Correo electrónico:</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosReporte.correo_paciente}
+                                        </Card.Text>
+                                    </Col>
+                                    <Col md={4}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Dirección:</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosReporte.direccion_paciente}
+                                        </Card.Text>
+                                    </Col>
+                                </Row>
+                                <hr />
+                                <Row className="mb-1">
+                                    <Card.Title style={{ fontSize: '1rem' }}>Descripción de actividad realizada:</Card.Title>
+                                    <Card.Text className="texto-peticion">
+                                        {datosReporte.descripcion_individual}
+                                    </Card.Text>
+                                </Row>
+                                <hr />
+                                <Row className="mb-1">
+                                    <Card.Title style={{ fontSize: '1rem' }}>Observación de actividad realizada:</Card.Title>
+                                    <Card.Text className="texto-peticion">
+                                        {datosReporte.observacion_}
+                                    </Card.Text>
+                                </Row>
+                                <hr />
+                                <Row className="mb-1">
+                                    <Card.Title style={{ fontSize: '1rem' }}>Tiempo de actividad realizada:</Card.Title>
+                                    <Card.Text className="texto-peticion">
+                                        {datosReporte.tiempo_m_} minutos con {datosReporte.tiempo_s_} segundos
+                                    </Card.Text>
+                                </Row>
+                                <hr />
+                                <Card.Text>
+                                    <small className="text-muted" style={{ fontFamily: 'Roboto' }}>Acciones</small>
+                                    <div className='d-flex justify-content-between align-items-center'>
+                                        <Link to={'/reporte/all'} title="Regresar" className="btn btn-primary">
+                                            <FontAwesomeIcon icon={faBackward} />
+                                        </Link>
+                                        <Button title="Eliminar reporte" variant="danger" className="separacion--boton h"
+                                            onClick={() => {
+                                                Swal.fire({
+                                                    title: '¿Está seguro que desea eliminar el reporte?',
+                                                    text: "Eliminar reporte",
+                                                    icon: 'warning',
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: '#3085d6',
+                                                    cancelButtonColor: '#d33',
+                                                    confirmButtonText: 'Sí'
+                                                }).then(async (result) => {
+                                                    if (result.isConfirmed) {
+                                                        const respuesta = await ModificarEstadoResultado(reporte.id);
+                                                        if (respuesta.data.success) {
+                                                            await ReporteEliminar(reporte.id);
+                                                            Swal.fire("Eliminación exitosa", "", "success");
+                                                            navigate('/reporte/all');
+                                                        } else {
+                                                            if (respuesta.data.error) {
+                                                                Swal.fire(respuesta.data.error, '', 'error');
+                                                            } else {
+                                                                Swal.fire('Eliminación fallida', '', 'error');
+                                                            }
+                                                        }
+                                                    }
+                                                })
+                                            }}
+                                        >
+                                            <FontAwesomeIcon icon={faTrash} />
+                                        </Button>
                                     </div>
                                 </Card.Text>
                             </Card.Body>

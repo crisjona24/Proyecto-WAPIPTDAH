@@ -2499,7 +2499,6 @@ def guardar_reporte(ob1, ob2):
         paciente_ob = resultado_ob.paciente
         contenido_individual_ob = resultado_ob.contenido_individual
         usuario_comun_ob = UsuarioComun.objects.get(user=ob2)
-        print("LLLego aqui")
         # Creamos el reporte
         reporte_ob = Reporte.objects.create(
             titulo_reporte = "Reporte de Resultado",
@@ -2509,8 +2508,51 @@ def guardar_reporte(ob1, ob2):
             paciente = paciente_ob,
             resultado = resultado_ob
         )
-        print("LLLego aqui x2")
         reporte_ob.save()
+        # Modifiamos el estado de reporte del resultado
+        resultado_ob.estado_reporte = True
+        resultado_ob.save()
+        return True
+    except Exception as e:
+        return False
+
+
+## GENERAR REPORTE ##
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def modificar_estado_reporte(request, id):
+    try: 
+        # Decodifica el token
+        token = request.headers.get('Authorization').split(" ")[1]
+        user = get_user_from_token_jwt(token)
+        # Verificar existencia del usuario
+        if user and token:
+            if request.method == 'GET':
+                id_reporte = id
+                # Guardar Reporte
+                if modificar_estado_resultado(id_reporte):
+                    return JsonResponse({'success': True})
+                else:
+                    error_message = "Error al eliminar el reporte...."
+                    context = {'error': error_message}
+                    return JsonResponse(context)
+            else:
+                return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
+        else:
+            return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
+    except Exception as e:
+        return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+    
+def modificar_estado_resultado(ob1):
+    try:
+        #Obtenemos el objeto reporte a partir del id
+        reporte_ob = Reporte.objects.get(id=ob1)
+        # Obtenemos el objeto resultado relacionado al reporte
+        resultado_ob = reporte_ob.resultado
+        # Modifiamos el estado de reporte del resultado
+        resultado_ob.estado_reporte = False
+        resultado_ob.save()
         return True
     except Exception as e:
         return False

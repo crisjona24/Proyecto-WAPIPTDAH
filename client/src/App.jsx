@@ -46,7 +46,7 @@ import { Probando } from "./pages/general/Probando"
 import { Ver, VerPeticion } from "./pages/general/Verpdf"
 import {
   InformacionDominio, InformacionContenido, InformacionIndividual,
-  InformacionPaciente, InformacionAPP
+  InformacionPaciente, InformacionAPP, InformacionReporte
 } from "./pages/general/InformacionDatos";
 
 function App() {
@@ -96,6 +96,7 @@ function App() {
         <Route path="/ver/peticion/:id" element={<VerPeticion />} />
         <Route path="/ver/paciente/:id" element={<InformacionPaciente />} />
         <Route path="/ver/datos" element={<InformacionAPP />} />
+        <Route path="/ver/reporte/:id" element={<InformacionReporte />} />
         <Route path="/ver" element={<Ver />} />
         {/* RUTA DE EDICION DE INFORMACION */}
         <Route path="/dominio/editar/:slug" element={<DominioEdición />} />

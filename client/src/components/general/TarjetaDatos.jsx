@@ -11,8 +11,9 @@ import { Dominio } from "./general__tarjeta/TarjetaGeneral";
 import { VerificarContenido, ContenidoIndividual } from "../../api/contenido.api";
 import { Contenido } from "./general__tarjeta/TarjetaGeneral";
 import { VerificarContenidoIndividual, ContenidoDatosIndividual } from "../../api/contenidoindividual.api";
-import { Individual, Peticion, Paciente, Aplicacion } from "./general__tarjeta/TarjetaGeneral";
+import { Individual, Peticion, Paciente, Aplicacion, Reporte } from "./general__tarjeta/TarjetaGeneral";
 import { PacienteIndividual } from "../../api/usuario.api";
+import { ReporteIndividual } from "../../api/reporte.api";
 
 
 // Tarjeta de dominio
@@ -342,6 +343,65 @@ export function TarjetaAplicacion() {
     return (
         <div>
             <Aplicacion />
+        </div>
+    )
+}
+
+
+// Tarjeta de reporte
+export function TarjetaReporte() {
+    // Obtener el parametro de la URL
+    let { id } = useParams(); // ID del reporte
+    /* *** Form **** */
+    const [datosReporte, setDatosReporte] = useState([]);
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
+    const token = localStorage.getItem('token'); // Token de usuario
+
+    // Obtener datos
+    const obtenerDatosReporte = async () => {
+        try {
+            // Buscar los datos de paciente
+            const contReporte = await ReporteIndividual(id);
+            setDatosReporte(contReporte.data);
+        } catch (err) {
+            if (err.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                mostrarError('Error al mostrar datos del reporte');
+            }
+        }
+    }
+
+    // Use effect
+    useEffect(() => {
+        if (!token) {
+            navigate('/login');
+        } else {
+            obtenerDatosReporte();
+        }
+    }, [id]);
+
+    // Funcion para mostrar errores
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
+
+    return (
+        <div>
+            <>
+                {
+                    error &&
+                    <div id="alert" className="alert alert-success" role="alert">
+                        <h5 className="alert-heading">!Atención!</h5>
+                        <span className="mb-0">{error}</span>
+                    </div>
+                }
+                <Reporte datosReporte={datosReporte} />
+            </>
         </div>
     )
 }

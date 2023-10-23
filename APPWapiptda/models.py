@@ -250,6 +250,7 @@ class Resultado(models.Model):
     fecha_registro_resultado = models.DateField(auto_now=True)
     estado_resultado = models.BooleanField(default=True)
     slug_resultado = models.SlugField(unique=True, blank=True)
+    estado_reporte = models.BooleanField(default=False)
     # Foranea
     contenido_individual = models.ForeignKey(
         ContenidoIndividual, on_delete=models.CASCADE, blank=True, null=True)
@@ -362,7 +363,7 @@ class DetalleSala(models.Model):
 class Reporte(models.Model):
     titulo_reporte = models.CharField(max_length=200, blank=False, null=True)
     descripcion_reporte = models.TextField(blank=False, null=True)
-    slug_reporte = models.SlugField(unique=True, blank=False, null=True)
+    slug_reporte = models.SlugField(unique=False, blank=False, null=True)
     fecha_registro_reporte = models.DateField(auto_now=True)
     estado_reporte = models.BooleanField(default=True)
     # Foraneas

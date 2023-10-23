@@ -4,14 +4,14 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Table } from "react-bootstrap";
 // Componentes
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBackward, faCheckDouble, faPencil, faTrash, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faBackward, faCheckDouble, faPencil, faTrash, faPlusCircle, faEye } from '@fortawesome/free-solid-svg-icons';
 import { Link, useNavigate } from 'react-router-dom';
 //import { useState } from "react";
 import React from 'react';
 import Swal from "sweetalert2";
 // Metodos
 import { SalaEliminar, AtenderSala } from "../../api/sala.api"
-import { ReporteEliminar, CrearReporteNuevo } from "../../api/reporte.api"
+import { ReporteEliminar, CrearReporteNuevo, ModificarEstadoResultado } from "../../api/reporte.api"
 import { ResultadoEliminar } from "../../api/resultado.api"
 
 
@@ -301,7 +301,7 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                         <th>Paciente</th>
                                         <th>Tiempo</th>
                                         <th>Observación</th>
-                                        <th>Opciones</th>
+                                        <th className="d-flex justify-content-center">Opciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -323,37 +323,43 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                                     </>
 
                                                     <td>
-                                                        <ul className="action-list d-flex">
-                                                            <Button title="Generar Reporte" variant="success" className="separacion--boton h"
-                                                                onClick={() => {
-                                                                    Swal.fire({
-                                                                        title: '¿Está seguro que desea generar el reporte?',
-                                                                        text: "Generar reporte",
-                                                                        icon: 'info',
-                                                                        showCancelButton: true,
-                                                                        confirmButtonColor: '#3085d6',
-                                                                        cancelButtonColor: '#d33',
-                                                                        confirmButtonText: 'Sí, generar'
-                                                                    }).then(async (result) => {
-                                                                        if (result.isConfirmed) {
-                                                                            const response = await CrearReporteNuevo(resultado.id);
-                                                                            if (response.data.success) {
-                                                                                console.log(response.data);
-                                                                                Swal.fire("Reporte generado de forma exitosa", "", "success");
-                                                                                navigate('/reporte/all');
-                                                                            } else {
-                                                                                if (response.data.error) {
-                                                                                    Swal.fire(response.data.error, '', 'error');
-                                                                                } else {
-                                                                                    Swal.fire('Reporte fallido', '', 'error');
+                                                        <ul className="action-list d-flex justify-content-center">
+                                                            <>
+                                                                {
+                                                                    resultado.estado_reporte === false && usuario.tipo === "comun" &&
+                                                                    <Button title="Generar Reporte" variant="success"
+                                                                        className="separacion--boton h" disabled={resultado.observacion === null}
+                                                                        onClick={() => {
+                                                                            Swal.fire({
+                                                                                title: '¿Está seguro que desea generar el reporte?',
+                                                                                text: "Generar reporte",
+                                                                                icon: 'info',
+                                                                                showCancelButton: true,
+                                                                                confirmButtonColor: '#3085d6',
+                                                                                cancelButtonColor: '#d33',
+                                                                                confirmButtonText: 'Sí, generar'
+                                                                            }).then(async (result) => {
+                                                                                if (result.isConfirmed) {
+                                                                                    const response = await CrearReporteNuevo(resultado.id);
+                                                                                    if (response.data.success) {
+                                                                                        console.log(response.data);
+                                                                                        Swal.fire("Reporte generado de forma exitosa", "", "success");
+                                                                                        navigate('/reporte/all');
+                                                                                    } else {
+                                                                                        if (response.data.error) {
+                                                                                            Swal.fire(response.data.error, '', 'error');
+                                                                                        } else {
+                                                                                            Swal.fire('Reporte fallido', '', 'error');
+                                                                                        }
+                                                                                    }
                                                                                 }
-                                                                            }
-                                                                        }
-                                                                    })
-                                                                }}
-                                                            >
-                                                                <FontAwesomeIcon icon={faCheckDouble} />
-                                                            </Button>
+                                                                            })
+                                                                        }}
+                                                                    >
+                                                                        <FontAwesomeIcon icon={faCheckDouble} />
+                                                                    </Button>
+                                                                }
+                                                            </>
                                                             <Button title="Eliminar resultado" variant="danger" className="separacion--boton h"
                                                                 onClick={() => {
                                                                     Swal.fire({
@@ -458,9 +464,9 @@ export function ListadodeReportes({ reportes, usuario, page, setPage, numeroPag 
                                 <thead>
                                     <tr>
 
-                                        <th>Título</th>
-                                        <th>Estado</th>
-                                        <th>Descripción</th>
+                                        <th>Paciente</th>
+                                        <th>Tiempo</th>
+                                        <th>Correo</th>
                                         <th>Opciones</th>
                                     </tr>
                                 </thead>
@@ -469,9 +475,9 @@ export function ListadodeReportes({ reportes, usuario, page, setPage, numeroPag 
                                         {
                                             reportes.map((reporte) => (
                                                 <tr key={reporte.id}>
-                                                    <td>{reporte.nombre_paciente}</td>
-                                                    <td>{reporte.apellido_paciente}</td>
-                                                    <td>{reporte.tiempo_m_}</td>
+                                                    <td>{reporte.nombre_paciente} {reporte.apellido_paciente}</td>
+                                                    <td>{reporte.tiempo_m_} m con {reporte.tiempo_s_} s</td>
+                                                    <td>{reporte.correo_paciente}</td>
                                                     <td>
                                                         <ul className="action-list">
                                                             <Button title="Eliminar reporte" variant="danger" className="separacion--boton h"
@@ -486,10 +492,19 @@ export function ListadodeReportes({ reportes, usuario, page, setPage, numeroPag 
                                                                         confirmButtonText: 'Sí'
                                                                     }).then(async (result) => {
                                                                         if (result.isConfirmed) {
-                                                                            await ReporteEliminar(reporte.id);
-                                                                            Swal.fire("Eliminación exitosa", "", "success");
-                                                                            navigate('/reporte/all');
-                                                                            window.location.reload();
+                                                                            const respuesta = await ModificarEstadoResultado(reporte.id);
+                                                                            if (respuesta.data.success) {
+                                                                                await ReporteEliminar(reporte.id);
+                                                                                Swal.fire("Eliminación exitosa", "", "success");
+                                                                                navigate('/reporte/all');
+                                                                                window.location.reload();
+                                                                            } else {
+                                                                                if (respuesta.data.error) {
+                                                                                    Swal.fire(respuesta.data.error, '', 'error');
+                                                                                } else {
+                                                                                    Swal.fire('Eliminación fallida', '', 'error');
+                                                                                }
+                                                                            }
                                                                         }
                                                                     })
                                                                 }}
@@ -498,9 +513,9 @@ export function ListadodeReportes({ reportes, usuario, page, setPage, numeroPag 
                                                             </Button>
                                                             {
                                                                 usuario.tipo === "comun" &&
-                                                                <Link title="Editar reporte"
+                                                                <Link to={`/ver/reporte/${reporte.id}/`} title="Ver reporte"
                                                                     className="btn btn-primary separacion--boton h">
-                                                                    <FontAwesomeIcon icon={faPencil} />
+                                                                    <FontAwesomeIcon icon={faEye} />
                                                                 </Link>
                                                             }
                                                         </ul>

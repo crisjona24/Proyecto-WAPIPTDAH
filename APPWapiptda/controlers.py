@@ -412,6 +412,62 @@ def resultado_por_nombre(request, nombre, apellido):
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
+class ReportedePacienteListView(generics.ListAPIView):
+    serializer_class = ReporteSerializer
+    pagination_class = Paginacion
+    def get_queryset(self):
+        # Obtener nombre y apellido de la url
+        nombre, apellido = self.kwargs['nombre'].split(' ', 1)
+        if (nombre_paciente_exist(nombre , apellido)):
+            # Filtrar registros de resultados por el nombre del paciente
+            reportes = reporte_por_nombre(self.request, nombre, apellido)
+            return reportes
+        else:
+            return []
+
+
+def reporte_por_nombre(request, nombre, apellido):
+    try:
+        # Decodifica el token para obtener el usuario
+        token = request.headers.get('Authorization').split(" ")[1]
+        user = get_user_from_token_jwt(token)
+        # Encontrar al usuario relacionado al user
+        if is_comun(user):
+            # Obtener el usuario comun
+            usuario__ob = UsuarioComun.objects.get(user=user)
+            # Obtener el paciente por nombre y apellido ignorando mayusculas y minusculas
+            paciente__ob = Paciente.objects.get(nombre_usuario__icontains=nombre, apellido_usuario__icontains=apellido)
+            # Obtener los cursos creados por el usuario comun
+            cursos = Curso.objects.filter(usuario_comun=usuario__ob)
+            # Obtener los cursos a los que está inscrito el paciente
+            inscripciones = DetalleInscripcionCurso.objects.filter(paciente=paciente__ob, curso__in=cursos).exists()
+            if inscripciones:
+                # Obtener los reportes  del paciente
+                reportes = Reporte.objects.filter(paciente=paciente__ob).order_by('fecha_registro_reporte')
+                return reportes
+            else :
+                return []
+        else:
+            if is_tecnico(user):
+                # Obtener el paciente por nombre y apellido ignorando mayusculas y minusculas
+                paciente__ob = Paciente.objects.get(nombre_usuario__icontains=nombre, apellido_usuario__icontains=apellido)
+                # Obtener los reportes  del paciente
+                reportes = Reporte.objects.filter(paciente=paciente__ob).order_by('fecha_registro_reporte')
+                return reportes
+            else:
+                return []
+    except UsuarioComun.DoesNotExist:
+        return []
+    except Paciente.DoesNotExist:
+        return []
+    except Curso.DoesNotExist:
+        return []
+    except Reporte.DoesNotExist:
+        return []
+
+# PROTECCION CON JWT
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 class SalasListView(generics.ListAPIView):
     serializer_class = SalaSerializer
     pagination_class = Paginacion

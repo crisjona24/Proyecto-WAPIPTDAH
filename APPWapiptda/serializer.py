@@ -66,7 +66,7 @@ class ResultadoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resultado
         fields = ('id', 'respuesta', 'tiempo_m', 'tiempo_s', 'observacion', 'fecha_registro_resultado',
-                  'slug_resultado', 'estado_resultado', 'contenido_individual', 'paciente',
+                  'slug_resultado', 'estado_resultado', 'estado_reporte', 'contenido_individual', 'paciente',
                   'nombre_paciente', 'apellido_paciente')
     def get_nombre_paciente(self, obj):
         return obj.paciente.nombre_usuario
@@ -123,6 +123,9 @@ class ReporteSerializer(serializers.ModelSerializer):
     nombre_paciente = serializers.SerializerMethodField()
     apellido_paciente = serializers.SerializerMethodField()
     correo_paciente = serializers.SerializerMethodField()
+    celular_paciente = serializers.SerializerMethodField()
+    edad_paciente = serializers.SerializerMethodField()
+    direccion_paciente = serializers.SerializerMethodField()
     # Datos de contenido individual
     descripcion_individual = serializers.SerializerMethodField()
     respuesta = serializers.SerializerMethodField()
@@ -131,13 +134,15 @@ class ReporteSerializer(serializers.ModelSerializer):
     tiempo_m_ = serializers.SerializerMethodField()
     tiempo_s_ = serializers.SerializerMethodField()
     observacion_ = serializers.SerializerMethodField()
+    fecha_registro_resultado_ = serializers.SerializerMethodField()
 
     class Meta:
         model = Reporte
         fields = ('id', 'titulo_reporte', 'descripcion_reporte', 'slug_reporte', 'estado_reporte', 
-                  'usuario_comun', 'contenido_individual', 'paciente', 'resultado',
+                  'usuario_comun', 'contenido_individual', 'paciente', 'resultado', 'fecha_registro_reporte',
                   'nombre_paciente', 'apellido_paciente', 'correo_paciente', 'descripcion_individual',
-                  'respuesta', 'tipo_contenido', 'tiempo_m_', 'tiempo_s_', 'observacion_')
+                  'respuesta', 'tipo_contenido', 'tiempo_m_', 'tiempo_s_', 'observacion_', 'celular_paciente',
+                  'fecha_registro_resultado_', 'edad_paciente', 'direccion_paciente')
     
     def get_nombre_paciente(self, obj):
         return obj.paciente.nombre_usuario
@@ -145,6 +150,12 @@ class ReporteSerializer(serializers.ModelSerializer):
         return obj.paciente.apellido_usuario
     def get_correo_paciente(self, obj):
         return obj.paciente.email_usuario
+    def get_edad_paciente(self, obj):
+        return obj.paciente.edad
+    def get_celular_paciente(self, obj):
+        return obj.paciente.celular
+    def get_direccion_paciente(self, obj):
+        return obj.paciente.direccion
     def get_descripcion_individual(self, obj):
         return obj.contenido_individual.descripcion_individual
     def get_respuesta(self, obj):
@@ -157,4 +168,6 @@ class ReporteSerializer(serializers.ModelSerializer):
         return obj.resultado.tiempo_s
     def get_observacion_(self, obj):
         return obj.resultado.observacion
+    def get_fecha_registro_resultado_(self, obj):
+        return obj.resultado.fecha_registro_resultado
     

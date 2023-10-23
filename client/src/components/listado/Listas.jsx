@@ -12,7 +12,7 @@ import { NivelListado } from "../../api/grado.api";
 import { PacientesInscritos, VerificarCurso, CursoListado, CursosUsuarioComun, BusquedaCurso } from "../../api/curso.api";
 import { ResultadosListado, PacientesResultados, ResultadosListaUsuario } from "../../api/resultado.api";
 import { SalasUsuarioComun, SalaListado, SalasPaciente, BusquedaSalas, AccederSala } from "../../api/sala.api";
-import { ReporteListado, ReporteListadoUsuarioComun } from "../../api/reporte.api";
+import { ReporteListado, ReporteListadoUsuarioComun, ReportesPaciente } from "../../api/reporte.api";
 import { SalasUsuarioComunAtendidas } from "../../api/sala.api";
 
 import { ListadodePacientes } from "../general/ListaPaciente";
@@ -1207,11 +1207,13 @@ export function ReporteLista({ usuario }) {
     const navigate = useNavigate();
     // Manejo del estado de los datos
     const [reportes, setReportes] = useState([]);
-    //const [isTamanio, setIstamanio] = useState(false);
-    //const [nombrebuscar, setNombreBuscar] = useState("");
-    //const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
     const [numeroPag, setNumeropag] = useState(1);
     const elementosPorPagina = 8;
+    // BUSQUEDA
+    const [nombrebuscar, setNombreBuscar] = useState("");
+    const [isTamanio, setIstamanio] = useState(false);
+    const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
+    const [entradaValida, setEntradavaldia] = useState(true);
 
     // Obtener resultados
     const cargarReporte = async () => {
@@ -1222,7 +1224,7 @@ export function ReporteLista({ usuario }) {
                 const reporte_tecnico = await ReporteListado(page);
                 setReportes(reporte_tecnico.data.results);
                 if (reporte_tecnico.data.results.length === 0) {
-                    //setIstamanio(true);
+                    setIstamanio(true);
                     setNumeropag(1);
                 } else {
                     setNumeropag(Math.ceil(reporte_tecnico.data.count / elementosPorPagina));
@@ -1249,14 +1251,22 @@ export function ReporteLista({ usuario }) {
 
     // Manejo del estado de los datos
     useEffect(() => {
-        cargarReporte();
+        if (!mostrarBusqueda) {
+            cargarReporte();
+        } else {
+            busquedaReporte();
+        }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            cargarReporte();
+            if (!mostrarBusqueda) {
+                cargarReporte();
+            } else {
+                busquedaReporte();
+            }
         }, 1200000); // 20 minutos
         return () => clearInterval(interval);
 
-    }, [page]);
+    }, [mostrarBusqueda, page]);
 
     // Funcion para mostrar errores
     const mostrarError = (message) => {
@@ -1264,6 +1274,64 @@ export function ReporteLista({ usuario }) {
         setTimeout(() => {
             setError("");
         }, 5000);
+    };
+
+    // BUSQUEDA
+    // Metodo de busqueda
+    const busquedaReporte = async () => {
+        // Verificar campos vacíos
+        if (isEmptyField(nombrebuscar)) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Entrada
+        if (!entradaValida) {
+            Swal.fire("Por favor ingrese el formato: Nombre Apellido", "", "warning");
+            return;
+        }
+        // Flujo normal
+        try {
+            const datos_obtenidos_repor = await ReportesPaciente(nombrebuscar, page);
+            if (datos_obtenidos_repor.data.results.length === 0) {
+                setNumeropag(1);
+                Swal.fire("No existen reportes con ese nombre de paciente. Ingresa un nombre válido", "", "warning");
+                return;
+            } else {
+                setReportes(datos_obtenidos_repor.data.results);
+                setNumeropag(Math.ceil(datos_obtenidos_repor.data.count / elementosPorPagina));
+                setMostrarBusqueda(true);
+            }
+        } catch (error) {
+            Swal.fire("No existen reportes con ese nombre de paciente. Ingresa un nombre válido", "", "warning");
+        }
+    }
+    // Control de entrada de datos
+    const isEmptyField = (...fields) => {
+        return fields.some(field => field.trim() === "");
+    }
+
+    // Resetear busqueda
+    const resetearBusqueda = () => {
+        setMostrarBusqueda(false);
+        setNombreBuscar("");
+    }
+
+    // Funcion para validar la entreada
+    const cambioEntrada = (e) => {
+        const value = e.target.value;
+        setNombreBuscar(value);
+
+        if (!validarEntrada(value)) {
+            setEntradavaldia(false);
+        } else {
+            setEntradavaldia(true);
+        }
+    };
+
+    // Validacion de entrada
+    const validarEntrada = (value) => {
+        const generar = /^[a-zA-Z]+ [a-zA-Z]+$/;
+        return generar.test(value);
     };
 
     return (
@@ -1285,6 +1353,27 @@ export function ReporteLista({ usuario }) {
                     <p className="mb-0">{error}</p>
                 </div>
             }
+            <div className="mt-4 container" style={{ height: '50px', borderRadius: '10px' }}>
+                <div className="d-flex flex-row justify-content-left w-100" style={{ alignItems: 'center', marginLeft: '1px' }}>
+                    <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar</a>
+                    <form className="d-flex flex-row justify-content-between w-50">
+                        <input className="form-control mr-sm-2 w-100" type="search" name="nombre" id="nombre"
+                            placeholder="Nombre del paciente.." aria-label="Search" value={nombrebuscar}
+                            onChange={cambioEntrada} disabled={isTamanio} />
+                        <>
+                            {
+                                mostrarBusqueda
+                                    ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                        X
+                                    </Button>
+                                    : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaReporte} disabled={isTamanio}>
+                                        Ir
+                                    </Button>
+                            }
+                        </>
+                    </form>
+                </div>
+            </div>
             {/* Table */}
             <ListadodeReportes reportes={reportes} usuario={usuario} page={page} setPage={setPage} numeroPag={numeroPag} />
         </div>

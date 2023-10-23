@@ -155,3 +155,39 @@ export const ReporteEliminar = (id) => {
         throw new Error("No se puede eliminar el reporte : " + error.message);
     }
 };
+
+// METODOS VARIOS
+export const ModificarEstadoResultado = (id) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return baseurl.get(`wapiptdah/modificar/estado/resultado/${id}/`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+    } catch (error) {
+        throw new Error("No se puede modificar el estado del resultado." + error.message);
+    }
+};
+
+// Resultados por paciente
+export const ReportesPaciente = async (nombre, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/reportes/${encodeURIComponent(nombre)}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a las peticiones: " + error.message);
+    }
+};

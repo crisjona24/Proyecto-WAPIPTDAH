@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 // Metodos
 import { onPageLoad } from "../../controles/logout"
 import { TarjetaDominio, TarjetaDatosContenido, TarjetaDatosIndividual } from '../../components/general/TarjetaDatos'
-import { TarjetaPaciente, TarjetaAplicacion } from '../../components/general/TarjetaDatos'
+import { TarjetaPaciente, TarjetaAplicacion, TarjetaReporte } from '../../components/general/TarjetaDatos'
 import { VerificarUsuario } from "../../api/usuario.api"
 import { Navbar_Paci, Navbar_C, Navbar_T, Navbar_Defect } from "../../components/partes/NavbarPrueba"
 
@@ -427,102 +427,204 @@ export function InformacionPaciente() {
 }
 
 /* INFORMACION DE APLICACION */
-export function InformacionAPP(){
-        // Pre loader
-        const [loading, setLoading] = useState(true);
-        // Establecer estado para saber si sidebar está activo
-        const [isActive, setIsActive] = useState(false);
-        // Controlador para el evento de clic
-        const activarSidebar = () => {
-            setIsActive(!isActive);
-        };
-        onPageLoad();
-    
-        /* *** Control de usuario *** */
-        const [tipoUsuario, setTipo] = useState([]);
-        const navigate = useNavigate();
-        const token = localStorage.getItem('token');
-    
-        // Datos
-        const verificacion = async () => {
-            if (!token) {
+export function InformacionAPP() {
+    // Pre loader
+    const [loading, setLoading] = useState(true);
+    // Establecer estado para saber si sidebar está activo
+    const [isActive, setIsActive] = useState(false);
+    // Controlador para el evento de clic
+    const activarSidebar = () => {
+        setIsActive(!isActive);
+    };
+    onPageLoad();
+
+    /* *** Control de usuario *** */
+    const [tipoUsuario, setTipo] = useState([]);
+    const navigate = useNavigate();
+    const token = localStorage.getItem('token');
+
+    // Datos
+    const verificacion = async () => {
+        if (!token) {
+            navigate('/');
+        }
+        // Flujo normal
+        try {
+            const cont = await VerificarUsuario();
+            if (cont.data.error) {
+                navigate('/login');
+            } else {
+                setTipo(cont.data);
+                console.log(cont.data);
+                setLoading(false);
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
                 navigate('/');
             }
-            // Flujo normal
-            try {
-                const cont = await VerificarUsuario();
-                if (cont.data.error) {
-                    navigate('/login');
-                } else {
-                    setTipo(cont.data);
-                    console.log(cont.data);
-                    setLoading(false);
-                }
-            } catch (error) {
-                if (error.message === "NOT_AUTHENTICATED") {
-                    navigate('/');
-                }
-            }
         }
-    
-        // Cargar datos
-        useEffect(() => {
-            verificacion();
-        }, []);
-    
-        /* *** Control de usuario *** */
-        let navbar;
-        if (tipoUsuario) {
-            switch (tipoUsuario.tipo) {
-                case 'tecnico':
-                    navbar = <Navbar_T />;
-                    break;
-                case 'paciente':
-                    navbar = <Navbar_Paci />;
-                    break;
-                case 'comun':
-                    navbar = <Navbar_C />;
-                    break;
-                default:
-                    navbar = <Navbar_Defect />;
-                    break;
-            }
+    }
+
+    // Cargar datos
+    useEffect(() => {
+        verificacion();
+    }, []);
+
+    /* *** Control de usuario *** */
+    let navbar;
+    if (tipoUsuario) {
+        switch (tipoUsuario.tipo) {
+            case 'tecnico':
+                navbar = <Navbar_T />;
+                break;
+            case 'paciente':
+                navbar = <Navbar_Paci />;
+                break;
+            case 'comun':
+                navbar = <Navbar_C />;
+                break;
+            default:
+                navbar = <Navbar_Defect />;
+                break;
         }
-    
-        return (
-            <div className="w-100 h-100">
-                <CabeceraRegister />
-                <div className="container-fluid p-0 m-0 w-100 h-100">
-                    <div className="almacenador ml-0">
-                        <>
-                            {loading ? (
-                                <div className="preloader">
-                                    <Image src="/gif/loader.gif" fluid />
-                                </div>
-                            ) : (
-                                <>
-                                    <aside id="sidebar" className={isActive ? 'active' : ''}>
-                                        {/* COMPONENTE NAVBAR */}
-                                        {navbar}
-                                    </aside>
-                                </>
-                            )}
-                        </>
-                        <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
-                            <div id="content">
-                                <button type="button" id="sidebarCollapse" onClick={activarSidebar}
-                                    className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
-                                    title="Menú">
-                                    <i className="fas fa-align-left"></i>
-                                    <FontAwesomeIcon icon={faBars} />
-                                </button>
-                                {/* COMPONENTE DEL CUERPO */}
-                                <TarjetaAplicacion />
+    }
+
+    return (
+        <div className="w-100 h-100">
+            <CabeceraRegister />
+            <div className="container-fluid p-0 m-0 w-100 h-100">
+                <div className="almacenador ml-0">
+                    <>
+                        {loading ? (
+                            <div className="preloader">
+                                <Image src="/gif/loader.gif" fluid />
                             </div>
-                        </section>
-                    </div>
+                        ) : (
+                            <>
+                                <aside id="sidebar" className={isActive ? 'active' : ''}>
+                                    {/* COMPONENTE NAVBAR */}
+                                    {navbar}
+                                </aside>
+                            </>
+                        )}
+                    </>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                        <div id="content">
+                            <button type="button" id="sidebarCollapse" onClick={activarSidebar}
+                                className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
+                                title="Menú">
+                                <i className="fas fa-align-left"></i>
+                                <FontAwesomeIcon icon={faBars} />
+                            </button>
+                            {/* COMPONENTE DEL CUERPO */}
+                            <TarjetaAplicacion />
+                        </div>
+                    </section>
                 </div>
-                <PieRegister />
             </div>
-        )
+            <PieRegister />
+        </div>
+    )
+}
+
+
+/* INFORMACION DE REPORTE */
+export function InformacionReporte() {
+    // Pre loader
+    const [loading, setLoading] = useState(true);
+    // Establecer estado para saber si sidebar está activo
+    const [isActive, setIsActive] = useState(false);
+    // Controlador para el evento de clic
+    const activarSidebar = () => {
+        setIsActive(!isActive);
+    };
+    onPageLoad();
+
+    /* *** Control de usuario *** */
+    const [tipoUsuario, setTipo] = useState([]);
+    const navigate = useNavigate();
+    const token = localStorage.getItem('token');
+
+    // Datos
+    const verificacion = async () => {
+        if (!token) {
+            navigate('/');
+        }
+        // Flujo normal
+        try {
+            const cont = await VerificarUsuario();
+            if (cont.data.error) {
+                navigate('/login');
+            } else {
+                setTipo(cont.data);
+                console.log(cont.data);
+                setLoading(false);
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/');
+            }
+        }
+    }
+
+    // Cargar datos
+    useEffect(() => {
+        verificacion();
+    }, []);
+
+    /* *** Control de usuario *** */
+    let navbar;
+    if (tipoUsuario) {
+        switch (tipoUsuario.tipo) {
+            case 'tecnico':
+                navbar = <Navbar_T />;
+                break;
+            case 'paciente':
+                navbar = <Navbar_Paci />;
+                break;
+            case 'comun':
+                navbar = <Navbar_C />;
+                break;
+            default:
+                navbar = <Navbar_Defect />;
+                break;
+        }
+    }
+
+    return (
+        <div className="w-100 h-100">
+            <CabeceraRegister />
+            <div className="container-fluid p-0 m-0 w-100 h-100">
+                <div className="almacenador ml-0" style={{height: '1150px'}}>
+                    <>
+                        {loading ? (
+                            <div className="preloader">
+                                <Image src="/gif/loader.gif" fluid />
+                            </div>
+                        ) : (
+                            <>
+                                <aside id="sidebar" className={isActive ? 'active' : ''}>
+                                    {/* COMPONENTE NAVBAR */}
+                                    {navbar}
+                                </aside>
+                            </>
+                        )}
+                    </>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                        <div id="content">
+                            <button type="button" id="sidebarCollapse" onClick={activarSidebar}
+                                className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
+                                title="Menú">
+                                <i className="fas fa-align-left"></i>
+                                <FontAwesomeIcon icon={faBars} />
+                            </button>
+                            {/* COMPONENTE DEL CUERPO */}
+                            <TarjetaReporte />
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <PieRegister />
+        </div>
+    )
 }

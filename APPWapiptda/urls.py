@@ -50,7 +50,8 @@ urlpatterns = [
     path('busqueda/paciente/curso/<str:nombre>/<str:slug>/', BusquedaPacienteCursoListView.as_view(), name='paciente-curso-busqueda'),
     path('busqueda/contenido/<str:nombre>/<str:slug>/', BusquedaContenidoListView.as_view(), name='contenido-busqueda'),
     path('busqueda/curso/<str:nombre>/', BusquedaCursoListView.as_view(), name='curso-busqueda'),
-    
+    path('lista/reportes/<str:nombre>/', ReportedePacienteListView.as_view(), name='reporte-list-paciente'),
+
     ### REGISTRO ###
     path('registro_usuario/', api_user_register, name='api_user_register'),
     path('registro_paciente/', api_paciente_register, name='api_paciente_register'),
@@ -100,4 +101,5 @@ urlpatterns = [
     path('contador/sala/reinicio/', reset_contador_salas, name='reinicio-sala'),
     path('contador/sala/atendida/', get_contador_salas_atendidas, name='contador-sala-atendida'),
     path('contador/sala/atendida/reinicio/', reset_contador_salas_atendidas, name='reinicio-sala-atendida'),
+    path('modificar/estado/resultado/<int:id>/', modificar_estado_reporte, name='modificar-estado-resultado'),
 ]
