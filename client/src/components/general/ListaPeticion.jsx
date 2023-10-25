@@ -49,6 +49,7 @@ export function ListaPeticion({ peticiones, page, setPage, numeroPag }) {
                                         <th>Estado</th>
                                         <th>Motivo</th>
                                         <th>Tipo</th>
+                                        <th style={{ textAlign: 'center' }} >Fecha</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -109,9 +110,9 @@ export function ListaPeticion({ peticiones, page, setPage, numeroPag }) {
                                                             <FontAwesomeIcon icon={faTimes} style={{ marginLeft: '25%' }} />
                                                         }
                                                     </td>
-                                                    <td>{peticion.motivo_peticion}</td>
+                                                    <td style={{ textAlign: 'justify' }}>{peticion.motivo_peticion}</td>
                                                     <td>{peticion.tipo_peticion}</td>
-
+                                                    <td style={{ textAlign: 'center' }} >{peticion.fecha_registro_peticion}</td>
                                                 </tr>
                                             ))
                                         }
@@ -189,6 +190,7 @@ export function ListaPeticionAtendida({ peticiones, page, setPage, numeroPag }) 
                                         <th>Estado</th>
                                         <th>Motivo</th>
                                         <th>Tipo</th>
+                                        <th style={{ textAlign: 'center' }}>Fecha</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -196,7 +198,7 @@ export function ListaPeticionAtendida({ peticiones, page, setPage, numeroPag }) 
                                         {
                                             peticiones.map((peticion) => (
                                                 <tr key={peticion.id}>
-                                                    <td>
+                                                    <td >
                                                         <ul className="action-list">
                                                             <Link to={`/ver/peticion/${peticion.id}/`} className="btn btn-success separacion--boton h" title="Ver petición">
                                                                 <FontAwesomeIcon icon={faEye} />
@@ -230,9 +232,9 @@ export function ListaPeticionAtendida({ peticiones, page, setPage, numeroPag }) 
                                                             <FontAwesomeIcon icon={faBatteryFull} style={{ marginLeft: '25%' }} />
                                                         }
                                                     </td>
-                                                    <td>{peticion.motivo_peticion}</td>
+                                                    <td style={{ textAlign: 'justify' }}>{peticion.motivo_peticion}</td>
                                                     <td>{peticion.tipo_peticion}</td>
-
+                                                    <td style={{ textAlign: 'center' }}>{peticion.fecha_registro_peticion}</td>
                                                 </tr>
                                             ))
                                         }
@@ -302,7 +304,7 @@ export function ListaPeticionesUsuario({ peticiones, page, setPage, numeroPag })
                             <div className="row">
                             </div>
                         </div>
-                        <div className="panel-body table-responsive">
+                        <div className="panel-body_2 table-responsive">
                             <Table responsive="sm" className="table">
                                 <thead>
                                     <tr>
@@ -311,6 +313,7 @@ export function ListaPeticionesUsuario({ peticiones, page, setPage, numeroPag })
                                         <th>Estado</th>
                                         <th>Motivo</th>
                                         <th>Tipo</th>
+                                        <th style={{ textAlign: 'center' }}>Fecha</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -327,10 +330,18 @@ export function ListaPeticionesUsuario({ peticiones, page, setPage, numeroPag })
                                                         </ul>
                                                     </td>
                                                     <td>
-                                                        <FontAwesomeIcon icon={faCheck} style={{ marginLeft: '25%' }} />
+                                                        {
+                                                            peticion.estado_revision === true ? (
+                                                                <FontAwesomeIcon icon={faCheck} style={{ marginLeft: '25%' }} />
+                                                            ) : peticion.estado_revision === false ? (
+                                                                <FontAwesomeIcon icon={faTimes} style={{ marginLeft: '25%' }} />
+                                                            ) : <></>
+                                                        }
+
                                                     </td>
-                                                    <td>{peticion.motivo_peticion}</td>
+                                                    <td style={{ textAlign: 'justify' }}>{peticion.motivo_peticion}</td>
                                                     <td>{peticion.tipo_peticion}</td>
+                                                    <td style={{ textAlign: 'center' }}>{peticion.fecha_registro_peticion}</td>
 
                                                 </tr>
                                             ))
@@ -338,6 +349,7 @@ export function ListaPeticionesUsuario({ peticiones, page, setPage, numeroPag })
                                         {
                                             peticiones.length === 0 &&
                                             <tr >
+                                                <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>

@@ -971,6 +971,7 @@ export function FormularioEdicionSala() {
     const [datosSala, setDatosSala] = useState([]);
     const [nombre_sala, setNombre] = useState("");
     const [anotaciones, setAnotaciones] = useState("");
+    const [codigo_identificador, setCodigoIdentificador] = useState("");
     const [error, setError] = useState("");
     const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
@@ -982,6 +983,7 @@ export function FormularioEdicionSala() {
             setDatosSala(datos__sala.data);
             setNombre(datos__sala.data.nombre_sala);
             setAnotaciones(datos__sala.data.anotaciones);
+            setCodigoIdentificador(datos__sala.data.codigo_identificador);
         } catch (error) {
             if (error.message === "NOT_AUTHENTICATED") {
                 navigate('/login');
@@ -1015,7 +1017,8 @@ export function FormularioEdicionSala() {
                 // Obtenemos los datos
                 const datos__post = {
                     nombre_sala,
-                    anotaciones
+                    anotaciones, 
+                    codigo_identificador
                 };
                 // Funcion de registro
                 confirmEdicion(datos__post);
@@ -1034,7 +1037,8 @@ export function FormularioEdicionSala() {
     const isValidForm = () => {
         if (
             nombre_sala.trim() === "" ||
-            anotaciones.trim() === ""
+            anotaciones.trim() === "" ||
+            codigo_identificador.trim() === ""
         ) {
             return false;
         }
@@ -1086,6 +1090,12 @@ export function FormularioEdicionSala() {
                 <textarea className='form-control w-100 h-100' type="text" id="anotacion"
                     value={anotaciones} onChange={e => setAnotaciones(e.target.value)}
                     name='anotacion' />
+            </div>
+            <div className="form-group">
+                <label className='label' htmlFor="codigo">Código/s de actividad:</label>
+                <textarea className='form-control w-100 h-100' type="text" id="codigo"
+                    value={codigo_identificador} onChange={e => setCodigoIdentificador(e.target.value)}
+                    name='codigo' />
             </div>
             <Button type="submit" variant="success" disabled={habilitado}>
                 {habilitado ? 'Actualizando...' : 'Actualizar'}

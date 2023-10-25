@@ -73,7 +73,7 @@ export function NivelLista({ usuario }) {
             if (datos_obtenidos.data.success) {
                 console.log(datos_obtenidos.data);
                 setMostrarBusqueda(true);
-                navigate(`/individual/${datos_obtenidos.data.slug}`);
+                navigate(`/individual/nuevo/${datos_obtenidos.data.slug}`);
             } else {
                 if (datos_obtenidos.data.error) {
                     Swal.fire(datos_obtenidos.data.error, "", "warning");
@@ -954,6 +954,9 @@ export function SalaLista({ usuario }) {
 
 // Lista de salas de paciente
 export function SalaPacienteLista() {
+    // Busqueda sala
+    const [codigosala, setCodigo] = useState("");
+    const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
     // Paginacion
     const [page, setPage] = useState(1);
     // Fin paginacion
@@ -1016,6 +1019,43 @@ export function SalaPacienteLista() {
         }, 5000);
     };
 
+    // Busqueda
+    const busquedaContenido = async (e) => {
+        // Verificar campos vacíos
+        if (!isValidForm()) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Flujo normal
+        try {
+            let datos_obtenidos = await AccederSala(codigosala);
+            if (datos_obtenidos.data.success) {
+                console.log(datos_obtenidos.data);
+                setMostrarBusqueda(true);
+                navigate(`/individual/nuevo/${datos_obtenidos.data.slug}`);
+            } else {
+                if (datos_obtenidos.data.error) {
+                    Swal.fire(datos_obtenidos.data.error, "", "warning");
+                } else {
+                    Swal.fire("No existen contenidos con ese código. Ingresa uno válido", "", "warning");
+                }
+            }
+        } catch (error) {
+            Swal.fire("No existen contenidos con ese código. Ingresa uno válido", "", "warning");
+        }
+    }
+
+    // Campos vacios
+    const isValidForm = () => {
+        if (
+            !codigosala ||
+            codigosala === 0
+        ) {
+            return false;
+        }
+        return true;
+    }
+
     return (
         <div>
             <div className="cabeza__Nivel">
@@ -1035,6 +1075,51 @@ export function SalaPacienteLista() {
                     <p className="mb-0">{error}</p>
                 </div>
             }
+            {/* Busqueda de actividad mediante el codigo */}
+            <div className="d-flex flex-row mt-4">
+                <div className="card-body">
+                    <form className="d-flex flex-row" >
+                        <div className="input-group" style={{marginLeft:'8%', width: '85%'}}>
+                            <input type="search" className="form-control rounded" placeholder="Inserta código de sala"
+                                aria-label="Search" aria-describedby="search-addon" value={codigosala}
+                                onChange={e => {
+                                    const entrada = e.target.value;
+                                    const numero = Number(entrada);
+                                    if (numero >= 0 || entrada === "") {
+                                        setCodigo(entrada);
+                                    }
+                                }
+                                } />
+                            <>
+                                {
+                                    !mostrarBusqueda
+                                        ? <Button variant="success" className="my-2 my-sm-0"
+                                            onClick={() => {
+                                                Swal.fire({
+                                                    title: '¿Está seguro que desea acceder a la actividad?',
+                                                    text: "Si, acceder",
+                                                    icon: 'info',
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: '#3085d6',
+                                                    cancelButtonColor: '#d33',
+                                                    confirmButtonText: 'Sí',
+                                                }).then(async (result) => {
+                                                    if (result.isConfirmed) {
+                                                        await busquedaContenido();
+                                                    }
+                                                })
+                                            }}
+                                        >
+                                            Buscar
+                                        </Button>
+                                        :
+                                        <></>
+                                }
+                            </>
+                        </div>
+                    </form>
+                </div>
+            </div>
             {/* Table */}
             <ListadodeSalaPaciente salas={salas} page={page} setPage={setPage} numeroPag={numeroPag} />
         </div>

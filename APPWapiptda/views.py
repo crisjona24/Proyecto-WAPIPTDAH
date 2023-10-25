@@ -411,7 +411,7 @@ def verificar_curso(request, slug):
             token = request.headers.get('Authorization').split(" ")[1]
             user = get_user_from_token_jwt(token)
             #user = get_user_from_token(token)
-            if is_comun(user):
+            if is_comun(user) or is_tecnico(user):
                 # Encontrar el contenido en base al slug
                 curso__ob = Curso.objects.get(slug_curso=slug)
                 # Verificar si el dominio existe

@@ -5,22 +5,80 @@ import "../../styles/Contenido_individual.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 // Componentes
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import { faBackward, faQuestion, fa1, fa2, fa3, fa4, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 // Metodos
 import { FormularioTres } from '../registro/Formulario_individual_3'
 import { VerificarUsuario } from "../../api/usuario.api"
+import { ContenidoIndividualTodo } from "../../api/contenidoindividual.api";
 
 export function ContenidoTipoThree({ context, slugContenido }) {
+    // Verificacion de usuario
+    const [tipoUsuario, setTipo] = useState([]);
+    const navigate = useNavigate();
+    const [error, setError] = useState("");
+
+    // NUEVO
+    const [contenidosI, setContenidos] = useState([]);
+    const [slugSiguiente, setSlugSiguiente] = useState([]);
+    const [slugAnterior, setSlugAnterior] = useState([]);
+    let { slug2 } = useParams();
+    let { slug } = useParams();
+    // Obtener datos
+    const cargarContenidosI = async () => {
+        try {
+            const cont = await ContenidoIndividualTodo(slug2);
+            setContenidos(cont.data);
+            console.log(cont.data);
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/');
+            } else {
+                mostrarError('Error al cargar contenidos');
+            }
+        }
+    }
+
+    // Buscar el slug siguiente y anterior
+    const buscarSlug = () => {
+        for (let i = 0; i < contenidosI.length; i++) {
+            if (contenidosI[i].slug_contenido_individual === slug) {
+                console.log(contenidosI[i].slug_contenido_individual);
+                if (i === 0) {
+                    setSlugAnterior("");
+                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
+                    break;
+                } else if (i === contenidosI.length - 1) {
+                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
+                    setSlugSiguiente("");
+                    break;
+                } else {
+                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
+                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
+                    break;
+                }
+            }
+        }
+    }
+
+    useEffect(() => {
+        cargarContenidosI();
+    }, []);
+
+    useEffect(() => {
+        if (contenidosI.length > 1) {
+            buscarSlug();
+        } else {
+            setSlugAnterior("");
+            setSlugSiguiente("");
+        }
+    }, [contenidosI]);
+
     /* *** Valores recuperados */
     const {
         nombre__contenido,
     } = context;
-
-    // Verificacion de usuario
-    const [tipoUsuario, setTipo] = useState([]);
-    const navigate = useNavigate();
 
     // Verificar usuario
     const VerificarUser = async () => {
@@ -115,17 +173,23 @@ export function ContenidoTipoThree({ context, slugContenido }) {
                             tipoUsuario.tipo === "paciente" &&
                             <div className="bajo__cuerpo">
                                 <div className="mt-2 mb-2">
-                                    <Link className="boton__regreso btn btn-success">
-                                        <FontAwesomeIcon title="Siguiente"
-                                            icon={faArrowLeft} />
-                                    </Link>
-
+                                    {
+                                        slugAnterior !== "" &&
+                                        <Link to={`/individual/${slugAnterior}/${slug2}/`} className="boton__regreso btn btn-success">
+                                            <FontAwesomeIcon title="Anteior"
+                                                icon={faArrowLeft} />
+                                        </Link>
+                                    }
                                 </div>
                                 <div className="mt-2 mb-2">
-                                    <Link className="boton__regreso btn btn-success">
-                                        <FontAwesomeIcon title="Siguiente"
-                                            icon={faArrowRight} />
-                                    </Link>
+                                    {
+                                        slugSiguiente !== "" &&
+                                        <Link to={`/individual/${slugSiguiente}/${slug2}/`} className="boton__regreso btn btn-success">
+                                            <FontAwesomeIcon title="Siguiente"
+                                                icon={faArrowRight} />
+                                        </Link>
+                                    }
+
                                 </div>
                             </div>
                         }

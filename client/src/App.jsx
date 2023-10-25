@@ -47,7 +47,7 @@ import { Probando } from "./pages/general/Probando"
 import { Ver, VerPeticion } from "./pages/general/Verpdf"
 import {
   InformacionDominio, InformacionContenido, InformacionIndividual,
-  InformacionPaciente, InformacionAPP, InformacionReporte
+  InformacionPaciente, InformacionAPP, InformacionReporte, InformacionResultado
 } from "./pages/general/InformacionDatos";
 
 function App() {
@@ -88,16 +88,18 @@ function App() {
         <Route path="/reporte/all" element={<ReportesALL />} />
         <Route path="/sala/paciente/all" element={<SalasPaciente />} />
         <Route path="/contenido/individual/all/:slug" element={<IndividualPrincipalAll />} />
-        <Route path="/individual/:slug" element={<ContenidoIndividual />} />
+        <Route path="/individual/:slug/:slug2/" element={<ContenidoIndividual />} />
+        <Route path="/individual/nuevo/:slug" element={<ContenidoIndividual />} />
         <Route path="/perfil" element={<Perfil_User />} />
         {/* RUTA DE CONSULTA INDIVIDUAL*/}
         <Route path="/dominio/detalle/:slug" element={<InformacionDominio />} />
         <Route path="/contenido/detalle/:slug" element={<InformacionContenido />} />
-        <Route path="/individual/detalle/:slug" element={<InformacionIndividual />} />
+        <Route path="/individual/detalle/:slug/:slug2/" element={<InformacionIndividual />} />
         <Route path="/ver/peticion/:id" element={<VerPeticion />} />
         <Route path="/ver/paciente/:id" element={<InformacionPaciente />} />
         <Route path="/ver/datos" element={<InformacionAPP />} />
         <Route path="/ver/reporte/:id" element={<InformacionReporte />} />
+        <Route path="/ver/resultados/:id" element={<InformacionResultado />} />
         <Route path="/ver" element={<Ver />} />
         {/* RUTA DE EDICION DE INFORMACION */}
         <Route path="/dominio/editar/:slug" element={<DominioEdición />} />

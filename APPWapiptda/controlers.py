@@ -79,6 +79,15 @@ class ContenidoIndividualView(viewsets.ModelViewSet):
     serializer_class = ContenidIndividualSerializer
     pagination_class = Paginacion2
 
+
+# PROTECCION CON JWT
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class ContenidoIndividualTodoView(viewsets.ModelViewSet):
+    queryset = ContenidoIndividual.objects.all().order_by('-id')
+    serializer_class = ContenidIndividualSerializer
+
+
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -188,6 +197,17 @@ def lista_cotenido_dominio(ob1):
     except Contenido.DoesNotExist:
         return []
 
+
+
+# PROTECCION CON JWT
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class ContenidoIndividualTodoListView(generics.ListAPIView):
+    serializer_class = ContenidIndividualSerializer
+    def get_queryset(self):
+        slug_contenido = self.kwargs['slug']
+        contenidos = lista_actividades_contenido(slug_contenido)
+        return contenidos
 
 
 # PROTECCION CON JWT

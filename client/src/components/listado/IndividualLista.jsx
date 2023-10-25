@@ -236,12 +236,12 @@ export function IndividualLista({ usuario }) {
                                             <h3></h3>
                                             <div className="d-flex flex-wrap justify-content-center">
                                                 <div className="col-md-6 align-self-end">
-                                                    <Link to={`/individual/detalle/${contenido.slug_contenido_individual}/`} className="btn btn-success">
+                                                    <Link to={`/individual/detalle/${contenido.slug_contenido_individual}/${slug}/`} className="btn btn-success">
                                                         Detalle
                                                     </Link>
                                                 </div>
                                                 <div className="col-md-6 align-self-center">
-                                                    <Link to={`/individual/${contenido.slug_contenido_individual}`} className="btn btn-success">
+                                                    <Link to={`/individual/${contenido.slug_contenido_individual}/${slug}/`} className="btn btn-success">
                                                         Aprendamos
                                                     </Link>
                                                 </div>

@@ -60,18 +60,40 @@ class ContenidIndividualSerializer(serializers.ModelSerializer):
 
 
 class ResultadoSerializer(serializers.ModelSerializer):
+    # Paciente
     nombre_paciente = serializers.SerializerMethodField()
     apellido_paciente = serializers.SerializerMethodField()
+    correo_paciente = serializers.SerializerMethodField()
+    celular_paciente = serializers.SerializerMethodField()
+    edad_paciente = serializers.SerializerMethodField()
+    # Actividad
+    descripcion_individual = serializers.SerializerMethodField()
+    respuesta_contenido = serializers.SerializerMethodField()
+    tipo_contenido = serializers.SerializerMethodField()
 
     class Meta:
         model = Resultado
         fields = ('id', 'respuesta', 'tiempo_m', 'tiempo_s', 'observacion', 'fecha_registro_resultado',
                   'slug_resultado', 'estado_resultado', 'estado_reporte', 'contenido_individual', 'paciente',
-                  'nombre_paciente', 'apellido_paciente')
+                  'nombre_paciente', 'apellido_paciente', 'correo_paciente', 'celular_paciente', 'edad_paciente',
+                  'tipo_contenido', 'descripcion_individual', 'respuesta_contenido')
+        
     def get_nombre_paciente(self, obj):
         return obj.paciente.nombre_usuario
     def get_apellido_paciente(self, obj):
         return obj.paciente.apellido_usuario
+    def get_correo_paciente(self, obj):
+        return obj.paciente.email_usuario
+    def get_edad_paciente(self, obj):
+        return obj.paciente.edad
+    def get_celular_paciente(self, obj):
+        return obj.paciente.celular
+    def get_descripcion_individual(self, obj):
+        return obj.contenido_individual.descripcion_individual
+    def get_respuesta_contenido(self, obj):
+        return obj.contenido_individual.respuesta
+    def get_tipo_contenido(self, obj):
+        return obj.contenido_individual.tipo_contenido
 
 
 class ResultadoSerializerOnly(serializers.ModelSerializer):
@@ -84,7 +106,7 @@ class CursoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Curso
         fields = ('id', 'nombre_curso', 'descripcion_curso', 'slug_curso', 'usuario_comun',
-                  'identificador_curso')
+                  'identificador_curso', 'fecha_registro_curso')
 
 
 class DetalleInscripcionCursoSerializer(serializers.ModelSerializer):
@@ -98,7 +120,7 @@ class PeticionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Peticion
         fields = ('id', 'motivo_peticion', 'tipo_peticion', 'slug_peticion',
-                  'estado_revision', 'peticion_cuerpo', 'usuario_comun')
+                  'estado_revision', 'peticion_cuerpo', 'fecha_registro_peticion', 'usuario_comun')
 
 
 class DetallePeticionSerializer(serializers.ModelSerializer):
@@ -115,7 +137,7 @@ class SalaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sala
         fields = ('id', 'nombre_sala', 'anotaciones', 'codigo_identificador', 'slug_sala', 'estado_sala', 
-                  'sala_atendida', 'paciente')
+                  'sala_atendida', 'fecha_registro_sala', 'paciente')
 
 
 class DetalleSalaSerializer(serializers.ModelSerializer):

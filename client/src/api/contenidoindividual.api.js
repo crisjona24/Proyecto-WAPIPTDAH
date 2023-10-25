@@ -5,6 +5,24 @@ const baseurl = axios.create({
 })
 
 // Listas
+export const ContenidoIndividualTodo = (slug) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return baseurl.get(`wapiptdah/contenidos/individuales/todo/${slug}/`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                    //'Authorization': `Token ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede listar los contenidos: " + error.message);
+    }
+};
+
 export const ContenidoIndividualListado = (page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {

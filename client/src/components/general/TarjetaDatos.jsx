@@ -11,9 +11,10 @@ import { Dominio } from "./general__tarjeta/TarjetaGeneral";
 import { VerificarContenido, ContenidoIndividual } from "../../api/contenido.api";
 import { Contenido } from "./general__tarjeta/TarjetaGeneral";
 import { VerificarContenidoIndividual, ContenidoDatosIndividual } from "../../api/contenidoindividual.api";
-import { Individual, Peticion, Paciente, Aplicacion, Reporte } from "./general__tarjeta/TarjetaGeneral";
+import { Individual, Peticion, Paciente, Aplicacion, Reporte, Resultado } from "./general__tarjeta/TarjetaGeneral";
 import { PacienteIndividual } from "../../api/usuario.api";
 import { ReporteIndividual } from "../../api/reporte.api";
+import { ResultadoIndividual } from "../../api/resultado.api";
 
 
 // Tarjeta de dominio
@@ -401,6 +402,64 @@ export function TarjetaReporte() {
                     </div>
                 }
                 <Reporte datosReporte={datosReporte} />
+            </>
+        </div>
+    )
+}
+
+// Tarjeta de resultado
+export function TarjetaResultado() {
+    // Obtener el parametro de la URL
+    let { id } = useParams(); // ID del reporte
+    /* *** Form **** */
+    const [datosResultado, setDatosResultado] = useState([]);
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
+    const token = localStorage.getItem('token'); // Token de usuario
+
+    // Obtener datos
+    const obtenerDatosResultado = async () => {
+        try {
+            // Buscar los datos de paciente
+            const contResultado = await ResultadoIndividual(id);
+            setDatosResultado(contResultado.data);
+        } catch (err) {
+            if (err.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                mostrarError('Error al mostrar datos del reporte');
+            }
+        }
+    }
+
+    // Use effect
+    useEffect(() => {
+        if (!token) {
+            navigate('/login');
+        } else {
+            obtenerDatosResultado();
+        }
+    }, [id]);
+
+    // Funcion para mostrar errores
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
+
+    return (
+        <div>
+            <>
+                {
+                    error &&
+                    <div id="alert" className="alert alert-success" role="alert">
+                        <h5 className="alert-heading">!Atención!</h5>
+                        <span className="mb-0">{error}</span>
+                    </div>
+                }
+                <Resultado datosResultado={datosResultado} />
             </>
         </div>
     )

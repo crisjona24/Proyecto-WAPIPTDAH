@@ -4,9 +4,9 @@ import "../../../styles/Varios.css"
 import "bootstrap/dist/css/bootstrap.min.css"
 import { Card, Col, Row, Image, Button } from 'react-bootstrap';
 // Componentes
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faPencil, faBackward, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faPencil, faBackward, faCheckCircle, faCheckDouble } from '@fortawesome/free-solid-svg-icons';
 import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
 // Metodos
@@ -16,7 +16,7 @@ import { IndividualEliminar, ObtenerSlugDominio, ObtenerSlugContenido } from '..
 import { VerificarUsuario } from "../../../api/usuario.api";
 //import { AtenderPeticion } from "../../../api/peticion.api"
 import { ObtenerSlugCurso } from "../../../api/curso.api"
-import { ReporteEliminar, ModificarEstadoResultado } from "../../../api/reporte.api"
+import { ReporteEliminar, ModificarEstadoResultado, CrearReporteNuevo } from "../../../api/reporte.api"
 
 
 // Dominio
@@ -310,6 +310,8 @@ export function Contenido({ datos, slug }) {
 
 // Individual
 export function Individual({ datos, slug }) {
+    // Slug de contenido
+    let { slug2 } = useParams();
     const navigate = useNavigate();
     /* *** Control de usuario *** */
     const [tipoUsuario, setTipo] = useState([]);
@@ -496,6 +498,10 @@ export function Individual({ datos, slug }) {
                                                 )
                                             }
                                         </>
+                                        <Link to={`/individual/${datos.slug_contenido_individual}/${slug2}/`} className="btn btn-success"
+                                            title="Ver actividad">
+                                            <FontAwesomeIcon icon={faCheckCircle} />
+                                        </Link>
                                     </div>
                                 </Card.Text>
                             </Card.Body>
@@ -559,7 +565,7 @@ export function Peticion({ datos }) {
                         <Col md={8}>
                             <Card.Body>
                                 <Card.Title className="titulo-peticion mb-3">Petición</Card.Title>
-                                <Row className="mb-3">
+                                <Row className="mb-1">
                                     <Col md={8}>
                                         <Card.Title style={{ fontSize: '1rem' }}>Motivo de petición:</Card.Title>
                                         <Card.Text className="texto-peticion">
@@ -567,17 +573,24 @@ export function Peticion({ datos }) {
                                         </Card.Text>
                                     </Col>
                                     <Col md={4}>
-                                        <Card.Title style={{ fontSize: '1rem' }}>Tipo:</Card.Title>
-                                        <Card.Text className="texto-peticion">
+                                        <Card.Title style={{ fontSize: '1rem' }} className="text-center">Tipo:</Card.Title>
+                                        <Card.Text className="texto-peticion-c">
                                             {datos.tipo_peticion}
                                         </Card.Text>
                                     </Col>
                                 </Row>
                                 <hr />
-                                <Row className="mb-3">
+                                <Row className="mb-1">
                                     <Card.Title style={{ fontSize: '1rem' }}>Descripción:</Card.Title>
-                                    <Card.Text className="texto-peticion">
+                                    <Card.Text className="texto-peticion" >
                                         {datos.peticion_cuerpo}
+                                    </Card.Text>
+                                </Row>
+                                <hr />
+                                <Row className="mb-1">
+                                    <Card.Title style={{ fontSize: '1rem' }}>Fecha de registro:</Card.Title>
+                                    <Card.Text className="texto-peticion">
+                                        {datos.fecha_registro_peticion}
                                     </Card.Text>
                                 </Row>
                                 <Card.Text>
@@ -940,10 +953,14 @@ export function Reporte({ datosReporte }) {
                                     <Card.Text className="texto-peticion tamnio_descripcion mt-2">
                                         {datosReporte.descripcion_reporte}
                                     </Card.Text>
-                                    <Link to={`/editar/reporte/${datosReporte.id}/`} title="Agregar descripción"
-                                        className="btn btn-success separacion--boton h mt-2">
-                                        <FontAwesomeIcon icon={faPencil} />
-                                    </Link>
+                                    {
+                                        tipoUsuario.tipo === "comun" ? (
+                                            <Link to={`/editar/reporte/${datosReporte.id}/`} title="Agregar descripción"
+                                                className="btn btn-success separacion--boton h mt-2">
+                                                <FontAwesomeIcon icon={faPencil} />
+                                            </Link>
+                                        ) : <> </>
+                                    }
                                 </div>
                             </div>
 
@@ -988,21 +1005,29 @@ export function Reporte({ datosReporte }) {
                                 </Row>
                                 <hr />
                                 <Row className="mb-1">
-                                    <Card.Title style={{ fontSize: '1rem' }}>Descripción de actividad realizada:</Card.Title>
-                                    <Card.Text className="texto-peticion">
-                                        {datosReporte.descripcion_individual}
-                                    </Card.Text>
+                                    <Col md={7}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Descripción de actividad:</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosReporte.descripcion_individual}
+                                        </Card.Text>
+                                    </Col>
+                                    <Col md={5}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Tipo de contenido:</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            Tipo {datosReporte.tipo_contenido}
+                                        </Card.Text>
+                                    </Col>
                                 </Row>
                                 <hr />
                                 <Row className="mb-1">
-                                    <Col md={8}>
+                                    <Col md={7}>
                                         <Card.Title style={{ fontSize: '1rem' }}>Observación de actividad realizada:</Card.Title>
                                         <Card.Text className="texto-peticion">
                                             {datosReporte.observacion_}
                                         </Card.Text>
                                     </Col>
-                                    <Col md={4}>
-                                        <Card.Title style={{ fontSize: '1rem' }}>Respuesta:</Card.Title>
+                                    <Col md={5}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Respuesta ingresada:</Card.Title>
                                         <Card.Text className="texto-peticion">
                                             {datosReporte.respuesta}
                                         </Card.Text>
@@ -1052,6 +1077,213 @@ export function Reporte({ datosReporte }) {
                                         >
                                             <FontAwesomeIcon icon={faTrash} />
                                         </Button>
+                                    </div>
+                                </Card.Text>
+                            </Card.Body>
+                        </Col>
+                    </Row>
+                </Card>
+            </div>
+        </div>
+    );
+}
+
+// Resultado
+export function Resultado({ datosResultado }) {
+    const navigate = useNavigate();
+    /* *** Control de tipo de usuario *** */
+    const [tipoUsuario, setTipo] = useState([]);
+
+    // Obtener tipo de usuario
+    const verificacionUser = async () => {
+        try {
+            let cont = await VerificarUsuario();
+            setTipo(cont.data);
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            }
+        }
+    }
+
+    // Obtener tipo de usuario
+    useEffect(() => {
+        verificacionUser();
+    }, []);
+
+    return (
+        <div>
+            <div className="cabeza__Nivel">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-md-12">
+                            <h4 className="display-7 mt-2">
+                                Información - Resultado
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-5 align-items-center" style={{ height: '100vh', marginLeft: '10%', marginRight: '10%' }}>
+                <Card className="mb-3" style={{ maxWidth: '100%' }}>
+                    <Row >
+                        <Col md={4}>
+                            <Image
+                                className="img-fluid"
+                                style={{ borderRadius: '10px', height: '40%', marginTop: '90%' }}
+                                src="/img/tarjeta-resultado.png"
+                                alt="Sample"
+                                fluid
+                            />
+                        </Col>
+                        <Col md={8}>
+                            <Card.Body>
+                                <Card.Title className="titulo-peticion">Información del paciente</Card.Title>
+                                <Row className="mb-1">
+                                    <Col md={6}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Nombres :</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosResultado.nombre_paciente} {datosResultado.apellido_paciente}
+                                        </Card.Text>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Edad :</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosResultado.edad_paciente} años
+                                        </Card.Text>
+                                    </Col>
+                                </Row>
+                                <hr />
+                                <Row className="mb-1">
+                                    <Col md={6}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Correo Electrónico :</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosResultado.correo_paciente}
+                                        </Card.Text>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Celular :</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosResultado.celular_paciente}
+                                        </Card.Text>
+                                    </Col>
+                                </Row>
+                                <hr />
+                                <Card.Title className="titulo-peticion">Información de la actividad</Card.Title>
+                                <Row className="mb-1" >
+                                    <Col md={5}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Contenido :</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            Tipo {datosResultado.tipo_contenido}
+                                        </Card.Text>
+                                    </Col>
+                                    <Col md={7}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Descripción :</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosResultado.descripcion_individual}
+                                        </Card.Text>
+                                    </Col>
+                                </Row>
+                                <hr />
+                                <Row className="mb-1">
+                                    <Col md={6}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Respuesta esperada :</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosResultado.respuesta}
+                                        </Card.Text>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Respuesta proporcionada :</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosResultado.respuesta_contenido}
+                                        </Card.Text>
+                                    </Col>
+                                </Row>
+                                <hr />
+                                <Card.Title className="titulo-peticion">Información de resultado</Card.Title>
+                                <Row className="mb-1">
+                                    <Col md={6}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Tiempo :</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosResultado.tiempo_m} minutos con {datosResultado.tiempo_s} segundos
+                                        </Card.Text>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Fecha :</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datosResultado.fecha_registro_resultado}
+                                        </Card.Text>
+                                    </Col>
+                                </Row>
+                                <hr />
+                                <Row className="mb-1">
+                                    <Card.Title style={{ fontSize: '1rem' }}>Observación :</Card.Title>
+                                    <Card.Text className="texto-peticion">
+                                        <>
+                                            {
+                                                datosResultado.observacion === null ? (
+                                                    <Card.Text className="texto-peticion">
+                                                        No se proporcionó observación
+                                                    </Card.Text>
+                                                ) : (
+                                                    datosResultado.observacion
+                                                )
+                                            }
+                                        </>
+
+                                    </Card.Text>
+                                </Row>
+                                <Card.Text>
+                                    <small className="text-muted" style={{ fontFamily: 'Roboto' }}>Acciones</small>
+                                    <div className='d-flex justify-content-between align-items-center'>
+                                        <Link to={'/resultado/all'} title="Regresar" className="btn btn-primary">
+                                            <FontAwesomeIcon icon={faBackward} />
+                                        </Link>
+                                        <>
+                                            {
+                                                tipoUsuario.tipo === "comun" ? (
+                                                    <Link to={`/resultado/editar/${datosResultado.id}`} title="Agregar observación"
+                                                        className="btn btn-success separacion--boton h">
+                                                        <FontAwesomeIcon icon={faPencil} />
+                                                    </Link>
+                                                ) : <></>
+                                            }
+                                            {
+                                                datosResultado.estado_reporte === false && tipoUsuario.tipo === "comun" &&
+                                                <Button title="Generar Reporte" variant="success"
+                                                    className="separacion--boton h" disabled={datosResultado.observacion === null}
+                                                    onClick={() => {
+                                                        Swal.fire({
+                                                            title: '¿Está seguro que desea generar el reporte?',
+                                                            text: "Generar reporte",
+                                                            icon: 'info',
+                                                            showCancelButton: true,
+                                                            confirmButtonColor: '#3085d6',
+                                                            cancelButtonColor: '#d33',
+                                                            confirmButtonText: 'Sí, generar'
+                                                        }).then(async (result) => {
+                                                            if (result.isConfirmed) {
+                                                                const response = await CrearReporteNuevo(datosResultado.id);
+                                                                if (response.data.success) {
+                                                                    console.log(response.data);
+                                                                    Swal.fire("Reporte generado de forma exitosa", "", "success");
+                                                                    navigate('/reporte/all');
+                                                                } else {
+                                                                    if (response.data.error) {
+                                                                        Swal.fire(response.data.error, '', 'error');
+                                                                    } else {
+                                                                        Swal.fire('Reporte fallido', '', 'error');
+                                                                    }
+                                                                }
+                                                            }
+                                                        })
+                                                    }}
+                                                >
+                                                    <FontAwesomeIcon icon={faCheckDouble} />
+                                                </Button>
+                                            }
+                                        </>
                                     </div>
                                 </Card.Text>
                             </Card.Body>

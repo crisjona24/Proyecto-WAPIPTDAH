@@ -39,22 +39,23 @@ export function ListadodeSala({ salas, usuario, page, setPage, numeroPag }) {
                                         {
                                             usuario.tipo === "comun" &&
                                             <Link to={'/sala/registro'} className="btn btn-sm btn-primary pull-left">
-                                                <FontAwesomeIcon icon={faPlusCircle} title="Agregar sala" /> Add New
+                                                <FontAwesomeIcon icon={faPlusCircle} title="Agregar sala" /> Agregar nuevo
                                             </Link>
                                         }
                                     </>
                                 </div>
                             </div>
                         </div>
-                        <div className="panel-body table-responsive">
+                        <div className="panel-body_2 table-responsive">
                             <Table responsive="sm" className="table">
                                 <thead>
                                     <tr>
 
                                         <th>Nombre</th>
-                                        <th>Código</th>
+                                        <th className="text-center">Código</th>
                                         <th>Anotaciones</th>
-                                        <th >Opciones</th>
+                                        <th className="text-center">Fecha</th>
+                                        <th className="text-center">Opciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -63,12 +64,15 @@ export function ListadodeSala({ salas, usuario, page, setPage, numeroPag }) {
                                             salas.map((sala) => (
                                                 <tr key={sala.id}>
                                                     <td>{sala.nombre_sala}</td>
-                                                    <td>{sala.codigo_identificador}</td>
-                                                    <td>{sala.anotaciones}</td>
-                                                    <td>
+                                                    <td className="text-center">{sala.codigo_identificador}</td>
+                                                    <td style={{ textAlign: 'justify' }}>{sala.anotaciones}</td>
+                                                    <td className="text-center">{sala.fecha_registro_sala}</td>
+                                                    <td >
                                                         <ul
                                                             className={`action-list ${sala.sala_atendida === true && usuario.tipo === 'comun' ? 'd-flex justify-content-center'
-                                                                : usuario.tipo === 'tecnico' ? 'd-flex justify-content-center' : ''}`}>
+                                                                : usuario.tipo === 'tecnico' ? 'd-flex justify-content-center' :
+                                                                    sala.sala_atendida == false && usuario.tipo === 'comun' ? 'd-flex justify-content-center'
+                                                                        : ""}`}>
                                                             <Button title="Eliminar sala" variant="danger"
                                                                 className="separacion--boton h"
                                                                 onClick={() => {
@@ -160,7 +164,7 @@ export function ListadodeSalaPaciente({ salas, page, setPage, numeroPag }) {
     };
 
     return (
-        <div className="cuerpo-tabla">
+        <div className="cuerpo-tabla-3">
             <div className="row">
                 <div className="col-md-offset-1 col-md-11">
                     <div className="panel">
@@ -168,7 +172,7 @@ export function ListadodeSalaPaciente({ salas, page, setPage, numeroPag }) {
                             <div className="row">
                             </div>
                         </div>
-                        <div className="panel-body table-responsive">
+                        <div className="panel-body_3 table-responsive">
                             <Table responsive="sm" className="table">
                                 <thead>
                                     <tr>
@@ -176,7 +180,8 @@ export function ListadodeSalaPaciente({ salas, page, setPage, numeroPag }) {
                                         <th>Nombre</th>
                                         <th>Código</th>
                                         <th>Anotaciones</th>
-                                        <th className="d-flex justify-content-center">Opciones</th>
+                                        <th className="text-center">Fecha</th>
+                                        <th className="text-center">Opciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -187,6 +192,7 @@ export function ListadodeSalaPaciente({ salas, page, setPage, numeroPag }) {
                                                     <td>{sala.nombre_sala}</td>
                                                     <td>{sala.codigo_identificador}</td>
                                                     <td style={{ textAlign: 'justify' }}>{sala.anotaciones}</td>
+                                                    <td className="text-center">{sala.fecha_registro_sala}</td>
                                                     <td>
                                                         <ul className="action-list d-flex justify-content-center" >
                                                             <Button title="Atender sala" variant="success" className="separacion--boton h"
@@ -230,6 +236,7 @@ export function ListadodeSalaPaciente({ salas, page, setPage, numeroPag }) {
                                         {
                                             salas.length === 0 &&
                                             <tr >
+                                                <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
@@ -293,7 +300,7 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                             <div className="row">
                             </div>
                         </div>
-                        <div className="panel-body table-responsive">
+                        <div className="panel-body_2 table-responsive">
                             <Table responsive="sm" className="table">
                                 <thead>
                                     <tr>
@@ -301,7 +308,8 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                         <th>Paciente</th>
                                         <th>Tiempo</th>
                                         <th>Observación</th>
-                                        <th className="d-flex justify-content-center">Opciones</th>
+                                        <th style={{ textAlign: 'center' }}>Fecha</th>
+                                        <th style={{ textAlign: 'center' }}>Opciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -311,17 +319,16 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                                 <tr key={resultado.id}>
                                                     <td>{resultado.nombre_paciente} {resultado.apellido_paciente}</td>
                                                     <td>{resultado.tiempo_m} m {resultado.tiempo_s} s</td>
-
                                                     <>
                                                         {
                                                             resultado.observacion === null ?
                                                                 <td>No hay observación. !Agrégala¡</td>
                                                                 :
-                                                                <td>{resultado.observacion}</td>
+                                                                <td style={{ textAlign: 'justify' }}>{resultado.observacion}</td>
                                                         }
 
                                                     </>
-
+                                                    <td style={{ textAlign: 'center' }}>{resultado.fecha_registro_resultado}</td>
                                                     <td>
                                                         <ul className="action-list d-flex justify-content-center">
                                                             <>
@@ -386,6 +393,13 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                                                 <Link to={`/resultado/editar/${resultado.id}`} title="Agregar observación"
                                                                     className="btn btn-primary separacion--boton h">
                                                                     <FontAwesomeIcon icon={faPencil} />
+                                                                </Link>
+                                                            }
+                                                            {
+                                                                usuario.tipo === "comun" &&
+                                                                <Link to={`/ver/resultados/${resultado.id}`} title="Ver descripción"
+                                                                    className="btn btn-success separacion--boton h">
+                                                                    <FontAwesomeIcon icon={faEye} />
                                                                 </Link>
                                                             }
                                                         </ul>
@@ -459,15 +473,16 @@ export function ListadodeReportes({ reportes, usuario, page, setPage, numeroPag 
                             <div className="row">
                             </div>
                         </div>
-                        <div className="panel-body table-responsive">
+                        <div className="panel-body_3 table-responsive">
                             <Table responsive="sm" className="table">
                                 <thead>
                                     <tr>
 
                                         <th>Paciente</th>
-                                        <th>Tiempo</th>
+                                        <th >Tiempo</th>
                                         <th>Correo</th>
-                                        <th className="d-flex justify-content-center">Opciones</th>
+                                        <th className="text-center">Fecha</th>
+                                        <th class="text-center">Opciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -478,6 +493,7 @@ export function ListadodeReportes({ reportes, usuario, page, setPage, numeroPag 
                                                     <td>{reporte.nombre_paciente} {reporte.apellido_paciente}</td>
                                                     <td>{reporte.tiempo_m_} m con {reporte.tiempo_s_} s</td>
                                                     <td>{reporte.correo_paciente}</td>
+                                                    <td className="text-center">{reporte.fecha_registro_reporte}</td>
                                                     <td>
                                                         <ul className="action-list d-flex justify-content-center">
                                                             <Button title="Eliminar reporte" variant="danger" className="separacion--boton h"
@@ -523,6 +539,7 @@ export function ListadodeReportes({ reportes, usuario, page, setPage, numeroPag 
                                         {
                                             reportes.length === 0 &&
                                             <tr >
+                                                <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>

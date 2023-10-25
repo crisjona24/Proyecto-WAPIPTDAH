@@ -58,22 +58,23 @@ export function ListadodeCursos({ cursos, page, setPage, numeroPag }) {
                                         {
                                             usuario.tipo === "comun" &&
                                             <Link to={'/curso/registro'} className="btn btn-sm btn-primary pull-left">
-                                                <FontAwesomeIcon icon={faPlusCircle} /> Add New
+                                                <FontAwesomeIcon icon={faPlusCircle} /> Agregar nuevo
                                             </Link>
                                         }
                                     </>
                                 </div>
                             </div>
                         </div>
-                        <div className="panel-body table-responsive">
+                        <div className="panel-body_4 table-responsive">
                             <Table responsive="sm" className="table">
                                 <thead>
                                     <tr>
 
                                         <th>Nombre</th>
-                                        <th>Identificador</th>
+                                        <th className="text-center">Fecha</th>
                                         <th>Descripción</th>
-                                        <th>Opciones</th>
+                                        <th className="text-center">Identificador</th>
+                                        <th className="text-center">Opciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -82,8 +83,9 @@ export function ListadodeCursos({ cursos, page, setPage, numeroPag }) {
                                             cursos.map((curso) => (
                                                 <tr key={curso.id}>
                                                     <td>{curso.nombre_curso}</td>
-                                                    <td>{curso.identificador_curso}</td>
+                                                    <td className="text-center">{curso.fecha_registro_curso}</td>
                                                     <td>{curso.descripcion_curso}</td>
+                                                    <td className="text-center">{curso.identificador_curso}</td>
                                                     <td>
                                                         <>
                                                             {

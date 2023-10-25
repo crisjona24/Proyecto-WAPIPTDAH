@@ -34,6 +34,7 @@ urlpatterns = [
     ### LISTADOS PERSONALIZADOS ###
     path('contenidos/<str:slug>/', ContenidoListView.as_view(), name='contenidos-list'),
     path('contenidos/individuales/<str:slug>/', ContenidoIndividualListView.as_view(), name='contenidos-individuales-list'),
+    path('contenidos/individuales/todo/<str:slug>/', ContenidoIndividualTodoListView.as_view(), name='contenidos-individuales-todo-list'),
     path('contenidos/individuales/nombre/<str:slug>/<str:nombre>/', CoInNombreListView.as_view(), name='contenidos-individuales-nombre-list'),
     path('peticion/pendiente/', PeticionListViewNo.as_view(), name='peticion-list-no'),
     path('peticion/atendida/', PeticionListViewSi.as_view(), name='peticion-list-si'),

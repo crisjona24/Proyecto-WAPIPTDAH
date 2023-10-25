@@ -25,21 +25,22 @@ export function ListadodePacientes({ pacientes, page, setPage, numeroPag }) {
     return (
         <div className="cuerpo-tabla">
             <div className="row">
-                <div className="col-md-offset-1 col-md-10">
+                <div className="col-md-offset-1 col-md-11">
                     <div className="panel">
                         <div className="panel-heading">
                             <div className="row">
                             </div>
                         </div>
-                        <div className="panel-body table-responsive">
+                        <div className="panel-body_3 table-responsive">
                             <Table responsive="sm" className="table">
                                 <thead>
                                     <tr>
 
                                         <th>Nombre</th>
-                                        <th>Celular</th>
+                                        <th>Contacto</th>
                                         <th>Email</th>
                                         <th>Emergencia</th>
+                                        <th className="text-center">Edad</th>
                                         <th>Opciones</th>
                                     </tr>
                                 </thead>
@@ -52,6 +53,7 @@ export function ListadodePacientes({ pacientes, page, setPage, numeroPag }) {
                                                     <td>{paciente.celular}</td>
                                                     <td>{paciente.email_usuario}</td>
                                                     <td>{paciente.contacto_emergencia}</td>
+                                                    <td className="text-center">{paciente.edad}</td>
                                                     <td>
                                                         <ul className="action-list d-flex justify-content-center">
                                                             <Link to={`/ver/paciente/${paciente.id}/`} className="btn btn-success separacion--boton h" title="Ver Pasciente">

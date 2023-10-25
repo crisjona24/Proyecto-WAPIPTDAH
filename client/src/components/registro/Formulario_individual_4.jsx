@@ -22,7 +22,7 @@ export function Formulariocuatro({ context, usuario, slugContenido }) {
 
     // Control de minutos
     const [startTime, setStartTime] = useState(null);
-    const [elapsedTime, setElapsedTime] = useState(0);
+    const [tiempoDuracion, setTiempoDuracion] = useState(0);
     const intervalRef = useRef(null);
     // Control de tiempo
     let tiempoDeCarga;
@@ -48,10 +48,10 @@ export function Formulariocuatro({ context, usuario, slugContenido }) {
         // Controlar el botón "Empezar"
         setupEmpezarButton();
         // Control de minutos
-        if (elapsedTime >= 40) {
+        if (tiempoDuracion >= 40) {
             Swal.fire("Tiempo de resolución agotado", "", "warning");
             // Enviar el formulario
-            handleSubmit(new Event('submit'));
+            enviarForm(new Event('submit'));
             // Si quieres, puedes detener el intervalo aquí
             clearInterval(intervalRef.current);
         }
@@ -86,7 +86,7 @@ export function Formulariocuatro({ context, usuario, slugContenido }) {
             };
         };
 
-    }, [elapsedTime, usuario]);
+    }, [tiempoDuracion, usuario]);
 
     // Controlar el botón "Empezar"
     const setupEmpezarButton = () => {
@@ -107,7 +107,7 @@ export function Formulariocuatro({ context, usuario, slugContenido }) {
             const now = Date.now();
             const timeDiff = now - startTime; // en milisegundos
             const minutesElapsed = Math.floor(timeDiff / (1000 * 60));
-            setElapsedTime(minutesElapsed);
+            setTiempoDuracion(minutesElapsed);
         }, 1000 * 60); // cada minuto
     };
 
@@ -137,7 +137,7 @@ export function Formulariocuatro({ context, usuario, slugContenido }) {
         try {
             const datos__post = {
                 slug__,
-                respuesta,
+                respuestas,
                 tiempoTranscurrido__minutos,
                 tiempoTranscurrido__segundos
             };
@@ -258,7 +258,7 @@ export function Formulariocuatro({ context, usuario, slugContenido }) {
                                                                     {item}</label>
                                                                 <div className="col-sm-7">
                                                                     <input autoComplete="off" type="text" className="form-control w-75" id={`respuesta-${index}`}
-                                                                        name="respuesta"
+                                                                        name="respuesta" style={{border: '1px solid #0C2342'}}
                                                                         onChange={(e) => handleInputChange(index - 1, e)} />
                                                                 </div>
                                                             </div>
