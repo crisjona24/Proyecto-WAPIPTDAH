@@ -14,7 +14,7 @@ import { VerificarContenidoIndividual, ContenidoDatosIndividual, ContenidoIndivi
 import { info__nivel, info__dominio, info__contenido, info__contenido__respuesta } from '../../controles/controlador_registro';
 import { validarTamanoImagen } from '../../controles/alert_user';
 import { ResultadoIndividual, ResultadoEditar } from '../../api/resultado.api';
-import { SalaIndividual, SalaActualizar } from "../../api/sala.api"
+import { SalaIndividual, EditarSala} from "../../api/sala.api"
 import { ReporteIndividual, ReporteEditar } from "../../api/reporte.api"
 
 
@@ -972,6 +972,7 @@ export function FormularioEdicionSala() {
     const [nombre_sala, setNombre] = useState("");
     const [anotaciones, setAnotaciones] = useState("");
     const [codigo_identificador, setCodigoIdentificador] = useState("");
+    const [identificador_sala, setIdentificadorSala] = useState("");
     const [error, setError] = useState("");
     const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
@@ -984,6 +985,7 @@ export function FormularioEdicionSala() {
             setNombre(datos__sala.data.nombre_sala);
             setAnotaciones(datos__sala.data.anotaciones);
             setCodigoIdentificador(datos__sala.data.codigo_identificador);
+            setIdentificadorSala(datos__sala.data.id);
         } catch (error) {
             if (error.message === "NOT_AUTHENTICATED") {
                 navigate('/login');
@@ -1017,8 +1019,9 @@ export function FormularioEdicionSala() {
                 // Obtenemos los datos
                 const datos__post = {
                     nombre_sala,
-                    anotaciones, 
-                    codigo_identificador
+                    anotaciones,
+                    codigo_identificador,
+                    identificador_sala
                 };
                 // Funcion de registro
                 confirmEdicion(datos__post);
@@ -1064,11 +1067,21 @@ export function FormularioEdicionSala() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await SalaActualizar(datosSala.id, datos__post);
-                    Swal.fire("Datos actualizados", "", "success");
-                    navigate('/sala/all')
+                    // Realizar la petición POST al servidor
+                    const response = await EditarSala(datos__post);
+                    if (response.data.success) {
+                        // Redireccionar a la página principal si el inicio de sesión es exitoso
+                        Swal.fire("Sala actualizada correctamente", "", "success");
+                        navigate('/sala/all');
+                    } else {
+                        if (response.data.error) {
+                            Swal.fire(response.data.error, '', 'error');
+                        } else {
+                            Swal.fire('Error al registrar', '', 'error');
+                        }
+                    }
                 } catch (error) {
-                    Swal.fire('Error al actualizar', '', 'error');
+                    Swal.fire('Error al registrar', '', 'error');
                 }
             } else if (result.isDenied) {
                 Swal.fire('Los datos no se guardaron', '', 'info');

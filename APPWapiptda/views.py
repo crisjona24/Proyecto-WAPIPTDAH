@@ -1930,9 +1930,20 @@ def api_sala_register(request):
         if not paciente_existe_curso(paciente__ob, usuario__ob):
             return JsonResponse({'error': "El paciente no se encuentra inscrito en un curso o no existe."})
 
-        if not identificador_existe(codigo_identificador_):
-            return JsonResponse({'error': "El contenido que requiere evaluar no existe. Ingresa un identificador válido."})
-
+        # Verificar si existen multiples codigos identificadores separados por coma o un solo codigo
+        if comprobar_separacion_coma(codigo_identificador_):
+            identificadores_separados = codigo_identificador_.split(', ')
+            # Cada identificador debe convertirse en dato entero
+            for identificador in identificadores_separados:
+                # Convertir identificador en entero
+                identificador = int(identificador)
+                if not identificador_existe(identificador):
+                    return JsonResponse({'error': "El contenido que requiere evaluar no existe. Ingresa un identificador válido."})
+        else:
+            codigo_ = int(codigo_identificador_)
+            if not identificador_existe(codigo_):
+                return JsonResponse({'error': "El contenido que requiere evaluar no existe. Ingresa un identificador válido."})        
+            
         if nombresala_exist(nombre_sala_):
             return JsonResponse({'error': "El nombre de la sala ya existe. Ingresa otro nombre."})
         
@@ -2026,6 +2037,98 @@ def nombresala_exist(ob1):
     except Sala.DoesNotExist:
         return False
     return False
+
+
+## METODO DE EDICION DE SALA
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def api_sala_edicion(request):
+    if request.user.is_authenticated:
+        try:
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+        except Exception as e:
+            return JsonResponse({'error': 'El usuario no está autenticado'})
+
+        # Verifica si el usuario es técnico.
+        if not is_comun(user):
+            return JsonResponse({'error': 'El usuario no está autenticado'})
+
+        # Encontrar al usuario relacionado al user
+        try:
+            usuario__ob = UsuarioComun.objects.get(user=user)
+        except UsuarioComun.DoesNotExist:
+            return JsonResponse({'error': 'Usuario no encontrado'})
+
+        if request.method != 'POST':
+            return JsonResponse({'error': 'Método no permitido'})
+
+        data = json.loads(request.body)
+        nombre_sala_ = data.get('nombre_sala')
+        anotaciones_ = data.get('anotaciones')
+        codigo_identificador_ = data.get('codigo_identificador')
+        identificador_sala_ = data.get('identificador_sala')
+
+        if not curso_existe(usuario__ob):
+            return JsonResponse({'error': "No tiene un curso registrado. No puede registrar salas."})
+
+        # Verificar si existen multiples codigos identificadores separados por coma o un solo codigo
+        if comprobar_separacion_coma(codigo_identificador_):
+            identificadores_separados = codigo_identificador_.split(', ')
+            # Cada identificador debe convertirse en dato entero
+            for identificador in identificadores_separados:
+                # Convertir identificador en entero
+                identificador = int(identificador)
+                if not identificador_existe(identificador):
+                    return JsonResponse({'error': "El contenido que requiere evaluar no existe. Ingresa un identificador válido."})
+        else:
+            codigo_ = int(codigo_identificador_)
+            if not identificador_existe(codigo_):
+                return JsonResponse({'error': "El contenido que requiere evaluar no existe. Ingresa un identificador válido."})        
+            
+        if nombresala_exist_edicion(nombre_sala_, identificador_sala_):
+            return JsonResponse({'error': "El nombre de la sala ya existe. Ingresa otro nombre."})
+        
+        try: 
+            if actualizar_sala(nombre_sala_, anotaciones_, codigo_identificador_, identificador_sala_):
+                # Enviamos una respuesta al front
+                return JsonResponse({'success': True})
+            else:
+                error_message = "Error al editar sala."
+                context = {'error': error_message}
+                return JsonResponse(context)
+        except Exception as e:
+            print(e)
+            return JsonResponse({'error': "Algo salió mal"})
+    else:
+        return JsonResponse({'error': 'El usuario no está autenticado'})
+
+def actualizar_sala(ob1, ob2, ob3, ob4):
+    try:
+        sala_obj = Sala.objects.get(id=ob4)
+        sala_obj.nombre_sala = ob1
+        sala_obj.anotaciones = ob2
+        sala_obj.codigo_identificador = ob3
+        sala_obj.save()
+        return True
+    except Exception as e:
+        return False
+
+def nombresala_exist_edicion(ob1, ob2):
+    try:
+        # Buscamos el objeto sala
+        sala__ob = Sala.objects.get(id=ob2)
+        # Comparar si el nombre del registro es el mismo que viene en el request muestra falso
+        if sala__ob.nombre_sala == ob1:
+            return False
+        # Buscamos si existe el nombre de la sala y que no sea el nombre del registro ya existente
+        if Sala.objects.filter(nombre_sala__iexact=ob1).exists():
+            return True
+    except Sala.DoesNotExist:
+        return False
+    return False
+
 
 
 ## CONTADOR DE SALAS 

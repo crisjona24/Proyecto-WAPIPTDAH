@@ -728,7 +728,7 @@ export function FormularioSala() {
         if (
             nombre_sala.trim() === "" ||
             anotaciones.trim() === "" ||
-            !codigo_identificador ||
+            codigo_identificador.trim() === "" ||
             nombre_paciente.trim() === ""
         ) {
             return false;
@@ -823,8 +823,10 @@ export function FormularioSala() {
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="identificador">Identificador del contenido:</label>
-                <input className='form-control w-100' type="number" placeholder="Ingrese el código de contenido**" id="identificador"
-                    name="identificador" value={codigo_identificador} onChange={e => setCodigo(e.target.value)} />
+                <textarea className='form-control w-100 h-100' type="text" id="identificador"
+                    value={codigo_identificador} onChange={e => setCodigo(e.target.value)}
+                    name='identificador'
+                    placeholder="Ingrese el código de contenido. Ejm: 12145, 45578" />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="paciente">Nombre de paciente:</label>

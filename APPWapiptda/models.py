@@ -333,7 +333,7 @@ class DetallePeticion(models.Model):
 class Sala(models.Model):
     nombre_sala = models.CharField(max_length=80, blank=False, null=True)
     anotaciones = models.TextField()
-    codigo_identificador = models.IntegerField(blank=False, null=True)
+    codigo_identificador = models.CharField(max_length=80, blank=False, null=True)
     fecha_registro_sala = models.DateField(auto_now=True)
     estado_sala = models.BooleanField(default=True)
     sala_atendida = models.BooleanField(default=False)

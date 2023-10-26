@@ -101,6 +101,24 @@ export const SalaActualizar = (id, sala) => {
     }
 };
 
+export const EditarSala = async (datos__post) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.post('wapiptdah/edicion_sala/', datos__post,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                    //'Authorization': `Token ${token}`
+                }
+            });
+    } catch (error) {
+        throw new Error("No se puede crear la sala : " + error.message);
+    }
+};
+
 /* *** METODOS COMUNES *** */
 export const VerificarSala = async (slug) => {
     const tokenLocal = localStorage.getItem('token');
