@@ -21,8 +21,8 @@ export function ContenidoTipoSeven({ context, slugContenido }) {
 
     // NUEVO
     const [contenidosI, setContenidos] = useState([]);
-    const [slugSiguiente, setSlugSiguiente] = useState([]);
-    const [slugAnterior, setSlugAnterior] = useState([]);
+    const [slugSiguiente, setSlugSiguiente] = useState("");
+    const [slugAnterior, setSlugAnterior] = useState("");
     let { slug2 } = useParams();
     let { slug } = useParams();
     // Obtener datos
@@ -41,7 +41,7 @@ export function ContenidoTipoSeven({ context, slugContenido }) {
     }
 
     // Buscar el slug siguiente y anterior
-    const buscarSlug = () => {
+    const buscarSlug = (contenidosI) => {
         for (let i = 0; i < contenidosI.length; i++) {
             if (contenidosI[i].slug_contenido_individual === slug) {
                 console.log(contenidosI[i].slug_contenido_individual);
@@ -64,11 +64,17 @@ export function ContenidoTipoSeven({ context, slugContenido }) {
 
     useEffect(() => {
         cargarContenidosI();
+        console.log("slug: " + slug)
+        console.log("slug2: " + slug2)
+        const interval = setInterval(() => {
+            cargarContenidosI();
+        }, 5000); // 5 segundos
+        return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
         if (contenidosI.length > 1) {
-            buscarSlug();
+            buscarSlug(contenidosI);
         } else {
             setSlugAnterior("");
             setSlugSiguiente("");
@@ -174,20 +180,24 @@ export function ContenidoTipoSeven({ context, slugContenido }) {
                             <div className="bajo__cuerpo">
                                 <div className="mt-2 mb-2">
                                     {
-                                        slugAnterior !== "" &&
-                                        <Link to={`/individual/${slugAnterior}/${slug2}/`} className="boton__regreso btn btn-success">
-                                            <FontAwesomeIcon title="Anteior"
-                                                icon={faArrowLeft} />
-                                        </Link>
+                                        slugAnterior !== "" ? (
+                                            <Link to={`/individual/${slugAnterior}/${slug2}/`} className="boton__regreso btn btn-success">
+                                                <FontAwesomeIcon title="Anteior"
+                                                    icon={faArrowLeft} />
+                                            </Link>
+                                        ) :
+                                        <></>
                                     }
                                 </div>
                                 <div className="mt-2 mb-2">
                                     {
-                                        slugSiguiente !== "" &&
-                                        <Link to={`/individual/${slugSiguiente}/${slug2}/`} className="boton__regreso btn btn-success">
-                                            <FontAwesomeIcon title="Siguiente"
-                                                icon={faArrowRight} />
-                                        </Link>
+                                        slugSiguiente !== "" ? (
+                                            <Link to={`/individual/${slugSiguiente}/${slug2}/`} className="boton__regreso btn btn-success">
+                                                <FontAwesomeIcon title="Siguiente"
+                                                    icon={faArrowRight} />
+                                            </Link>
+                                        ) :
+                                        <></>
                                     }
 
                                 </div>

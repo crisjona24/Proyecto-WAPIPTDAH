@@ -57,18 +57,18 @@ export function IndividualRegistro() {
             </>
             {/* FIN MODAL */}
             <CabeceraRegister />
-            <Container className="contenedor__edicion">
+            <Container className="contenedor__ancho">
                 <Container className='barraSup mt-5' >
                     <Row className='col-md-12'>
                         <div className="card-body col-md-7">
                             <h4 className="titulo__CE"> Registro de Contenido</h4>
                         </div>
-                        <div className='card-body col-md-2 pt-1'>
+                        <div className='card-body col-md-1 pt-1'>
                             <Button variant="success" onClick={abrir} className='mt-2'>
                                 Detalle
                             </Button>
                         </div>
-                        <div className='card-body col-md-2 pt-1'>
+                        <div className='card-body col-md-1 pt-1'>
                             <Link to={`/contenido/individual/all/${slug}/`} className='btn btn-danger mt-2'>
                                 Cancelar
                             </Link>

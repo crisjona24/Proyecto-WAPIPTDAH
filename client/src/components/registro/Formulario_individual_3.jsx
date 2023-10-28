@@ -243,7 +243,7 @@ export function FormularioTres({ context, usuario, slugContenido }) {
                     }}>
                     <div className="contenedor__cuerpo__division">
                         <div className="alineacion__etiquetas d-flex">
-                            <span className="span mt-3" style={{ color: 'rgb(0, 146, 99)' }}>
+                            <span className="span-2 mt-3" style={{ color: 'rgb(0, 146, 99)' }}>
                                 Indicación: {descripcion__contenido}</span>
                         </div>
                         <br />
@@ -287,15 +287,14 @@ export function FormularioTres({ context, usuario, slugContenido }) {
                     </div>
                     <div className="contenedor__imagen">
                         <div className="conten__">
-                            <div className="imagen mt-5 ml-3 mb-5">
-                                <img style={{ width: '200px', height: '200px', border: ' 0.5px grey' }}
-                                    src={url__contenido} alt="" />
+                            <div className="imagen_tipo3 mt-2">
+                                <img src={url__contenido} alt="" />
                             </div>
-                        </div>
-                        <div className="card__cuerpo mt-2 pl-2">
-                            <span className="referencia">
-                                Exámen: Prova de Aferição 1.º CEB, 2009, Portugal
-                            </span>
+                            <div className="card__cuerpo mt-2 pl-2">
+                                <span className="referencia">
+                                    Actividad: Desarrollo de habilidades en niños, Ecuador
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>

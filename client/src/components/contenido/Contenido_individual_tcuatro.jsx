@@ -21,17 +21,16 @@ export function ContenidoTipoFour({ context, slugContenido }) {
 
     // NUEVO
     const [contenidosI, setContenidos] = useState([]);
-    const [slugSiguiente, setSlugSiguiente] = useState([]);
-    const [slugAnterior, setSlugAnterior] = useState([]);
+    const [slugSiguiente, setSlugSiguiente] = useState("");
+    const [slugAnterior, setSlugAnterior] = useState("");
     let { slug2 } = useParams();
     let { slug } = useParams();
-    
+
     // Obtener datos
     const cargarContenidosI = async () => {
         try {
             const cont = await ContenidoIndividualTodo(slug2);
             setContenidos(cont.data);
-            console.log(cont.data);
         } catch (error) {
             if (error.message === "NOT_AUTHENTICATED") {
                 navigate('/');
@@ -42,21 +41,27 @@ export function ContenidoTipoFour({ context, slugContenido }) {
     }
 
     // Buscar el slug siguiente y anterior
-    const buscarSlug = () => {
-        for (let i = 0; i < contenidosI.length; i++) {
-            if (contenidosI[i].slug_contenido_individual === slug) {
-                console.log("slug: " + contenidosI[i].slug_contenido_individual);
+    const buscarSlug = (contenidos) => {
+        console.log("slug busqueda: " + slug)
+        console.log("slug2 busqueda: " + slug2)
+
+        for (let i = 0; i < contenidos.length; i++) {
+            if (contenidos[i].slug_contenido_individual === slug) {
+                console.log("slug actual: " + contenidos[i].slug_contenido_individual);
                 if (i === 0) {
                     setSlugAnterior("");
-                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
+                    setSlugSiguiente(contenidos[i + 1].slug_contenido_individual);
                     break;
-                } else if (i === contenidosI.length - 1) {
-                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
+                } else if (i === contenidos.length - 1) {
+                    setSlugAnterior(contenidos[i - 1].slug_contenido_individual);
                     setSlugSiguiente("");
                     break;
                 } else {
-                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
-                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
+                    console.log("Me estoy actualizando")
+                    setSlugAnterior(contenidos[i - 1].slug_contenido_individual);
+                    setSlugSiguiente(contenidos[i + 1].slug_contenido_individual);
+                    console.log("Anterior: " + contenidos[i - 1].slug_contenido_individual);
+                    console.log("Siguiente: " + contenidos[i + 1].slug_contenido_individual);
                     break;
                 }
             }
@@ -65,11 +70,17 @@ export function ContenidoTipoFour({ context, slugContenido }) {
 
     useEffect(() => {
         cargarContenidosI();
+        console.log("slug: " + slug)
+        console.log("slug2: " + slug2)
+        const interval = setInterval(() => {
+            cargarContenidosI();
+        }, 5000); // 5 segundos
+        return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
         if (contenidosI.length > 1) {
-            buscarSlug();
+            buscarSlug(contenidosI);
         } else {
             setSlugAnterior("");
             setSlugSiguiente("");

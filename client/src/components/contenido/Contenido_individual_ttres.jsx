@@ -21,8 +21,8 @@ export function ContenidoTipoThree({ context, slugContenido }) {
 
     // NUEVO
     const [contenidosI, setContenidos] = useState([]);
-    const [slugSiguiente, setSlugSiguiente] = useState([]);
-    const [slugAnterior, setSlugAnterior] = useState([]);
+    const [slugSiguiente, setSlugSiguiente] = useState("");
+    const [slugAnterior, setSlugAnterior] = useState("");
     let { slug2 } = useParams();
     let { slug } = useParams();
     // Obtener datos

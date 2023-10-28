@@ -1050,11 +1050,14 @@ def api_dominio_register(request):
                     else:
                         # Calculamos el identificador
                         identificador_ = generar_identificador_unico()
-                        # Creamos el contenido
-                        if guardar_dominio(nombre_dominio_, identificador_, descripcion_, portada_, usuario__ob):
-                            return JsonResponse({'success': True})
+                        if control_categorias():
+                            # Creamos el contenido
+                            if guardar_dominio(nombre_dominio_, identificador_, descripcion_, portada_, usuario__ob):
+                                return JsonResponse({'success': True})
+                            else:
+                                return JsonResponse({'error': 'Error al guardar el dominio'})
                         else:
-                            return JsonResponse({'error': 'Error al guardar el dominio'})
+                            return JsonResponse({'error': 'No se puede registrar el dominio porque se excede lo permitido'})
                 else:
                     return JsonResponse({'error': 'No esta permitido'})
             else:
@@ -1086,6 +1089,25 @@ def nombre_dominio_exist(ob1):
     except Dominio.DoesNotExist:
         return False
     return False
+
+def control_categorias():
+    try:
+        # Obtenemos los registros de nivel
+        grado__ob = GradoTDAH.objects.all()
+        # Buscamos el numero_categorias de los niveles
+        numero_categorias_ = 0
+        for grado in grado__ob:
+            numero_categorias_ = grado.numero_categorias
+        # Buscamos el numero de dominios registrados
+        dominiio_ob = Dominio.objects.all()
+        numero_dominios_ = dominiio_ob.count()
+        # Verificar si el numero de dominios es menor al numero de categorias
+        if numero_dominios_ < numero_categorias_:
+            return True
+        else:
+            return False
+    except GradoTDAH.DoesNotExist:
+        return False
 
 # METODO DE REGISTRO DE CONTENIDO
 @api_view(['POST'])

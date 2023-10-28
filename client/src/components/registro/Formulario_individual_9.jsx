@@ -225,7 +225,7 @@ export function FormularioNueve({ context, usuario, slugContenido }) {
                 }}>
                     <div className="contenedor__cuerpo__division_t9">
                         <div className="alineacion__etiquetas d-flex">
-                            <span className="span mt-3" style={{ color: 'rgb(0, 146, 99)' }}>
+                            <span className="span-2 mt-3" style={{ color: 'rgb(0, 146, 99)' }}>
                                 Indicación: {descripcion__contenido} </span>
                         </div>
                         <div className="contenido-imagen">

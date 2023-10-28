@@ -84,7 +84,7 @@ export function ListadodeCursos({ cursos, page, setPage, numeroPag }) {
                                                 <tr key={curso.id}>
                                                     <td>{curso.nombre_curso}</td>
                                                     <td className="text-center">{curso.fecha_registro_curso}</td>
-                                                    <td>{curso.descripcion_curso}</td>
+                                                    <td style={{ textAlign: 'justify' }}>{curso.descripcion_curso}</td>
                                                     <td className="text-center">{curso.identificador_curso}</td>
                                                     <td>
                                                         <>
@@ -108,6 +108,7 @@ export function ListadodeCursos({ cursos, page, setPage, numeroPag }) {
                                         {
                                             cursos.length === 0 &&
                                             <tr >
+                                                <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>

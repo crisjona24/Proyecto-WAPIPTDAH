@@ -113,9 +113,8 @@ export function ListadodeSala({ salas, usuario, page, setPage, numeroPag }) {
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td>
-                                                    <ul></ul>
-                                                </td>
+                                                <td></td>
+                                                <td></td>
                                             </tr>
                                         }
                                     </>
@@ -240,9 +239,7 @@ export function ListadodeSalaPaciente({ salas, page, setPage, numeroPag }) {
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td>
-                                                    <ul></ul>
-                                                </td>
+                                                <td></td>
                                             </tr>
                                         }
                                     </>
@@ -413,9 +410,8 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td>
-                                                    <ul></ul>
-                                                </td>
+                                                <td></td>
+                                                <td></td>
                                             </tr>
                                         }
                                     </>
@@ -543,9 +539,7 @@ export function ListadodeReportes({ reportes, usuario, page, setPage, numeroPag 
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td>
-                                                    <ul></ul>
-                                                </td>
+                                                <td></td>
                                             </tr>
                                         }
                                     </>

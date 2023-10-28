@@ -205,10 +205,10 @@ export function Navbar_T() {
 
             <ul className="list-unstyled CTAs">
                 <li>
-                    <a href="https://bootstrapious.com/tutorial/files/sidebar.zip" className="download">Download source</a>
+                    <a className="download">WAPIPTDAH</a>
                 </li>
                 <li>
-                    <a href="https://bootstrapious.com/p/bootstrap-sidebar" className="article">Back to article</a>
+                    <Link to="/ver/datos" className="article">Conocenos</Link>
                 </li>
             </ul>
         </nav>
@@ -416,10 +416,10 @@ export function Navbar_C() {
 
             <ul className="list-unstyled CTAs">
                 <li>
-                    <a href="https://bootstrapious.com/tutorial/files/sidebar.zip" className="download">Download source</a>
+                    <a className="download">WAPIPTDAH</a>
                 </li>
                 <li>
-                    <a href="https://bootstrapious.com/p/bootstrap-sidebar" className="article">Back to article</a>
+                    <Link to="/ver/datos" className="article">Conocenos</Link>
                 </li>
             </ul>
         </nav>
@@ -604,10 +604,10 @@ export function Navbar_Paci() {
 
             <ul className="list-unstyled CTAs">
                 <li>
-                    <a href="https://bootstrapious.com/tutorial/files/sidebar.zip" className="download">Download source</a>
+                    <a className="download">WAPIPTDAH</a>
                 </li>
                 <li>
-                    <a href="https://bootstrapious.com/p/bootstrap-sidebar" className="article">Back to article</a>
+                    <Link to="/ver/datos" className="article">Conocenos</Link>
                 </li>
             </ul>
         </nav>
@@ -678,10 +678,10 @@ export function Navbar_Defect() {
 
             <ul className="list-unstyled CTAs">
                 <li>
-                    <a href="https://bootstrapious.com/tutorial/files/sidebar.zip" className="download">Download source</a>
+                    <a className="download">WAPIPTDAH</a>
                 </li>
                 <li>
-                    <a href="https://bootstrapious.com/p/bootstrap-sidebar" className="article">Back to article</a>
+                    <Link to="/ver/datos" className="article">Conocenos</Link>
                 </li>
             </ul>
         </nav>

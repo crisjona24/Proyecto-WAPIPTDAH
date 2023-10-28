@@ -312,8 +312,12 @@ export function FormularioCurso() {
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="descripcion">Descripción de curso:</label>
-                <input className='form-control w-100' type="text" placeholder="Ingrese una descripción corta**" id="descripcion"
-                    value={descripcion} onChange={e => setDescripcionCurso(e.target.value)} />
+                <textarea className='form-control w-100 tamanio-text-area' type="text" id="descripcion"
+                    value={descripcion} onChange={e => setDescripcionCurso(e.target.value)}
+                    name='descripcion'
+                    placeholder="Ingrese una descripción corta**"
+                />
+
             </div>
             <Button type="submit" variant="success" disabled={habilitado}>
                 {habilitado ? 'Guardando...' : 'Guardar'}
@@ -420,7 +424,9 @@ export function FormularioNivel() {
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="descripcion">Descripción de nivel:</label>
-                <input onClick={info__nivel} className='form-control w-100' type="text" placeholder="Ingrese una descripción corta**" id="descripcion"
+                <textarea onClick={info__nivel} className='form-control w-100 tamanio-text-area' type="text"
+                    placeholder="Ingrese una descripción corta**"
+                    id="descripcion" name="descripcion"
                     value={descripcion} onChange={e => setDescripcion(e.target.value)} />
             </div>
             <div className="form-group">
@@ -537,7 +543,9 @@ export function FormularioDominio() {
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="descripcion">Descripción:</label>
-                <input onClick={info__dominio} className='form-control w-100' type="text" placeholder="Ingrese una descripción corta**" id="descripcion"
+                <textarea onClick={info__dominio} className='form-control w-100 tamanio-text-area' type="text"
+                    placeholder="Ingrese una descripción corta**"
+                    id="descripcion" name="descripcion"
                     value={descripcion} onChange={e => setDescripcion(e.target.value)} />
             </div>
             <div className="form-group">
@@ -662,9 +670,11 @@ export function FormularioPeticion() {
             */}
             <div className="form-group">
                 <label className='label' htmlFor="peticion_cuerpo">Descripción de petición:</label>
-                <textarea className='form-control w-100 h-100' type="text" id="peticion_cuerpo"
+                <textarea className='form-control w-100 tamanio-text-area' type="text" id="peticion_cuerpo"
                     value={peticion_cuerpo} onChange={e => setPeticionCuerpo(e.target.value)}
-                    name='peticion_cuerpo' />
+                    name='peticion_cuerpo' 
+                    placeholder="Mira detalles en el boton Detalle**"
+                    />
             </div>
             <Button type="submit" variant="success" disabled={habilitado}>
                 {habilitado ? 'Guardando...' : 'Guardar'}
@@ -680,7 +690,7 @@ export function FormularioSala() {
     const [nombre_sala, setNombre] = useState("");
     const [nombre_sala_n, setNombreN] = useState("");
     const [anotaciones, setAnotaciones] = useState("");
-    const [codigo_identificador, setCodigo] = useState(0);
+    const [codigo_identificador, setCodigo] = useState("");
     const [nombre_paciente, setNombrePaciente] = useState("");
     const [error, setError] = useState("");
     const [entradaValida, setEntradavaldia] = useState(true);
@@ -817,7 +827,7 @@ export function FormularioSala() {
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="anotacion">Descripción de actividad:</label>
-                <textarea className='form-control w-100 h-100' type="text" id="anotacion"
+                <textarea className='form-control w-100 tamanio-text-area' type="text" id="anotacion"
                     value={anotaciones} onChange={e => setAnotaciones(e.target.value)}
                     name='anotacion' />
             </div>
@@ -826,7 +836,7 @@ export function FormularioSala() {
                 <textarea className='form-control w-100 h-100' type="text" id="identificador"
                     value={codigo_identificador} onChange={e => setCodigo(e.target.value)}
                     name='identificador'
-                    placeholder="Ingrese el código de contenido. Ejm: 12145, 45578" />
+                    placeholder="Ingrese el código/s de contenido. Ejm: 12145, 45578" />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="paciente">Nombre de paciente:</label>
@@ -1056,7 +1066,7 @@ export function FormularioConfirmacion() {
             {error && <span>{error}</span>}
             <div className="form-group">
                 <label className='label' htmlFor="codigo">Ingrese el código proporcionado :</label>
-                <textarea class="form-control w-100" placeholder="Ingrese el código**"
+                <textarea class="form-control w-100 tamanio-text-area" placeholder="Ingrese el código**"
                     id="codigo" required
                     name="codigo"
                     value={tokenVerificacion}
@@ -1070,6 +1080,7 @@ export function FormularioConfirmacion() {
     )
 
 }
+
 
 // Contacto
 export function FormularioContacto() {
@@ -1168,7 +1179,7 @@ export function FormularioContacto() {
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="cuerpo">Mensaje:</label>
-                <textarea className='form-control w-100 h-100' type="text" placeholder="Ingrese el mensaje**" id="cuerpo"
+                <textarea className='form-control w-100 tamanio-text-area' type="text" placeholder="Ingrese el mensaje**" id="cuerpo"
                     value={cuerpo} onChange={e => setCuerpo(e.target.value)} />
             </div>
             <Button type="submit" variant="success" disabled={habilitado}>

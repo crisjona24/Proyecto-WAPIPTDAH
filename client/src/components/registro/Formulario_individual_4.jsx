@@ -221,65 +221,69 @@ export function Formulariocuatro({ context, usuario, slugContenido }) {
                         <div className="alineacion__etiquetas d-flex">
                             <>
                                 {descripcion__contenido && descripcion__contenido.length > 1 && descripcion__contenido[0] &&
-                                    <span className="span mt-3" style={{ color: 'rgb(0, 146, 99)' }}>
+                                    <span className="span-2 mt-3" style={{ color: 'rgb(0, 146, 99)' }}>
                                         Indicación: {descripcion__contenido[0]}</span>
                                 }
                             </>
                         </div>
                         {/* <!-- Contenido de url--> */}
-                        <div className="contenedor__imagen_tipo4" style={{ marginLeft: '5%' }}>
+                        <div className="contenedor__imagen_tipo4 espacio-tipo4">
                             <div className="conten__tipo4 mt-4">
                                 <div className="imagen_tipo4 mt-1 ml-5 mb-1 d-flex justify-content-center">
-                                    <img style={{ width: '400px', height: '300px', border: '0.5px grey' }}
-                                        src={url__contenido} alt="" />
+                                    <img src={url__contenido} alt="" />
                                 </div>
                             </div>
-                            <div className="card__cuerpo mt-2 pl-2">
-                                <span className="referencia">
-                                    Exámen: Prova de Aferição 1.º CEB, 2009, Portugal
+                            <div className="card__cuerpo mt-2 pl-2 d-flex justify-content-center">
+                                <span className="referencia-2">
+                                    Actividad: Desarrollo de habilidades en niños
                                 </span>
                             </div>
                         </div>
                         <br />
                         {/* <!-- Contenido de url--> */}
-                        <form onSubmit={enviarForm} style={{ marginLeft: '5%', marginTop: '1%' }}>
-                            <div className="ml-3 pl-3">
-                                <fieldset>
-                                    <>
-                                        {
-                                            descripcion__contenido && descripcion__contenido.length > 1 &&
-                                            descripcion__contenido[1].trim().startsWith("¿") &&
-                                            descripcion__contenido.map((item, index) => {
-                                                if (index > 0) {
-                                                    return (
-                                                        <div className="d-flex flex-column justify-content-between" key={index}>
-                                                            <div className="form-group row ml-2">
-                                                                <label htmlFor={`respuesta-${index}`} className="etiqueta col-sm-5 col-form-label" style={{ fontFamily: 'Pacifico cursive' }}>
-                                                                    {item}</label>
-                                                                <div className="col-sm-7">
-                                                                    <input autoComplete="off" type="text" className="form-control w-75" id={`respuesta-${index}`}
-                                                                        name="respuesta" style={{border: '1px solid #0C2342'}}
-                                                                        onChange={(e) => handleInputChange(index - 1, e)} />
+                        <div style={{ width: '800px' }}>
+                            <form onSubmit={enviarForm} style={{ marginLeft: '5%', marginTop: '1%' }}>
+                                <div className="ml-3 pl-3">
+                                    <fieldset>
+                                        <>
+                                            {
+                                                descripcion__contenido && descripcion__contenido.length > 1 &&
+                                                descripcion__contenido[1].trim().startsWith("¿") &&
+                                                descripcion__contenido.map((item, index) => {
+                                                    if (index > 0) {
+                                                        return (
+                                                            <div className="d-flex flex-column justify-content-between" key={index}>
+                                                                <div className="form-group row ml-2">
+                                                                    <label htmlFor={`respuesta-${index}`}
+                                                                        className="d-flex justify-content-center etiqueta col-sm-5 col-form-label"
+                                                                        style={{ fontFamily: 'Pacifico cursive' }}>
+                                                                        {item}
+                                                                    </label>
+                                                                    <div className="col-sm-7 mt-3">
+                                                                        <input autoComplete="off" type="text" className="form-control w-100 h-75" id={`respuesta-${index}`}
+                                                                            name="respuesta" style={{ border: '1px solid #0C2342' }}
+                                                                            onChange={(e) => handleInputChange(index - 1, e)} />
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    )
-                                                }
-                                            })
-                                        }
-                                    </>
-                                </fieldset>
-                            </div>
-                            {/* Eñ input que se envia */}
-                            <input type="hidden" id="slug" name="slug" value={slug__} onChange={e => setSlug(e.target.value)} />
+                                                        )
+                                                    }
+                                                })
+                                            }
+                                        </>
+                                    </fieldset>
+                                </div>
+                                {/* Eñ input que se envia */}
+                                <input type="hidden" id="slug" name="slug" value={slug__} onChange={e => setSlug(e.target.value)} />
 
-                            <div className="d-flex flex-column justify-content-between align-items-center mt-3">
-                                <button type="submit" className="btn btn-success w-25"
-                                    id="verificarBtn" ref={verificarRef} disabled={verificarBtnD}>
-                                    !Listo!
-                                </button>
-                            </div>
-                        </form>
+                                <div className="d-flex flex-column align-items-center mt-3" >
+                                    <button type="submit" className="btn btn-success w-25"
+                                        id="verificarBtn" ref={verificarRef} disabled={verificarBtnD}>
+                                        !Listo!
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
 
                     </div>
                 </div>

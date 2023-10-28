@@ -92,7 +92,7 @@ export function FormularioContenidoIndividual({ slug }) {
             const nivel = await NivelListado();
             setNiveles(nivel.data);
         } catch (error) {
-            mostrarError('Error al obtener datos de dominio');
+            mostrarError('Error al obtener datos de nivel');
         }
     };
 
@@ -101,7 +101,7 @@ export function FormularioContenidoIndividual({ slug }) {
             const data = await ContenidoListadoSolo();
             setContenidos(data.data);
         } catch (error) {
-            mostrarError('Error al obtener datos de dominio');
+            mostrarError('Error al obtener datos de contenido');
         }
     };
 
@@ -144,8 +144,11 @@ export function FormularioContenidoIndividual({ slug }) {
             {error && <p>{error}</p>}
             <div className="form-group">
                 <label className='label' htmlFor="descripcion">Indicación:</label>
-                <input onClick={info__contenido} className='form-control w-100' type="text" placeholder="Ingresa la indicación de la actividad**" id="descripcion" name="descripcion"
-                    value={descripcion_individual} onChange={e => setDescripcion(e.target.value)} />
+                <textarea onClick={info__contenido} className='form-control w-100 tamanio-text-area' type="text" id="descripcion"
+                    value={descripcion_individual} onChange={e => setDescripcion(e.target.value)}
+                    name='descripcion'
+                    placeholder="Ingresa la indicación de la actividad**"
+                />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="respuesta">Respuesta:</label>
@@ -182,18 +185,21 @@ export function FormularioContenidoIndividual({ slug }) {
             {
                 tipo_contenido === "selecion_multiple_img" &&
                 <>
-                    <div className="form-group">
-                        <label className='label' htmlFor="img1">Contenido de opción 2:</label>
-                        <input className='form-control w-100' type="file" id="img1"
-                            onChange={(e) => { setImg1(e.target.files[0]); validarTamanoImagen(e.target) }}
-                            name='img1' accept="image/*" />
+                    <div className='form-row row'>
+                        <div className="form-group col-md-6">
+                            <label className='label' htmlFor="img1">Contenido de opción 2:</label>
+                            <input className='form-control w-100' type="file" id="img1"
+                                onChange={(e) => { setImg1(e.target.files[0]); validarTamanoImagen(e.target) }}
+                                name='img1' accept="image/*" />
+                        </div>
+                        <div className="form-group col-md-6">
+                            <label className='label' htmlFor="img2">Contenido de opción 3:</label>
+                            <input className='form-control w-100' type="file" id="img2"
+                                onChange={(e) => { setImg2(e.target.files[0]); validarTamanoImagen(e.target) }}
+                                name='img2' accept="image/*" />
+                        </div>
                     </div>
-                    <div className="form-group">
-                        <label className='label' htmlFor="img2">Contenido de opción 3:</label>
-                        <input className='form-control w-100' type="file" id="img2"
-                            onChange={(e) => { setImg2(e.target.files[0]); validarTamanoImagen(e.target) }}
-                            name='img2' accept="image/*" />
-                    </div>
+
                     <div className="form-group">
                         <label className='label' htmlFor="img3">Contenido de opción 4:</label>
                         <input className='form-control w-100' type="file" id="img3"
@@ -202,34 +208,37 @@ export function FormularioContenidoIndividual({ slug }) {
                     </div>
                 </>
             }
-            <div className="form-group">
-                <label className='label' htmlFor="conten">Pertenece a:</label>
-                <select className="form-control w-100" id="conten"
-                    name="conten" value={conten} onChange={e => setConten(e.target.value)}>
-                    <option value="none">None</option>
-                    <>
-                        {contenidos.map((dominio) => (
-                            <option key={dominio.id} value={dominio.nombre}>
-                                {dominio.nombre}
-                            </option>
-                        ))}
-                    </>
-                </select>
+            <div className='form-row row'>
+                <div className="form-group col-md-6">
+                    <label className='label' htmlFor="conten">Pertenece a:</label>
+                    <select className="form-control w-100" id="conten"
+                        name="conten" value={conten} onChange={e => setConten(e.target.value)}>
+                        <option value="none">None</option>
+                        <>
+                            {contenidos.map((dominio) => (
+                                <option key={dominio.id} value={dominio.nombre}>
+                                    {dominio.nombre}
+                                </option>
+                            ))}
+                        </>
+                    </select>
+                </div>
+                <div className="form-group col-md-6">
+                    <label className='label' htmlFor="grado">Grado:</label>
+                    <select className="form-control w-100" id="grado"
+                        name="grado" value={nombre_nivel} onChange={e => setNombreNivel(e.target.value)}>
+                        <option value="none">None</option>
+                        <>
+                            {niveles.map((nivel) => (
+                                <option key={nivel.id} value={nivel.nombre_nivel}>
+                                    {nivel.nombre_nivel}
+                                </option>
+                            ))}
+                        </>
+                    </select>
+                </div>
             </div>
-            <div className="form-group">
-                <label className='label' htmlFor="grado">Grado:</label>
-                <select className="form-control w-100" id="grado"
-                    name="grado" value={nombre_nivel} onChange={e => setNombreNivel(e.target.value)}>
-                    <option value="none">None</option>
-                    <>
-                        {niveles.map((nivel) => (
-                            <option key={nivel.id} value={nivel.nombre_nivel}>
-                                {nivel.nombre_nivel}
-                            </option>
-                        ))}
-                    </>
-                </select>
-            </div>
+
             <Button type="submit" variant="success" disabled={habilitado}>
                 {habilitado ? 'Guardando...' : 'Guardar'}
             </Button>

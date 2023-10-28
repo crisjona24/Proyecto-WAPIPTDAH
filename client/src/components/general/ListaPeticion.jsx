@@ -122,9 +122,8 @@ export function ListaPeticion({ peticiones, page, setPage, numeroPag }) {
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td>
-                                                    <ul></ul>
-                                                </td>
+                                                <td></td>
+                                                <td></td>
                                             </tr>
                                         }
                                     </>
@@ -244,9 +243,8 @@ export function ListaPeticionAtendida({ peticiones, page, setPage, numeroPag }) 
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td>
-                                                    <ul></ul>
-                                                </td>
+                                                <td></td>
+                                                <td></td>
                                             </tr>
                                         }
                                     </>
@@ -353,9 +351,7 @@ export function ListaPeticionesUsuario({ peticiones, page, setPage, numeroPag })
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td>
-                                                    <ul></ul>
-                                                </td>
+                                                <td></td>
                                             </tr>
                                         }
                                     </>

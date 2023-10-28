@@ -13,7 +13,7 @@ import { InscripcionCurso } from "../../api/usuario.api"
 /* Opciones de Usuario comun */
 export function OpcionesComun({ curso }) {
     return (
-        <ul className="action-list d-flex ">
+        <ul className="action-list d-flex justify-content-center">
             <Link to={`/pacientes/all/${curso.slug_curso}/`} className="btn btn-success separacion--boton"
                 title="Ver pacientes inscritos" style={{ width: '40px', height: '35px' }}>
                 <FontAwesomeIcon icon={faEye} />

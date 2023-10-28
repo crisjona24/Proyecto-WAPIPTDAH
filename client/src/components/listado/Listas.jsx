@@ -928,7 +928,7 @@ export function SalaLista({ usuario }) {
                     <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar</a>
                     <form className="d-flex flex-row justify-content-between w-50">
                         <input className="form-control mr-sm-2 w-100" type="search" name="nombre" id="nombre"
-                            placeholder="Nombre de sala.." aria-label="Search" value={nombrebuscar}
+                            placeholder="Nombre de sala.. Ejm: Sala 1" aria-label="Search" value={nombrebuscar}
                             onChange={e => setNombreBuscar(e.target.value)} disabled={isTamanio} />
                         <>
                             {

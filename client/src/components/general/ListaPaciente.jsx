@@ -71,9 +71,8 @@ export function ListadodePacientes({ pacientes, page, setPage, numeroPag }) {
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td>
-                                                    <ul></ul>
-                                                </td>
+                                                <td></td>
+                                                <td></td>
                                             </tr>
                                         }
                                     </>

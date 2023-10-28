@@ -151,7 +151,7 @@ export function FormularioUno({ context, usuario, slugContenido }) {
             console.log(datos__post);
             setVerificarBtnD(true);
             // Realizar la petición POST al servidor
-           const response = await CrearResultadoNew(datos__post);
+            const response = await CrearResultadoNew(datos__post);
             if (response.data.success) {
                 // Redireccionar a la página principal de contenido individual
                 Swal.fire("Respuesta registrada", "", "success");
@@ -224,7 +224,7 @@ export function FormularioUno({ context, usuario, slugContenido }) {
                 }}>
                     <div className="contenedor__cuerpo__division">
                         <div className="alineacion__etiquetas d-flex">
-                            <span className="span mt-3" style={{ color: 'rgb(0, 146, 99)' }}>
+                            <span className="span-2 mt-3" style={{ color: 'rgb(0, 146, 99)' }}>
                                 Indicación: {descripcion__contenido} </span>
                         </div>
                         <form onSubmit={enviarForm} style={{ marginLeft: '5%', marginTop: '1%' }}>
@@ -289,17 +289,16 @@ export function FormularioUno({ context, usuario, slugContenido }) {
                             </div>
                         </form>
                     </div>
-                    <div className="contenedor__imagen">
+                    <div className="contenedor__imagen" conten__>
                         <div className="conten__">
-                            <div className="imagen mt-5 ml-3 mb-5">
-                                <img style={{ width: '200px', height: '200px', border: ' 0.5px grey', marginLeft: '15px' }} src={url__contenido}
-                                    alt="" />
+                            <div className="imagen_tipo1 mt-2">
+                                <img src={url__contenido} alt="" />
                             </div>
-                        </div>
-                        <div className="card__cuerpo mt-2 pl-2">
-                            <span className="referencia">
-                                Exámen: Prova de Aferição 1.º CEB, 2009, Portugal
-                            </span>
+                            <div className="card__cuerpo mt-2 pl-2">
+                                <span className="referencia">
+                                    Actividad: Desarrollo de habilidades en niños, Ecuador
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>

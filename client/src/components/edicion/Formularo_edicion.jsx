@@ -14,7 +14,7 @@ import { VerificarContenidoIndividual, ContenidoDatosIndividual, ContenidoIndivi
 import { info__nivel, info__dominio, info__contenido, info__contenido__respuesta } from '../../controles/controlador_registro';
 import { validarTamanoImagen } from '../../controles/alert_user';
 import { ResultadoIndividual, ResultadoEditar } from '../../api/resultado.api';
-import { SalaIndividual, EditarSala} from "../../api/sala.api"
+import { SalaIndividual, EditarSala } from "../../api/sala.api"
 import { ReporteIndividual, ReporteEditar } from "../../api/reporte.api"
 
 
@@ -159,7 +159,9 @@ export function FormularioEdicionNivel() {
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="descripcion">Descripción de nivel:</label>
-                <input onClick={info__nivel} className='form-control w-100' type="text" placeholder="Ingrese una descripción corta**" id="descripcion"
+                <textarea onClick={info__nivel} className='form-control w-100 tamanio-text-area' type="text"
+                    placeholder="Ingrese una descripción corta**"
+                    id="descripcion" name="descripcion"
                     value={descripcion_grado} onChange={e => setDescripcion(e.target.value)} />
             </div>
             <div className="form-group">
@@ -317,7 +319,9 @@ export function FormularioEdicion() {
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="descripcion">Descripción:</label>
-                <input onClick={info__dominio} className='form-control w-100' type="text" placeholder="Ingrese una descripción corta**" id="descripcion"
+                <textarea onClick={info__dominio} className='form-control w-100 tamanio-text-area' type="text"
+                    placeholder="Ingrese una descripción corta**"
+                    id="descripcion" name="descripcion"
                     value={descripcion_dominio} onChange={e => setDescripcionDominio(e.target.value)} />
             </div>
             <Button type="submit" variant="success" disabled={habilitado}>
@@ -824,8 +828,11 @@ export function FormularioEdicionCurso() {
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="descripcion">Descripción de curso:</label>
-                <input className='form-control w-100' type="text" placeholder="Ingrese una descripción corta**" id="descripcion"
-                    value={descripcion_curso} onChange={e => setDescripcionCurso(e.target.value)} />
+                <textarea className='form-control w-100 tamanio-text-area' type="text" id="descripcion"
+                    value={descripcion_curso} onChange={e => setDescripcionCurso(e.target.value)}
+                    name='descripcion'
+                    placeholder="Ingrese una descripción corta**"
+                />
             </div>
             <Button type="submit" variant="success" disabled={habilitado}>
                 {habilitado ? 'Actualizando...' : 'Actualizar'}
@@ -948,7 +955,7 @@ export function FormularioEdicionResultado() {
             {error && <p>{error}</p>}
             <div className="form-group">
                 <label className='label' htmlFor="resultado">Observación de resultado:</label>
-                <textarea class="form-control" placeholder="Ingrese las observaciones**"
+                <textarea class="form-control tamanio-text-area w-100" placeholder="Ingrese las observaciones**"
                     id="resultado" required
                     value={observacion}
                     onChange={e => setObservacion(e.target.value)}>
@@ -1100,7 +1107,7 @@ export function FormularioEdicionSala() {
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="anotacion">Descripción de actividad:</label>
-                <textarea className='form-control w-100 h-100' type="text" id="anotacion"
+                <textarea className='form-control w-100 tamanio-text-area' type="text" id="anotacion"
                     value={anotaciones} onChange={e => setAnotaciones(e.target.value)}
                     name='anotacion' />
             </div>
@@ -1108,7 +1115,8 @@ export function FormularioEdicionSala() {
                 <label className='label' htmlFor="codigo">Código/s de actividad:</label>
                 <textarea className='form-control w-100 h-100' type="text" id="codigo"
                     value={codigo_identificador} onChange={e => setCodigoIdentificador(e.target.value)}
-                    name='codigo' />
+                    name='codigo'
+                    placeholder="Ingrese el código/s de contenido. Ejm: 12145, 45578" />
             </div>
             <Button type="submit" variant="success" disabled={habilitado}>
                 {habilitado ? 'Actualizando...' : 'Actualizar'}
@@ -1232,7 +1240,8 @@ export function FormularioEdicionReporte() {
             {error && <p>{error}</p>}
             <div className="form-group">
                 <label className='label' htmlFor="reporte">Observación de reporte:</label>
-                <textarea class="form-control" placeholder="Ingrese las observaciones**"
+                <textarea class="form-control w-100 tamanio-text-area"
+                    placeholder="Ingrese las observaciones**"
                     id="reporte" required
                     value={descripcion_reporte}
                     onChange={e => setDescripcionReporte(e.target.value)}>
