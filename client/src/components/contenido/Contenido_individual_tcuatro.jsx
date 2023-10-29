@@ -41,27 +41,23 @@ export function ContenidoTipoFour({ context, slugContenido }) {
     }
 
     // Buscar el slug siguiente y anterior
-    const buscarSlug = (contenidos) => {
-        console.log("slug busqueda: " + slug)
-        console.log("slug2 busqueda: " + slug2)
-
-        for (let i = 0; i < contenidos.length; i++) {
-            if (contenidos[i].slug_contenido_individual === slug) {
-                console.log("slug actual: " + contenidos[i].slug_contenido_individual);
+    const buscarSlug = () => {
+        for (let i = 0; i < contenidosI.length; i++) {
+            if (contenidosI[i].slug_contenido_individual === slug) {
                 if (i === 0) {
                     setSlugAnterior("");
-                    setSlugSiguiente(contenidos[i + 1].slug_contenido_individual);
+                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
                     break;
-                } else if (i === contenidos.length - 1) {
-                    setSlugAnterior(contenidos[i - 1].slug_contenido_individual);
+                } else if (i === contenidosI.length - 1) {
+                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
                     setSlugSiguiente("");
                     break;
                 } else {
                     console.log("Me estoy actualizando")
-                    setSlugAnterior(contenidos[i - 1].slug_contenido_individual);
-                    setSlugSiguiente(contenidos[i + 1].slug_contenido_individual);
-                    console.log("Anterior: " + contenidos[i - 1].slug_contenido_individual);
-                    console.log("Siguiente: " + contenidos[i + 1].slug_contenido_individual);
+                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
+                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
+                    console.log("Anterior: " + contenidosI[i - 1].slug_contenido_individual);
+                    console.log("Siguiente: " + contenidosI[i + 1].slug_contenido_individual);
                     break;
                 }
             }
@@ -70,17 +66,16 @@ export function ContenidoTipoFour({ context, slugContenido }) {
 
     useEffect(() => {
         cargarContenidosI();
-        console.log("slug: " + slug)
-        console.log("slug2: " + slug2)
+        // Tiempo
         const interval = setInterval(() => {
             cargarContenidosI();
-        }, 5000); // 5 segundos
+        }, 2000);
         return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
         if (contenidosI.length > 1) {
-            buscarSlug(contenidosI);
+            buscarSlug();
         } else {
             setSlugAnterior("");
             setSlugSiguiente("");
@@ -153,6 +148,7 @@ export function ContenidoTipoFour({ context, slugContenido }) {
                 </div>
                 <div className="almacen__niveles row col-md-12">
                     <div className="contenedor__niveles mt-4 mb-4">
+                        {/*
                         <>
                             {
                                 tipoUsuario.tipo === "paciente" &&
@@ -172,6 +168,7 @@ export function ContenidoTipoFour({ context, slugContenido }) {
                                 </div>
                             }
                         </>
+    */}
                     </div>
                 </div>
 

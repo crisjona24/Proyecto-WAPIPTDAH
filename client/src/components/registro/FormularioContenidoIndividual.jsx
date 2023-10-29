@@ -24,6 +24,8 @@ export function FormularioContenidoIndividual({ slug }) {
     const [img1, setImg1] = useState("");
     const [img2, setImg2] = useState("");
     const [img3, setImg3] = useState("");
+    const [img4, setImg4] = useState("");
+    const [img5, setImg5] = useState("");
     const [portada_individual, setPortada] = useState("");
     const [respuesta, setRespuesta] = useState("");
     const [error, setError] = useState("");
@@ -50,6 +52,8 @@ export function FormularioContenidoIndividual({ slug }) {
             formData.append('img1', img1);
             formData.append('img2', img2);
             formData.append('img3', img3);
+            formData.append('img4', img4);
+            formData.append('img5', img5);
             formData.append('portada_individual', portada_individual);
             formData.append('conten', conten);
             // Realizar la petición POST al servidor
@@ -69,6 +73,8 @@ export function FormularioContenidoIndividual({ slug }) {
         try {
             const response = await CrearContenidoIndividual(formData);
             if (response.data.success) {
+                // Mensaje
+                Swal.fire("Actividad registrado", "", "success");
                 // Redireccionar a la página principal si el inicio de sesión es exitoso
                 navigate(`/contenido/individual/all/${slug}/`);
             } else {
@@ -182,32 +188,73 @@ export function FormularioContenidoIndividual({ slug }) {
                     onChange={(e) => { setContenido(e.target.files[0]); validarTamanoImagen(e.target) }}
                     name='contenido_individual' accept="image/*" />
             </div>
-            {
-                tipo_contenido === "selecion_multiple_img" &&
-                <>
-                    <div className='form-row row'>
-                        <div className="form-group col-md-6">
-                            <label className='label' htmlFor="img1">Contenido de opción 2:</label>
-                            <input className='form-control w-100' type="file" id="img1"
-                                onChange={(e) => { setImg1(e.target.files[0]); validarTamanoImagen(e.target) }}
-                                name='img1' accept="image/*" />
+            <>
+                {
+                    tipo_contenido === "selecion_multiple_img" &&
+                    <>
+                        <div className='form-row row'>
+                            <div className="form-group col-md-6">
+                                <label className='label' htmlFor="img1">Contenido de opción 2:</label>
+                                <input className='form-control w-100' type="file" id="img1"
+                                    onChange={(e) => { setImg1(e.target.files[0]); validarTamanoImagen(e.target) }}
+                                    name='img1' accept="image/*" />
+                            </div>
+                            <div className="form-group col-md-6">
+                                <label className='label' htmlFor="img2">Contenido de opción 3:</label>
+                                <input className='form-control w-100' type="file" id="img2"
+                                    onChange={(e) => { setImg2(e.target.files[0]); validarTamanoImagen(e.target) }}
+                                    name='img2' accept="image/*" />
+                            </div>
                         </div>
-                        <div className="form-group col-md-6">
-                            <label className='label' htmlFor="img2">Contenido de opción 3:</label>
-                            <input className='form-control w-100' type="file" id="img2"
-                                onChange={(e) => { setImg2(e.target.files[0]); validarTamanoImagen(e.target) }}
-                                name='img2' accept="image/*" />
+                        <div className="form-group">
+                            <label className='label' htmlFor="img3">Contenido de opción 4:</label>
+                            <input className='form-control w-100' type="file" id="img3"
+                                onChange={(e) => { setImg3(e.target.files[0]); validarTamanoImagen(e.target) }}
+                                name='img3' accept="image/*" />
                         </div>
-                    </div>
+                    </>
 
-                    <div className="form-group">
-                        <label className='label' htmlFor="img3">Contenido de opción 4:</label>
-                        <input className='form-control w-100' type="file" id="img3"
-                            onChange={(e) => { setImg3(e.target.files[0]); validarTamanoImagen(e.target) }}
-                            name='img3' accept="image/*" />
-                    </div>
-                </>
-            }
+                }
+                {
+                    tipo_contenido === "seleccionar_imagen" &&
+                    <>
+                        <div className='form-row row'>
+                            <div className="form-group col-md-6">
+                                <label className='label' htmlFor="img1">Contenido de opción 2:</label>
+                                <input className='form-control w-100' type="file" id="img1"
+                                    onChange={(e) => { setImg1(e.target.files[0]); validarTamanoImagen(e.target) }}
+                                    name='img1' accept="image/*" />
+                            </div>
+                            <div className="form-group col-md-6">
+                                <label className='label' htmlFor="img2">Contenido de opción 3:</label>
+                                <input className='form-control w-100' type="file" id="img2"
+                                    onChange={(e) => { setImg2(e.target.files[0]); validarTamanoImagen(e.target) }}
+                                    name='img2' accept="image/*" />
+                            </div>
+                        </div>
+                        <div className='form-row row'>
+                            <div className="form-group col-md-6">
+                                <label className='label' htmlFor="img3">Contenido de opción 4:</label>
+                                <input className='form-control w-100' type="file" id="img3"
+                                    onChange={(e) => { setImg3(e.target.files[0]); validarTamanoImagen(e.target) }}
+                                    name='img3' accept="image/*" />
+                            </div>
+                            <div className="form-group col-md-6">
+                                <label className='label' htmlFor="img4">Contenido de opción 5:</label>
+                                <input className='form-control w-100' type="file" id="img4"
+                                    onChange={(e) => { setImg4(e.target.files[0]); validarTamanoImagen(e.target) }}
+                                    name='img4' accept="image/*" />
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <label className='label' htmlFor="img5">Contenido de opción 6:</label>
+                            <input className='form-control w-100' type="file" id="img5"
+                                onChange={(e) => { setImg5(e.target.files[0]); validarTamanoImagen(e.target) }}
+                                name='img5' accept="image/*" />
+                        </div>
+                    </>
+                }
+            </>
             <div className='form-row row'>
                 <div className="form-group col-md-6">
                     <label className='label' htmlFor="conten">Pertenece a:</label>

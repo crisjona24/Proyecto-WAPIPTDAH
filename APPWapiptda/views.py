@@ -1193,6 +1193,8 @@ def api_contenido_individual_register(request):
                     img1_ = request.FILES.get('img1')
                     img2_ = request.FILES.get('img2')
                     img3_ = request.FILES.get('img3')
+                    img4_ = request.FILES.get('img4')
+                    img5_ = request.FILES.get('img5')
                     portada_ = request.FILES.get('portada_individual')
                     pertenece_ = request.POST.get('conten')
                     nombre_nivel_ = request.POST.get('nombre_nivel')
@@ -1205,6 +1207,13 @@ def api_contenido_individual_register(request):
                         if guardar_contenido_individual_2(descripcion_, identificador_, tipocontenido_, contenido_, 
                                                         portada_, respuesta_, nombre_nivel_, contenido__ob, img1_, img2_, img3_):
                             return JsonResponse({'success': True})
+                        elif img4_ and img5_:
+                            if guardar_contenido_individual_2(descripcion_, identificador_, tipocontenido_, contenido_, 
+                                                        portada_, respuesta_, nombre_nivel_, contenido__ob,
+                                                         img1_, img2_, img3_, img4_, img5_):
+                                return JsonResponse({'success': True})
+                            else:
+                                return JsonResponse({'error': 'Error al guardar el contenido individual'})
                         else:
                             return JsonResponse({'error': 'Error al guardar el contenido individual'})
                     else:
@@ -1464,6 +1473,15 @@ def contenido_individual(request, slug):
                     return JsonResponse(context)
                 elif (contenidoI__ob.tipo_contenido == 'selecion_multiple'):
                     context.update({'tipo': 'selecion_multiple'})
+                    return JsonResponse(context)
+                elif (contenidoI__ob.tipo_contenido == 'seleccionar_imagen'):
+                    url_c1 = cloudinary.CloudinaryImage(contenidoI__ob.imagen1.name).build_url()
+                    url_c2 = cloudinary.CloudinaryImage(contenidoI__ob.imagen2.name).build_url()
+                    url_c3 = cloudinary.CloudinaryImage(contenidoI__ob.imagen3.name).build_url()
+                    url_c4 = cloudinary.CloudinaryImage(contenidoI__ob.imagen4.name).build_url()
+                    url_c5 = cloudinary.CloudinaryImage(contenidoI__ob.imagen5.name).build_url()
+                    context.update({'tipo': 'seleccionar_imagen', 'url_c1': url_c1, 
+                                    'url_c2': url_c2, 'url_c3': url_c3, 'url_c4': url_c4, 'url_c5': url_c5})
                     return JsonResponse(context)
                 elif (contenidoI__ob.tipo_contenido == 'responder_preguntas'):
                     context.update({'tipo': 'responder_preguntas'})

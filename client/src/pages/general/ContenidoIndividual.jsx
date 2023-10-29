@@ -17,6 +17,7 @@ import { ContenidoTipoOne } from '../../components/contenido/Contenido_individua
 import { ContenidoTipoTwo } from '../../components/contenido/Contenido_individual_tdos';
 import { ContenidoTipoThree } from '../../components/contenido/Contenido_individual_ttres';
 import { ContenidoTipoFour } from '../../components/contenido/Contenido_individual_tcuatro';
+import { ContenidoTipoSix } from '../../components/contenido/Contenido_individual_tseis';
 import { ContenidoTipoSeven } from '../../components/contenido/Contenido_individual_tsiete';
 import { ContenidoTipoNine } from '../../components/contenido/Contenido_individual_tnueve';
 import { CargarContenido, ObtenerSlugContenido } from "../../api/contenidoindividual.api";
@@ -136,6 +137,9 @@ export function ContenidoIndividual() {
                 break;
             case 'responder_preguntas':
                 contenidoComponente = <ContenidoTipoFour context={contenidosI} slugContenido={slugContenido} />;
+                break;
+            case 'seleccionar_imagen':
+                contenidoComponente = <ContenidoTipoSix context={contenidosI} slugContenido={slugContenido} />;
                 break;
             case 'cuento':
                 contenidoComponente = <ContenidoTipoSeven context={contenidosI} slugContenido={slugContenido} />;

@@ -10,24 +10,52 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, useNavigate } from 'react-router-dom';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import Swal from "sweetalert2";
+import { DndProvider, useDrag, useDrop } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 // Metodos
 import { CrearResultadoNew } from "../../api/resultado.api"
 
 // Funciones
-// Convertir milisegundos a minutos y segundos
-const convertirMilisegundosAMinutosYSegundos = (milisegundos) => {
-    const segundos = Math.floor(milisegundos / 1000);
-    const minutos = Math.floor(segundos / 60);
-    const segundosRestantes = segundos % 60;
-    return { minutos, segundos: segundosRestantes };
+// Función para desordenar aleatoriamente un array
+const randomImgs = (array) => {
+    let random = [...array];
+    for (let i = random.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [random[i], random[j]] = [random[j], random[i]]; // Intercambia los elementos
+    }
+    return random;
+}
+
+
+
+// Imagenes
+const TYPE = 'IMAGE';
+const MovimientoImagen = ({ url, index, moveImage }) => {
+    const [, ref] = useDrag({
+        type: TYPE,
+        item: { index }
+    });
+
+    const [, drop] = useDrop({
+        accept: TYPE,
+        hover: (draggedItem) => {
+            if (draggedItem.index !== index) {
+                moveImage(draggedItem.index, index);
+                draggedItem.index = index;
+            }
+        }
+    });
+
+    return <img ref={(node) => ref(drop(node))} src={url} alt="" />;
 };
 
-export function FormularioNueve({ context, usuario, slugContenido }) {
+
+export function FormularioSeis({ context, usuario, slugContenido }) {
     /* *** Valores recuperados */
     const {
         url__contenido, descripcion__contenido,
         identificador, tipo__contenido, slug, url_c1, url_c2,
-        url_c3
+        url_c3, url_c4, url_c5
     } = context;
     const tipo = usuario.tipo;
 
@@ -36,8 +64,8 @@ export function FormularioNueve({ context, usuario, slugContenido }) {
     const [elapsedTime, setElapsedTime] = useState(0);
     const intervalRef = useRef(null);
     // Control de tiempo
-    const [tiempoDeCarga, setTiempoDeCarga] = useState(null);
     let tiempoActual;
+    const [tiempoDeCarga, setTiempoDeCarga] = useState(null);
     // Controles de contenido de estudio
     const empezarBtnRef = useRef(null);
     const verificarRef = useRef(null);
@@ -45,10 +73,14 @@ export function FormularioNueve({ context, usuario, slugContenido }) {
     const [contenidoHabilitado, setContenidoHabilitado] = useState(false);
     const [btnDisabled, setBtnDisabled] = useState(false);
     const [verificarBtnD, setVerificarBtnD] = useState(true);
-    // Respuesta
+    // Controles de respuesta
     const [respuesta, setRespuesta] = useState("");
     const [tiempoTranscurrido__minutos, setMinutos] = useState(0);
     const [tiempoTranscurrido__segundos, setSegundos] = useState(0);
+    // Control de imágenes
+    const [imagenesRandom, setImagenesRandom] = useState([]);
+    const [movimientos, setMovimientos] = useState(0);
+
     // Formulario
     const [slug__, setSlug] = useState(slug);
     const [error, setError] = useState("");
@@ -59,37 +91,17 @@ export function FormularioNueve({ context, usuario, slugContenido }) {
         // Controlar el botón "Empezar"
         setupEmpezarButton();
         // Control de minutos
-        if (elapsedTime >= 40) {
+        if (elapsedTime >= 5) {
             Swal.fire("Tiempo de resolución agotado", "", "warning");
             // Enviar el formulario
             enviarForm(new Event('submit'));
             // Si quieres, puedes detener el intervalo aquí
             clearInterval(intervalRef.current);
         }
-        // Controlar los input checkbox
-        const checkboxes = document.querySelectorAll('input[type="radio"]');
-        checkboxes.forEach((checkbox) => {
-            checkbox.addEventListener("click", () => {
-                // Verificar si al menos uno de los checkboxes está seleccionado
-                const isChecked = Array.from(checkboxes).some(
-                    (checkbox) => checkbox.checked
-                );
-                // Habilitar o deshabilitar el botón "Verificar" según el resultado
-                if (isChecked) {
-                    checkbox.addEventListener("change", obtenerRespuestaSeleccionada);
-                    setVerificarBtnD(false);
-                } else {
-                    setVerificarBtnD(true);
-                }
-            });
-        });
         return () => {
             if (empezarBtnRef.current) {
                 empezarBtnRef.current.removeEventListener("click", botnEmpezar);
             };
-            checkboxes.forEach((checkbox) => {
-                checkbox.removeEventListener("change", obtenerRespuestaSeleccionada);
-            });
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
             };
@@ -110,7 +122,8 @@ export function FormularioNueve({ context, usuario, slugContenido }) {
         setTiempoDeCarga(new Date());
         setContenidoHabilitado(true);
         setBtnDisabled(true);
-
+        // Activar boton de Listo
+        setVerificarBtnD(false);
         // Control de minutos
         setStartTime(Date.now());
         intervalRef.current = setInterval(() => {
@@ -121,15 +134,12 @@ export function FormularioNueve({ context, usuario, slugContenido }) {
         }, 1000 * 60); // cada minuto
     };
 
-    // Capturar la respuesta seleccionada
-    const obtenerRespuestaSeleccionada = () => {
-        const radios = document.getElementsByName('gridRadios');
-        for (let i = 0; i < radios.length; i++) {
-            if (radios[i].checked) {
-                setRespuesta(radios[i].value);
-                break;
-            }
-        }
+    // Mostrar error
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
     };
 
     // Cptura de tiempo
@@ -143,6 +153,36 @@ export function FormularioNueve({ context, usuario, slugContenido }) {
         setSegundos(segundos);
         setVerificarBtnD(false);
     }
+
+    // Convertir milisegundos a minutos y segundos
+    const convertirMilisegundosAMinutosYSegundos = (milisegundos) => {
+        const segundos = Math.floor(milisegundos / 1000);
+        const minutos = Math.floor(segundos / 60);
+        const segundosRestantes = segundos % 60;
+        return { minutos, segundos: segundosRestantes };
+    };
+
+    // CONTROL DE IMAGENES
+    // Lista completa de imágenes
+    const todasLasImgs = [url__contenido, url_c1, url_c2, url_c3, url_c4, url_c5];
+
+    useEffect(() => {
+        setImagenesRandom(randomImgs(todasLasImgs.filter(Boolean)));
+    }, [context]);
+
+    useEffect(() => {
+        setRespuesta(`Número de movimientos: ${movimientos}`);
+    }, [movimientos]);
+
+    // Mover imágenes
+    const moveImage = (fromIndex, toIndex) => {
+        const updatedImages = [...imagenesRandom];
+        const [movedItem] = updatedImages.splice(fromIndex, 1);
+        updatedImages.splice(toIndex, 0, movedItem);
+
+        setImagenesRandom(updatedImages);
+        setMovimientos(prevMov => prevMov + 1);  // Incrementa el contador de movimientos
+    };
 
     // Enviar los datos del formulario
     const enviarForm = async (e) => {
@@ -178,14 +218,6 @@ export function FormularioNueve({ context, usuario, slugContenido }) {
                 mostrarError("Error al registrar resultado");
             }
         }
-    };
-
-    // Mostrar error
-    const mostrarError = (message) => {
-        setError(message);
-        setTimeout(() => {
-            setError("");
-        }, 5000);
     };
 
     return (
@@ -239,52 +271,16 @@ export function FormularioNueve({ context, usuario, slugContenido }) {
                             <form onSubmit={enviarForm} style={{ marginLeft: '5%', marginTop: '1%' }}>
                                 <div className="ml-3 pl-3">
                                     <fieldset className="form-group">
-                                        <div className="contenedor-division_CI">
-                                            <div className="card_CI form-check">
-                                                <div className="textos__">
-                                                    <div className="container mt-3">
-                                                        <input className="form-check-input border border-dark mt-5" type="radio" name="gridRadios"
-                                                            id="gridRadios1" value="Correcto" onChange={e => setRespuesta(e.target.value)} />
+                                        <DndProvider backend={HTML5Backend}>
+                                            <div className={imagenesRandom.length > 4 && imagenesRandom.length <= 6 ? "contenedor-division_CI_6_3" : "contenedor-division_CI_6"}>
+                                                {imagenesRandom.map((url, index) => (
+                                                    <div className={imagenesRandom.length > 4 && imagenesRandom.length <= 6 ? "textos__6_3" : "textos__6"}
+                                                        key={index}>
+                                                        <MovimientoImagen url={url} index={index} moveImage={moveImage} />
                                                     </div>
-                                                    <div>
-                                                        <img src={url__contenido} alt="" style={{ height: '150px', width: '200px' }} />
-                                                    </div>
-                                                </div>
+                                                ))}
                                             </div>
-                                            <div className="card_CI form-check">
-                                                <div className="textos__">
-                                                    <div className="container mt-3">
-                                                        <input className="form-check-input border border-dark mt-5" type="radio" name="gridRadios"
-                                                            id="gridRadios2" value="Incorrecto" onChange={e => setRespuesta(e.target.value)} />
-                                                    </div>
-                                                    <div>
-                                                        <img src={url_c1} alt="" style={{ height: '150px', width: '200px' }} />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="card_CI form-check">
-                                                <div className="textos__">
-                                                    <div className="container mt-3">
-                                                        <input className="form-check-input border border-dark mt-5" type="radio" name="gridRadios"
-                                                            id="gridRadios3" value="Incorrecto" onChange={e => setRespuesta(e.target.value)} />
-                                                    </div>
-                                                    <div>
-                                                        <img src={url_c2} alt="" style={{ height: '150px', width: '200px' }} />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="card_CI form-check">
-                                                <div className="textos__">
-                                                    <div className="container mt-3">
-                                                        <input className="form-check-input border border-dark mt-5" type="radio" name="gridRadios"
-                                                            id="gridRadios4" value="Incorrecto" onChange={e => setRespuesta(e.target.value)} />
-                                                    </div>
-                                                    <div>
-                                                        <img src={url_c3} alt="" style={{ height: '150px', width: '200px' }} />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </DndProvider>
                                     </fieldset>
                                 </div>
                                 {/* Eñ input que se envia */}

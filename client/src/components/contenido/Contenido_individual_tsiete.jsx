@@ -64,11 +64,10 @@ export function ContenidoTipoSeven({ context, slugContenido }) {
 
     useEffect(() => {
         cargarContenidosI();
-        console.log("slug: " + slug)
-        console.log("slug2: " + slug2)
+        // Tiempo
         const interval = setInterval(() => {
             cargarContenidosI();
-        }, 5000); // 5 segundos
+        }, 2000);
         return () => clearInterval(interval);
     }, []);
 
@@ -147,25 +146,7 @@ export function ContenidoTipoSeven({ context, slugContenido }) {
                 </div>
                 <div className="almacen__niveles row col-md-12">
                     <div className="contenedor__niveles mt-4 mb-4">
-                        <>
-                            {
-                                tipoUsuario.tipo === "paciente" &&
-                                <div className="contenido__niveles">
-                                    <div className="level textos">
-                                        <Link> <FontAwesomeIcon title="Nivel de dificultad 1" icon={fa1} /> </Link>
-                                    </div>
-                                    <div className="level textos">
-                                        <Link> <FontAwesomeIcon title="Nivel de dificultad 2" icon={fa2} /> </Link>
-                                    </div>
-                                    <div className="level textos">
-                                        <Link> <FontAwesomeIcon title="Nivel de dificultad 3" icon={fa3} /> </Link>
-                                    </div>
-                                    <div className="level textos">
-                                        <Link> <FontAwesomeIcon title="Nivel de dificultad 4" icon={fa4} /> </Link>
-                                    </div>
-                                </div>
-                            }
-                        </>
+                        
                     </div>
                 </div>
 

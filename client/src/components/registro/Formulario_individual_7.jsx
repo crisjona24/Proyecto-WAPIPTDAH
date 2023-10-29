@@ -12,6 +12,15 @@ import Swal from 'sweetalert2';
 // Metodos
 import { CrearResultadoNew } from "../../api/resultado.api"
 
+// Funciones
+// Convertir milisegundos a minutos y segundos
+const convertirMilisegundosAMinutosYSegundos = (milisegundos) => {
+    const segundos = Math.floor(milisegundos / 1000);
+    const minutos = Math.floor(segundos / 60);
+    const segundosRestantes = segundos % 60;
+    return { minutos, segundos: segundosRestantes };
+};
+
 export function FormularioSiete({ context, usuario, slugContenido }) {
     /* *** Valores recuperados *** */
     const {
@@ -25,19 +34,19 @@ export function FormularioSiete({ context, usuario, slugContenido }) {
     const [tiempoDuracion, setTiempoDuracion] = useState(0);
     const intervalRef = useRef(null);
     // Control de tiempo
-    let tiempoDeCarga;
+    const [tiempoDeCarga, setTiempoDeCarga] = useState(null);
     let tiempoActual;
     // Controles de contenido de estudio
     const empezarBtnRef = useRef(null);
     const verificarRef = useRef(null);
     const miContainerRef = useRef(null);
-    const [respuestas, setRespuestas] = useState([]);
-    const [tiempoTranscurrido__minutos, setMinutos] = useState(0);
-    const [tiempoTranscurrido__segundos, setSegundos] = useState(0);
     const [contenidoHabilitado, setContenidoHabilitado] = useState(false);
     const [btnDisabled, setBtnDisabled] = useState(false);
     const [verificarBtnD, setVerificarBtnD] = useState(true);
-
+    // Respuestas
+    const [respuestas, setRespuestas] = useState([]);
+    const [tiempoTranscurrido__minutos, setMinutos] = useState(0);
+    const [tiempoTranscurrido__segundos, setSegundos] = useState(0);
     // Formulario
     const [slug__, setSlug] = useState(slug);
     const [error, setError] = useState("");
@@ -51,7 +60,7 @@ export function FormularioSiete({ context, usuario, slugContenido }) {
         if (tiempoDuracion >= 40) {
             Swal.fire("Tiempo de resolución agotado", "", "warning");
             // Enviar el formulario
-            handleSubmit(new Event('submit'));
+            enviarForm(new Event('submit'));
             // Si quieres, puedes detener el intervalo aquí
             clearInterval(intervalRef.current);
         }
@@ -66,12 +75,6 @@ export function FormularioSiete({ context, usuario, slugContenido }) {
 
                 // Habilitar o deshabilitar el botón "Verificar" según el resultado
                 if (isChecked) {
-                    tiempoActual = new Date();
-                    let tiempoTranscurrido = tiempoActual - tiempoDeCarga;
-                    // Convertir el tiempo a minutos y segundos
-                    let { minutos, segundos } = convertirMilisegundosAMinutosYSegundos(tiempoTranscurrido);
-                    setMinutos(minutos);
-                    setSegundos(segundos);
                     setVerificarBtnD(false);
                 } else {
                     setVerificarBtnD(true);
@@ -93,12 +96,12 @@ export function FormularioSiete({ context, usuario, slugContenido }) {
     const setupEmpezarButton = () => {
         if (empezarBtnRef.current) {
             empezarBtnRef.current.addEventListener("click", botonEmpezar);
-            tiempoDeCarga = new Date();
         }
     };
 
     // Controlar el botón "Verificar"
     const botonEmpezar = () => {
+        setTiempoDeCarga(new Date());
         setContenidoHabilitado(true);
         setBtnDisabled(true);
 
@@ -112,14 +115,6 @@ export function FormularioSiete({ context, usuario, slugContenido }) {
         }, 1000 * 60); // cada minuto
     };
 
-    // Convertir milisegundos a minutos y segundos
-    const convertirMilisegundosAMinutosYSegundos = (milisegundos) => {
-        const segundos = Math.floor(milisegundos / 1000);
-        const minutos = Math.floor(segundos / 60);
-        const segundosRestantes = segundos % 60;
-        return { minutos, segundos: segundosRestantes };
-    };
-
     // Capturar los valores de los input
     const handleInputChange = (index, e) => {
         console.log(`Index: ${index}`, `Value: ${e.target.value}`);
@@ -129,6 +124,18 @@ export function FormularioSiete({ context, usuario, slugContenido }) {
             return newRespuestas;
         });
     };
+
+    // Cptura de tiempo
+    const tiempo = () => {
+        if (!tiempoDeCarga) return;
+        tiempoActual = new Date();
+        let tiempoTranscurrido = tiempoActual - tiempoDeCarga;
+        // Convertir el tiempo a minutos y segundos
+        let { minutos, segundos } = convertirMilisegundosAMinutosYSegundos(tiempoTranscurrido);
+        setMinutos(minutos);
+        setSegundos(segundos);
+        setVerificarBtnD(false);
+    }
 
     // Enviar los datos del formulario
     const enviarForm = async (e) => {
@@ -278,7 +285,7 @@ export function FormularioSiete({ context, usuario, slugContenido }) {
 
                                 <div className="d-flex flex-column justify-content-between align-items-center mt-3">
                                     <button type="submit" className="btn btn-success w-25"
-                                        id="verificarBtn" ref={verificarRef} disabled={verificarBtnD}>
+                                        id="verificarBtn" ref={verificarRef} disabled={verificarBtnD} onClick={tiempo}>
                                         !Listo!
                                     </button>
                                 </div>

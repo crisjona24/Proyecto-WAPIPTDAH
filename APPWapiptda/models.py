@@ -218,6 +218,8 @@ class ContenidoIndividual(models.Model):
     imagen1 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
     imagen2 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
     imagen3 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
+    imagen4 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
+    imagen5 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
     # Foranea
     contenido = models.ForeignKey(Contenido, on_delete=models.CASCADE, blank=True, null=True)
 
@@ -249,7 +251,7 @@ class Resultado(models.Model):
     observacion = models.TextField(blank=False, null=True)
     fecha_registro_resultado = models.DateField(auto_now=True)
     estado_resultado = models.BooleanField(default=True)
-    slug_resultado = models.SlugField(unique=True, blank=True)
+    slug_resultado = models.SlugField(unique=False, blank=True)
     estado_reporte = models.BooleanField(default=False)
     # Foranea
     contenido_individual = models.ForeignKey(
