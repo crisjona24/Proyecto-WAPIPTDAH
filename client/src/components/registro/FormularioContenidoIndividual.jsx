@@ -19,6 +19,7 @@ export function FormularioContenidoIndividual({ slug }) {
     const [contenidos, setContenidos] = useState([]);
     const [conten, setConten] = useState("");
     const [descripcion_individual, setDescripcion] = useState("");
+    const [preguntas, setPreguntas] = useState("");
     const [tipo_contenido, setTipo] = useState("");
     const [contenido_individual, setContenido] = useState("");
     const [img1, setImg1] = useState("");
@@ -43,8 +44,10 @@ export function FormularioContenidoIndividual({ slug }) {
         //Flujo normal
         setHabilitado(true);
         try {
+            // Obtenemos los combinados de preguntas y descripcion_individual
+            const descripcion_individual_ = combinarDescripcionYPreguntas();
             const formData = new FormData(); // Crear un objeto FormData
-            formData.append('descripcion_individual', descripcion_individual);
+            formData.append('descripcion_individual', descripcion_individual_);
             formData.append('tipo_contenido', tipo_contenido);
             formData.append('respuesta', respuesta);
             formData.append('nombre_nivel', nombre_nivel);
@@ -145,14 +148,29 @@ export function FormularioContenidoIndividual({ slug }) {
         }, 5000);
     };
 
+    // Método para combinar descripcion_individual y preguntas
+    const combinarDescripcionYPreguntas = () => {
+        // Combinar los valores y regresar
+        return `${descripcion_individual}, ${preguntas}`;
+    }
+
     return (
         <form onSubmit={enviarFContenido} encType='multipart/form-data'>
             {error && <p>{error}</p>}
             <div className="form-group">
                 <label className='label' htmlFor="descripcion">Indicación:</label>
-                <textarea onClick={info__contenido} className='form-control w-100 tamanio-text-area' type="text" id="descripcion"
+                <textarea className='form-control w-100 h-100' type="text" id="descripcion"
                     value={descripcion_individual} onChange={e => setDescripcion(e.target.value)}
                     name='descripcion'
+                    placeholder="Ingresa la indicación de la actividad**"
+                />
+            </div>
+            <div className="form-group">
+                <label className='label' htmlFor="preguntas">Preguntas:</label>
+                <textarea onClick={info__contenido} className='form-control w-100 tamanio-text-area'
+                    type="text" id="preguntas"
+                    value={preguntas} onChange={e => setPreguntas(e.target.value)}
+                    name='preguntas'
                     placeholder="Ingresa la indicación de la actividad**"
                 />
             </div>
@@ -178,8 +196,7 @@ export function FormularioContenidoIndividual({ slug }) {
                     <option value="pintar_imagen">Tipo 5 - Colorear</option>
                     <option value="seleccionar_imagen">Tipo 6 - Selección de Imágenes</option>
                     <option value="cuento">Tipo 7 - Lectura Comprensiva</option>
-                    <option value="juego_simple">Tipo 8 - Juegos Simples</option>
-                    <option value="selecion_multiple_img">Tipo 9 - Selección Individual con imagen</option>
+                    <option value="selecion_multiple_img">Tipo 8 - Selección Individual con imagen</option>
                 </select>
             </div>
             <div className="form-group">
@@ -251,6 +268,17 @@ export function FormularioContenidoIndividual({ slug }) {
                             <input className='form-control w-100' type="file" id="img5"
                                 onChange={(e) => { setImg5(e.target.files[0]); validarTamanoImagen(e.target) }}
                                 name='img5' accept="image/*" />
+                        </div>
+                    </>
+                }
+                {
+                    tipo_contenido === "pintar_imagen" &&
+                    <>
+                        <div className="form-group">
+                            <label className='label' htmlFor="img1">Contenido de opción 2:</label>
+                            <input className='form-control w-100' type="file" id="img1"
+                                onChange={(e) => { setImg1(e.target.files[0]); validarTamanoImagen(e.target) }}
+                                name='img1' accept="image/*" />
                         </div>
                     </>
                 }

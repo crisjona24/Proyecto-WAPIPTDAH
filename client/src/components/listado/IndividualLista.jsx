@@ -2,6 +2,7 @@
 // Estilos
 //import "../../styles/Cabecera.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "../../styles/Varios.css";
 import { Row, Col } from "react-bootstrap"
 // Componentes
 import { useEffect, useState } from "react";
@@ -234,7 +235,7 @@ export function IndividualLista({ usuario }) {
                                     <div className="card" key={contenido.id} style={{ backgroundImage: `url(${contenido.portada_individual})` }}>
                                         <div className="textos__ pt-1">
                                             <h3></h3>
-                                            <div className="d-flex flex-wrap justify-content-center">
+                                            <div className="orden_lista_contenido">
                                                 <div className="col-md-6 align-self-end">
                                                     <Link to={`/individual/detalle/${contenido.slug_contenido_individual}/${slug}/`} className="btn btn-success">
                                                         Detalle

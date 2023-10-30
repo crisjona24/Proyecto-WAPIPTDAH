@@ -138,7 +138,7 @@ export function DominioLista({ usuario }) {
                                     <div className="card" key={dominio.id} style={{ backgroundImage: `url(${dominio.portada_dominio})` }}>
                                         <div className="textos__ pt-1">
                                             <h3></h3>
-                                            <div className="d-flex flex-wrap justify-content-center">
+                                            <div className="orden_lista_contenido">
                                                 <div className="col-md-6 align-self-end">
                                                     <Link to={`/dominio/detalle/${dominio.slug_dominio}/`} className="btn btn-success">
                                                         Detalle

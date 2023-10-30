@@ -1,4 +1,13 @@
-.alineacion-RS{
+/* ALINEACION DE LISTADO DE CONTENIDO */
+.orden_lista_contenido {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* ALINEACION DE LISTADO DE CONTENIDO */
+.alineacion-RS {
     width: 100%;
     height: 100%;
     display: grid;
@@ -61,4 +70,20 @@
     height: 20%;
     margin-top: 50%;
     margin-left: 10%;
+}
+
+
+/* MEDIAS */
+@media (max-width: 975px) {
+    .orden_lista_contenido {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .orden_lista_contenido div{
+        margin-bottom: 5px;
+        margin-right: 50px;
+    }
 }

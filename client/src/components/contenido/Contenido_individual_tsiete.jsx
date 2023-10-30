@@ -7,13 +7,18 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from "react";
-import { faBackward, faQuestion, fa1, fa2, fa3, fa4, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faBackward, faQuestion, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 // Metodos
 import { FormularioSiete } from '../registro/Formulario_individual_7'
 import { VerificarUsuario } from "../../api/usuario.api"
 import { ContenidoIndividualTodo } from "../../api/contenidoindividual.api";
 
-export function ContenidoTipoSeven({ context, slugContenido }) {
+export function ContenidoTipoSeven({ context, slugContenido, tipoUsuarioP }) {
+    // Valores recuperados de context
+    const {
+        nombre__contenido,
+    } = context;
+
     // Verificacion de usuario
     const [tipoUsuario, setTipo] = useState([]);
     const navigate = useNavigate();
@@ -25,65 +30,6 @@ export function ContenidoTipoSeven({ context, slugContenido }) {
     const [slugAnterior, setSlugAnterior] = useState("");
     let { slug2 } = useParams();
     let { slug } = useParams();
-    // Obtener datos
-    const cargarContenidosI = async () => {
-        try {
-            const cont = await ContenidoIndividualTodo(slug2);
-            setContenidos(cont.data);
-            console.log(cont.data);
-        } catch (error) {
-            if (error.message === "NOT_AUTHENTICATED") {
-                navigate('/');
-            } else {
-                mostrarError('Error al cargar contenidos');
-            }
-        }
-    }
-
-    // Buscar el slug siguiente y anterior
-    const buscarSlug = (contenidosI) => {
-        for (let i = 0; i < contenidosI.length; i++) {
-            if (contenidosI[i].slug_contenido_individual === slug) {
-                console.log(contenidosI[i].slug_contenido_individual);
-                if (i === 0) {
-                    setSlugAnterior("");
-                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
-                    break;
-                } else if (i === contenidosI.length - 1) {
-                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
-                    setSlugSiguiente("");
-                    break;
-                } else {
-                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
-                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
-                    break;
-                }
-            }
-        }
-    }
-
-    useEffect(() => {
-        cargarContenidosI();
-        // Tiempo
-        const interval = setInterval(() => {
-            cargarContenidosI();
-        }, 2000);
-        return () => clearInterval(interval);
-    }, []);
-
-    useEffect(() => {
-        if (contenidosI.length > 1) {
-            buscarSlug(contenidosI);
-        } else {
-            setSlugAnterior("");
-            setSlugSiguiente("");
-        }
-    }, [contenidosI]);
-
-    /* *** Valores recuperados */
-    const {
-        nombre__contenido,
-    } = context;
 
     // Verificar usuario
     const VerificarUser = async () => {
@@ -103,10 +49,66 @@ export function ContenidoTipoSeven({ context, slugContenido }) {
         }
     }
 
-    // Estado de los datos
+    // Estado de los datos del usuario
     useEffect(() => {
         VerificarUser();
     }, []);
+
+    // Obtener datos de las actividades
+    const cargarContenidosI = async () => {
+        try {
+            // Verificar tipo de paciente
+            if (tipoUsuarioP.tipo === "paciente") {
+                const cont = await ContenidoIndividualTodo(slug2);
+                setContenidos(cont.data);
+                console.log(cont.data);
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/');
+            } else {
+                mostrarError('Error al cargar contenidos');
+            }
+        }
+    }
+
+    // Buscar el slug siguiente y anterior
+    const buscarSlug = () => {
+        // Uso de maping para recorrer la lista de contenido consultada
+        contenidosI.map((contenido, i) => {
+            // Si el slug del contenido es igual al slug de la url en el momento
+            if (contenido.slug_contenido_individual === slug) {
+                // Si el indice es 0 o es el primer elemento, no hay anterior
+                if (i === 0) {
+                    setSlugAnterior("");
+                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
+                    // Si el indice es el ultimo, no hay siguiente
+                } else if (i === contenidosI.length - 1) {
+                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
+                    setSlugSiguiente("");
+                    // Si no es ninguno de los anteriores, hay anterior y siguiente
+                } else {
+                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
+                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
+                }
+            }
+        });
+    }
+
+    // Cargar contenidos completos
+    useEffect(() => {
+        cargarContenidosI();
+    }, [context]);
+
+    // Buscar el slug
+    useEffect(() => {
+        if (contenidosI.length > 1) {
+            buscarSlug();
+        } else {
+            setSlugAnterior("");
+            setSlugSiguiente("");
+        }
+    }, [contenidosI]);
 
     // Mostrar error
     const mostrarError = (message) => {
@@ -146,7 +148,7 @@ export function ContenidoTipoSeven({ context, slugContenido }) {
                 </div>
                 <div className="almacen__niveles row col-md-12">
                     <div className="contenedor__niveles mt-4 mb-4">
-                        
+
                     </div>
                 </div>
 
@@ -167,7 +169,7 @@ export function ContenidoTipoSeven({ context, slugContenido }) {
                                                     icon={faArrowLeft} />
                                             </Link>
                                         ) :
-                                        <></>
+                                            <></>
                                     }
                                 </div>
                                 <div className="mt-2 mb-2">
@@ -178,7 +180,7 @@ export function ContenidoTipoSeven({ context, slugContenido }) {
                                                     icon={faArrowRight} />
                                             </Link>
                                         ) :
-                                        <></>
+                                            <></>
                                     }
 
                                 </div>

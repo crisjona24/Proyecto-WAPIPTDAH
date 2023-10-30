@@ -45,8 +45,14 @@ export function IndividualRegistro() {
                             del Contenido.</p>
                         <h6>Sección: Contenido</h6>
                         <p style={{ color: '#333', textAlign: 'justify', fontSize: '1rem' }}>
-                            Se debe elegir una imagen que representa la actividad a resolver
+                            Se debe elegir una imagen o imágenes que representen la actividad a resolver
                             según la indicación plasmada.</p>
+                        <h6>Sección: Tipo de contenido</h6>
+                        <p style={{ color: '#333', textAlign: 'justify', fontSize: '1rem' }}>
+                            Si escoge "Selección de Imágenes" está hablando de rompecabezas y pueden ser 
+                            4 o 6. Si escoge "Colorear" debe ajuntar una imagen con el color real y una sin
+                            color.
+                        </p>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="success" onClick={cerrar}>

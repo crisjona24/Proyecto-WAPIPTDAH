@@ -58,14 +58,6 @@ export function FormularioNueve({ context, usuario, slugContenido }) {
     useEffect(() => {
         // Controlar el botón "Empezar"
         setupEmpezarButton();
-        // Control de minutos
-        if (elapsedTime >= 40) {
-            Swal.fire("Tiempo de resolución agotado", "", "warning");
-            // Enviar el formulario
-            enviarForm(new Event('submit'));
-            // Si quieres, puedes detener el intervalo aquí
-            clearInterval(intervalRef.current);
-        }
         // Controlar los input checkbox
         const checkboxes = document.querySelectorAll('input[type="radio"]');
         checkboxes.forEach((checkbox) => {
@@ -90,12 +82,9 @@ export function FormularioNueve({ context, usuario, slugContenido }) {
             checkboxes.forEach((checkbox) => {
                 checkbox.removeEventListener("change", obtenerRespuestaSeleccionada);
             });
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            };
         };
 
-    }, [elapsedTime, usuario]);
+    }, [usuario]);
 
     // Controlar el botón "Empezar"
     const setupEmpezarButton = () => {
@@ -112,13 +101,7 @@ export function FormularioNueve({ context, usuario, slugContenido }) {
         setBtnDisabled(true);
 
         // Control de minutos
-        setStartTime(Date.now());
-        intervalRef.current = setInterval(() => {
-            const now = Date.now();
-            const timeDiff = now - startTime; // en milisegundos
-            const minutesElapsed = Math.floor(timeDiff / (1000 * 60));
-            setElapsedTime(minutesElapsed);
-        }, 1000 * 60); // cada minuto
+        setStartTime(new Date());
     };
 
     // Capturar la respuesta seleccionada
@@ -143,6 +126,32 @@ export function FormularioNueve({ context, usuario, slugContenido }) {
         setSegundos(segundos);
         setVerificarBtnD(false);
     }
+
+    // CONTROL DE FUERA DE TIEMPO
+    useEffect(() => {
+        if (startTime) {
+            console.log("startTime: ", startTime);
+            console.log("elapsedTime: ", elapsedTime);
+            const interval = setInterval(() => {
+                const now = Date.now();
+                const timeDiff = now - startTime; // en milisegundos
+                const secondsElapsed = Math.floor(timeDiff / 1000);
+                const minutesElapsed = Math.floor(secondsElapsed / 60);
+                setElapsedTime(minutesElapsed);
+            }, 1000); // cada segundo
+            return () => clearInterval(interval);
+        }
+    }, [startTime]);
+
+    useEffect(() => {
+        if (elapsedTime >= 40) {
+            console.log("Tiempo de resolución agotado: ", elapsedTime);
+            // Enviar el formulario
+            enviarForm(new Event('submit'));
+            Swal.fire("Tiempo de resolución agotado", "", "warning");
+            clearInterval(intervalRef.current);
+        }
+    }, [elapsedTime]);
 
     // Enviar los datos del formulario
     const enviarForm = async (e) => {

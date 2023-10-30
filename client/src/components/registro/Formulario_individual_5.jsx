@@ -3,69 +3,39 @@
 import "../../styles/Cabecera.css";
 import "../../styles/Contenido_individual.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-// Contenidos
+// Componentes
 import React, { useState, useRef, useEffect } from 'react';
-//import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, useNavigate } from 'react-router-dom';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
-import Swal from "sweetalert2";
-import { DndProvider, useDrag, useDrop } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
+import Swal from 'sweetalert2';
 // Metodos
 import { CrearResultadoNew } from "../../api/resultado.api"
 
 // Funciones
-// Función para desordenar aleatoriamente un array
-const randomImgs = (array) => {
-    let random = [...array];
-    for (let i = random.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [random[i], random[j]] = [random[j], random[i]]; // Intercambia los elementos
-    }
-    return random;
-}
-
-
-
-// Imagenes
-const TYPE = 'IMAGE';
-const MovimientoImagen = ({ url, index, moveImage }) => {
-    const [, ref] = useDrag({
-        type: TYPE,
-        item: { index }
-    });
-
-    const [, drop] = useDrop({
-        accept: TYPE,
-        hover: (draggedItem) => {
-            if (draggedItem.index !== index) {
-                moveImage(draggedItem.index, index);
-                draggedItem.index = index;
-            }
-        }
-    });
-
-    return <img ref={(node) => ref(drop(node))} src={url} alt="" />;
+// Convertir milisegundos a minutos y segundos
+const convertirMilisegundosAMinutosYSegundos = (milisegundos) => {
+    const segundos = Math.floor(milisegundos / 1000);
+    const minutos = Math.floor(segundos / 60);
+    const segundosRestantes = segundos % 60;
+    return { minutos, segundos: segundosRestantes };
 };
 
-
-export function FormularioSeis({ context, usuario, slugContenido }) {
-    /* *** Valores recuperados */
+export function FormularioCinco({ context, usuario, slugContenido }) {
+    /* *** Valores recuperados *** */
     const {
-        url__contenido, descripcion__contenido,
-        identificador, tipo__contenido, slug, url_c1, url_c2,
-        url_c3, url_c4, url_c5
+        url__contenido, descripcion__contenido, identificador,
+        tipo__contenido, slug, url_c1
     } = context;
     const tipo = usuario.tipo;
 
     // Control de minutos
     const [startTime, setStartTime] = useState(null);
-    const [elapsedTime, setElapsedTime] = useState(0);
+    const [tiempoDuracion, setTiempoDuracion] = useState(0);
     const intervalRef = useRef(null);
     // Control de tiempo
-    let tiempoActual;
     const [tiempoDeCarga, setTiempoDeCarga] = useState(null);
+    let tiempoActual;
     // Controles de contenido de estudio
     const empezarBtnRef = useRef(null);
     const verificarRef = useRef(null);
@@ -73,15 +43,11 @@ export function FormularioSeis({ context, usuario, slugContenido }) {
     const [contenidoHabilitado, setContenidoHabilitado] = useState(false);
     const [btnDisabled, setBtnDisabled] = useState(false);
     const [verificarBtnD, setVerificarBtnD] = useState(true);
-    // Controles de respuesta
-    const [respuesta, setRespuesta] = useState("");
+    // Respuestas
+    const [respuestas, setRespuestas] = useState([]);
     const [tiempoTranscurrido__minutos, setMinutos] = useState(0);
     const [tiempoTranscurrido__segundos, setSegundos] = useState(0);
-    // Control de imágenes
-    const [imagenesRandom, setImagenesRandom] = useState([]);
-    const [movimientos, setMovimientos] = useState(0);
-
-    // Formulario
+    // Formulario    
     const [slug__, setSlug] = useState(slug);
     const [error, setError] = useState("");
     const navigate = useNavigate();
@@ -90,9 +56,25 @@ export function FormularioSeis({ context, usuario, slugContenido }) {
     useEffect(() => {
         // Controlar el botón "Empezar"
         setupEmpezarButton();
+        // Controlar los input checkbox
+        const inputs = document.querySelectorAll('input[name="respuesta"]');
+        inputs.forEach((input) => {
+            input.addEventListener("input", () => {
+                // Verificar si al menos uno de los checkboxes está seleccionado
+                const isChecked = Array.from(inputs).some(
+                    (input) => input.value != ""
+                );
+                // Habilitar o deshabilitar el botón "Verificar" según el resultado
+                if (isChecked) {
+                    setVerificarBtnD(false);
+                } else {
+                    setVerificarBtnD(true);
+                }
+            });
+        });
         return () => {
             if (empezarBtnRef.current) {
-                empezarBtnRef.current.removeEventListener("click", botnEmpezar);
+                empezarBtnRef.current.removeEventListener("click", botonEmpezar);
             };
         };
 
@@ -100,29 +82,29 @@ export function FormularioSeis({ context, usuario, slugContenido }) {
 
     // Controlar el botón "Empezar"
     const setupEmpezarButton = () => {
-        // vericiar si el contdor es igual a 0
         if (empezarBtnRef.current) {
-            empezarBtnRef.current.addEventListener("click", botnEmpezar);
+            empezarBtnRef.current.addEventListener("click", botonEmpezar);
         }
     };
 
     // Controlar el botón "Verificar"
-    const botnEmpezar = () => {
+    const botonEmpezar = () => {
         setTiempoDeCarga(new Date());
         setContenidoHabilitado(true);
         setBtnDisabled(true);
-        // Activar boton de Listo
-        setVerificarBtnD(false);
+
         // Control de minutos
         setStartTime(new Date());
     };
 
-    // Mostrar error
-    const mostrarError = (message) => {
-        setError(message);
-        setTimeout(() => {
-            setError("");
-        }, 5000);
+    // Capturar los valores de los input
+    const handleInputChange = (index, e) => {
+        console.log(`Index: ${index}`, `Value: ${e.target.value}`);
+        setRespuestas(prev => {
+            const newRespuestas = [...prev];
+            newRespuestas[index] = e.target.value;
+            return newRespuestas;
+        });
     };
 
     // Cptura de tiempo
@@ -135,27 +117,19 @@ export function FormularioSeis({ context, usuario, slugContenido }) {
         setMinutos(minutos);
         setSegundos(segundos);
         setVerificarBtnD(false);
-    }
-
-    // Convertir milisegundos a minutos y segundos
-    const convertirMilisegundosAMinutosYSegundos = (milisegundos) => {
-        const segundos = Math.floor(milisegundos / 1000);
-        const minutos = Math.floor(segundos / 60);
-        const segundosRestantes = segundos % 60;
-        return { minutos, segundos: segundosRestantes };
     };
 
     // CONTROL DE FUERA DE TIEMPO
     useEffect(() => {
         if (startTime) {
             console.log("startTime: ", startTime);
-            console.log("elapsedTime: ", elapsedTime);
+            console.log("elapsedTime: ", tiempoDuracion);
             const interval = setInterval(() => {
                 const now = Date.now();
                 const timeDiff = now - startTime; // en milisegundos
                 const secondsElapsed = Math.floor(timeDiff / 1000);
                 const minutesElapsed = Math.floor(secondsElapsed / 60);
-                setElapsedTime(minutesElapsed);
+                setTiempoDuracion(minutesElapsed);
             }, 1000); // cada segundo
 
             return () => clearInterval(interval);
@@ -163,36 +137,14 @@ export function FormularioSeis({ context, usuario, slugContenido }) {
     }, [startTime]);
 
     useEffect(() => {
-        if (elapsedTime >= 40) {
-            console.log("Tiempo de resolución agotado: ", elapsedTime);
+        if (tiempoDuracion >= 40) {
+            console.log("Tiempo de resolución agotado: ", tiempoDuracion);
             // Enviar el formulario
             enviarForm(new Event('submit'));
             Swal.fire("Tiempo de resolución agotado", "", "warning");
             clearInterval(intervalRef.current);
         }
-    }, [elapsedTime]);
-
-    // CONTROL DE IMAGENES
-    // Lista completa de imágenes
-    const todasLasImgs = [url__contenido, url_c1, url_c2, url_c3, url_c4, url_c5];
-
-    useEffect(() => {
-        setImagenesRandom(randomImgs(todasLasImgs.filter(Boolean)));
-    }, [context]);
-
-    useEffect(() => {
-        setRespuesta(`Número de movimientos: ${movimientos}`);
-    }, [movimientos]);
-
-    // Mover imágenes
-    const moveImage = (fromIndex, toIndex) => {
-        const updatedImages = [...imagenesRandom];
-        const [movedItem] = updatedImages.splice(fromIndex, 1);
-        updatedImages.splice(toIndex, 0, movedItem);
-
-        setImagenesRandom(updatedImages);
-        setMovimientos(prevMov => prevMov + 1);  // Incrementa el contador de movimientos
-    };
+    }, [tiempoDuracion]);
 
     // Enviar los datos del formulario
     const enviarForm = async (e) => {
@@ -202,10 +154,11 @@ export function FormularioSeis({ context, usuario, slugContenido }) {
         try {
             const datos__post = {
                 slug__,
-                respuesta,
+                respuestas,
                 tiempoTranscurrido__minutos,
                 tiempoTranscurrido__segundos
             };
+            console.log("Datos a enviar");
             console.log(datos__post);
             setVerificarBtnD(true);
             // Realizar la petición POST al servidor
@@ -228,6 +181,14 @@ export function FormularioSeis({ context, usuario, slugContenido }) {
                 mostrarError("Error al registrar resultado");
             }
         }
+    };
+
+    // Mostrar error
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
     };
 
     return (
@@ -268,34 +229,76 @@ export function FormularioSeis({ context, usuario, slugContenido }) {
                 </div>
             }
             <div className="container row col-md-12 mt-4">
-                <div className="contenedor__cuerpo" id="miContainer" ref={miContainerRef} style={{
-                    pointerEvents: contenidoHabilitado ? 'auto' : 'none',
-                    opacity: contenidoHabilitado ? 1 : 0.5
-                }}>
-                    <div className="contenedor__cuerpo__division_t9">
+                <div className="contenedor__cuerpo" id="miContainer" ref={miContainerRef}
+                    style={{
+                        pointerEvents: contenidoHabilitado ? 'auto' : 'none',
+                        opacity: contenidoHabilitado ? 1 : 0.5
+                    }}>
+                    <div className="contenedor__cuerpo__division">
                         <div className="alineacion__etiquetas d-flex">
-                            <span className="span-2 mt-3" style={{ color: 'rgb(0, 146, 99)' }}>
-                                Indicación: {descripcion__contenido} </span>
+                            <>
+                                {descripcion__contenido && descripcion__contenido.length > 1 && descripcion__contenido[0] &&
+                                    <span className="span-2 mt-3" style={{ color: 'rgb(0, 146, 99)' }}>
+                                        Indicación: {descripcion__contenido[0]}</span>
+                                }
+                            </>
                         </div>
-                        <div className="contenido-imagen">
+                        {/* <!-- Contenido de url--> */}
+                        <div className="contenedor__imagen_tipo4 espacio-tipo4">
+                            <div className="conten__tipo4 mt-4">
+                                <div className="contenedor__colorear">
+                                    <div className="imagen_tipo4 mt-1 ml-5 mb-1 d-flex justify-content-center">
+                                        <img src={url__contenido} alt="" />
+                                    </div>
+                                    <div className="d-flex justify-content-center">
+                                        <span>Hola</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="card__cuerpo mt-2 pl-2 d-flex justify-content-left">
+                                <span className="referencia-2">
+                                    Actividad: Desarrollo de habilidades en niños
+                                </span>
+                            </div>
+                        </div>
+                        <br />
+                        {/* <!-- Contenido de url--> */}
+                        <div style={{ width: '800px' }}>
                             <form onSubmit={enviarForm} style={{ marginLeft: '5%', marginTop: '1%' }}>
                                 <div className="ml-3 pl-3">
-                                    <fieldset className="form-group">
-                                        <DndProvider backend={HTML5Backend}>
-                                            <div className={imagenesRandom.length > 4 && imagenesRandom.length <= 6 ? "contenedor-division_CI_6_3" : "contenedor-division_CI_6"}>
-                                                {imagenesRandom.map((url, index) => (
-                                                    <div className={imagenesRandom.length > 4 && imagenesRandom.length <= 6 ? "textos__6_3" : "textos__6"}
-                                                        key={index}>
-                                                        <MovimientoImagen url={url} index={index} moveImage={moveImage} />
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </DndProvider>
+                                    <fieldset>
+                                        <>
+                                            {
+                                                descripcion__contenido && descripcion__contenido.length > 1 &&
+                                                descripcion__contenido[1].trim().startsWith("¿") &&
+                                                descripcion__contenido.map((item, index) => {
+                                                    if (index > 0) {
+                                                        return (
+                                                            <div className="d-flex flex-column justify-content-between" key={index}>
+                                                                <div className="form-group row ml-2">
+                                                                    <label htmlFor={`respuesta-${index}`}
+                                                                        className="d-flex justify-content-center etiqueta col-sm-5 col-form-label"
+                                                                        style={{ fontFamily: 'Pacifico cursive' }}>
+                                                                        {item}
+                                                                    </label>
+                                                                    <div className="col-sm-7 mt-3">
+                                                                        <input autoComplete="off" type="text" className="form-control w-100 h-75" id={`respuesta-${index}`}
+                                                                            name="respuesta" style={{ border: '1px solid #0C2342' }}
+                                                                            onChange={(e) => handleInputChange(index - 1, e)} />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    }
+                                                })
+                                            }
+                                        </>
                                     </fieldset>
                                 </div>
                                 {/* Eñ input que se envia */}
                                 <input type="hidden" id="slug" name="slug" value={slug__} onChange={e => setSlug(e.target.value)} />
-                                <div className="d-flex flex-column justify-content-between align-items-center mt-3">
+
+                                <div className="d-flex flex-column align-items-center mt-3" >
                                     <button type="submit" className="btn btn-success w-25"
                                         id="verificarBtn" ref={verificarRef} disabled={verificarBtnD} onClick={tiempo}>
                                         !Listo!

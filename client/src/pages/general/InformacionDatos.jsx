@@ -697,7 +697,7 @@ export function InformacionResultado() {
         <div className="w-100 h-100">
             <CabeceraRegister />
             <div className="container-fluid p-0 m-0 w-100 h-100">
-                <div className="almacenador ml-0" style={{ height: '1050px' }}>
+                <div className="almacenador ml-0" style={{ height: '1150px' }}>
                     <>
                         {loading ? (
                             <div className="preloader">

@@ -1203,14 +1203,24 @@ def api_contenido_individual_register(request):
                     # Calculamos el identificador
                     identificador_ = generar_identificador_individual()
                     # Creamos el contenido
-                    if img1_ and img2_ and img3_:
-                        if guardar_contenido_individual_2(descripcion_, identificador_, tipocontenido_, contenido_, 
-                                                        portada_, respuesta_, nombre_nivel_, contenido__ob, img1_, img2_, img3_):
-                            return JsonResponse({'success': True})
-                        elif img4_ and img5_:
-                            if guardar_contenido_individual_2(descripcion_, identificador_, tipocontenido_, contenido_, 
+                    if tipocontenido_ == 'pintar_imagen':
+                        if guardar_contenido_individual_4(descripcion_, identificador_, tipocontenido_, contenido_, 
                                                         portada_, respuesta_, nombre_nivel_, contenido__ob,
-                                                         img1_, img2_, img3_, img4_, img5_):
+                                                         img1_):
+                            return JsonResponse({'success': True})
+                        else:
+                            return JsonResponse({'error': 'Error al guardar el contenido individual'})
+                    elif tipocontenido_ == 'seleccionar_imagen':
+                        # Para imagen 1, 2 y 3 y que no exista imagen 4 y 5
+                        if img1_ and img2_ and img3_ and not img4_ and not img5_:
+                            if guardar_contenido_individual_2(descripcion_, identificador_, tipocontenido_, contenido_, 
+                                                            portada_, respuesta_, nombre_nivel_, contenido__ob, img1_, img2_, img3_):
+                                return JsonResponse({'success': True})
+                            else:
+                                return JsonResponse({'error': 'Error al guardar el contenido individual'})
+                        elif img1_ and img2_ and img3_ and img4_ and img5_:
+                            if guardar_contenido_individual_3(descripcion_, identificador_, tipocontenido_, contenido_, 
+                                                            portada_, respuesta_, nombre_nivel_, contenido__ob, img1_, img2_, img3_):
                                 return JsonResponse({'success': True})
                             else:
                                 return JsonResponse({'error': 'Error al guardar el contenido individual'})
@@ -1259,6 +1269,48 @@ def guardar_contenido_individual_2(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, 
             imagen1=ob9,
             imagen2=ob10,
             imagen3=ob11,
+            portada_individual=ob5,
+            respuesta=ob6,
+            nivel=ob7,
+            contenido=ob8
+        )
+        # Añadimos a contenido
+        contenido_individual.save()
+        return True
+    except Exception as e:
+        return False
+
+def guardar_contenido_individual_3(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, ob10, ob11, ob12, ob13):
+    try:
+        contenido_individual = ContenidoIndividual.objects.create(
+            descripcion_individual=ob1,
+            identificador_individual=ob2,
+            tipo_contenido=ob3,
+            contenido_individual=ob4,
+            imagen1=ob9,
+            imagen2=ob10,
+            imagen3=ob11,
+            imagen4=ob12,
+            imagen5=ob13,
+            portada_individual=ob5,
+            respuesta=ob6,
+            nivel=ob7,
+            contenido=ob8
+        )
+        # Añadimos a contenido
+        contenido_individual.save()
+        return True
+    except Exception as e:
+        return False
+
+def guardar_contenido_individual_4(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9):
+    try:
+        contenido_individual = ContenidoIndividual.objects.create(
+            descripcion_individual=ob1,
+            identificador_individual=ob2,
+            tipo_contenido=ob3,
+            contenido_individual=ob4,
+            imagen1=ob9,
             portada_individual=ob5,
             respuesta=ob6,
             nivel=ob7,
@@ -1485,6 +1537,10 @@ def contenido_individual(request, slug):
                     return JsonResponse(context)
                 elif (contenidoI__ob.tipo_contenido == 'responder_preguntas'):
                     context.update({'tipo': 'responder_preguntas'})
+                    return JsonResponse(context)
+                elif (contenidoI__ob.tipo_contenido == 'pintar_imagen'):
+                    url_c1 = cloudinary.CloudinaryImage(contenidoI__ob.imagen1.name).build_url()
+                    context.update({'tipo': 'pintar_imagen', 'url_c1': url_c1})
                     return JsonResponse(context)
                 elif (contenidoI__ob.tipo_contenido == 'cuento'):
                     context.update({'tipo': 'cuento'})

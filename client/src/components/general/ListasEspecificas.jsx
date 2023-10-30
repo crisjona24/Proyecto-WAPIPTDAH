@@ -297,7 +297,7 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                             <div className="row">
                             </div>
                         </div>
-                        <div className="panel-body_2 table-responsive">
+                        <div className="panel-body_2_2 table-responsive">
                             <Table responsive="sm" className="table">
                                 <thead>
                                     <tr>
@@ -378,7 +378,8 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                                                         if (result.isConfirmed) {
                                                                             await ResultadoEliminar(resultado.id);
                                                                             Swal.fire("Eliminación exitosa", "", "success");
-                                                                            navigate('/resultado/all');
+                                                                            // Recargamos 
+                                                                            window.location.reload();
                                                                         }
                                                                     })
                                                                 }}

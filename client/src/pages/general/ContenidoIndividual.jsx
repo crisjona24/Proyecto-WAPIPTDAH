@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 // Metodos
+import { ContenidoCuerpo } from '../../components/contenido/Contenido_individual_cuerpo';
 import { ContenidoTipoOne } from '../../components/contenido/Contenido_individual_tuno';
 import { ContenidoTipoTwo } from '../../components/contenido/Contenido_individual_tdos';
 import { ContenidoTipoThree } from '../../components/contenido/Contenido_individual_ttres';
@@ -98,7 +99,6 @@ export function ContenidoIndividual() {
         }
     }
 
-
     // Cargar contenido individual
     useEffect(() => {
         cargarContenidosI();
@@ -136,13 +136,13 @@ export function ContenidoIndividual() {
                 contenidoComponente = <ContenidoTipoThree context={contenidosI} slugContenido={slugContenido} />;
                 break;
             case 'responder_preguntas':
-                contenidoComponente = <ContenidoTipoFour context={contenidosI} slugContenido={slugContenido} />;
+                contenidoComponente = <ContenidoTipoFour context={contenidosI} slugContenido={slugContenido} tipoUsuarioP={tipoUsuario} />;
                 break;
             case 'seleccionar_imagen':
-                contenidoComponente = <ContenidoTipoSix context={contenidosI} slugContenido={slugContenido} />;
+                contenidoComponente = <ContenidoTipoSix context={contenidosI} slugContenido={slugContenido} tipoUsuarioP={tipoUsuario} />;
                 break;
             case 'cuento':
-                contenidoComponente = <ContenidoTipoSeven context={contenidosI} slugContenido={slugContenido} />;
+                contenidoComponente = <ContenidoTipoSeven context={contenidosI} slugContenido={slugContenido} tipoUsuarioP={tipoUsuario} />;
                 break;
             case 'selecion_multiple_img':
                 contenidoComponente = <ContenidoTipoNine context={contenidosI} slugContenido={slugContenido} />;
@@ -196,8 +196,8 @@ export function ContenidoIndividual() {
                                     </div>
                                 }
                                 {/* Renderiza el componente almacenado en la variable contenidoComponente */}
-                                {contenidoComponente}
                             </>
+                            <ContenidoCuerpo context={contenidosI} slugContenido={slugContenido} tipoUsuarioP={tipoUsuario} />
                         </div>
                     </section>
                 </div>

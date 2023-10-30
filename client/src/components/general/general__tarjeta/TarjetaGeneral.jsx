@@ -1111,6 +1111,36 @@ export function Resultado({ datosResultado }) {
         verificacionUser();
     }, []);
 
+    // Ordenador tipo de contenido
+    let tipoContenido = "";
+    // Usamos case para formatear los valores
+    switch (datosResultado.tipo_contenido) {
+        case "selecion_individual":
+            tipoContenido = " Selección Individual";
+            break;
+        case "verdadero_falso":
+            tipoContenido = "Verdadero o Falso";
+            break;
+        case "selecion_multiple":
+            tipoContenido = "Selección Múltiple";
+            break;
+        case "responder_preguntas":
+            tipoContenido = "Respuesta a preguntas";
+            break;
+        case "seleccionar_imagen":
+            tipoContenido = "Selección de Imágenes";
+            break;
+        case "cuento":
+            tipoContenido = "Lectura Comprensiva";
+            break;
+        case "selecion_multiple_img":
+            tipoContenido = " Selección con Imagen";
+            break;
+        default:
+            tipoContenido = "No definido";
+            break;
+    }
+
     return (
         <div>
             <div className="cabeza__Nivel">
@@ -1172,13 +1202,13 @@ export function Resultado({ datosResultado }) {
                                 <hr />
                                 <Card.Title className="titulo-peticion">Información de la actividad</Card.Title>
                                 <Row className="mb-1" >
-                                    <Col md={5}>
+                                    <Col md={4}>
                                         <Card.Title style={{ fontSize: '1rem' }}>Contenido :</Card.Title>
                                         <Card.Text className="texto-peticion">
-                                            Tipo {datosResultado.tipo_contenido}
+                                            {tipoContenido}
                                         </Card.Text>
                                     </Col>
-                                    <Col md={7}>
+                                    <Col md={8}>
                                         <Card.Title style={{ fontSize: '1rem' }}>Descripción :</Card.Title>
                                         <Card.Text className="texto-peticion">
                                             {datosResultado.descripcion_individual}

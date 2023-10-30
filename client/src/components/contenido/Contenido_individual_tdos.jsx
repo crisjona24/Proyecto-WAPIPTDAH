@@ -14,16 +14,46 @@ import { VerificarUsuario } from "../../api/usuario.api";
 import { ContenidoIndividualTodo } from "../../api/contenidoindividual.api";
 
 export function ContenidoTipoTwo({ context, slugContenido }) {
+    // Valores recuperados de context
+    const {
+        nombre__contenido,
+    } = context;
+
     // Verificacion de usuario
     const [tipoUsuario, setTipo] = useState([]);
     const navigate = useNavigate();
-
+    const [error, setError] = useState("");
+    
     // NUEVO
     const [contenidosI, setContenidos] = useState([]);
     const [slugSiguiente, setSlugSiguiente] = useState("");
     const [slugAnterior, setSlugAnterior] = useState("");
     let { slug2 } = useParams();
     let { slug } = useParams();
+
+    // Verificar usuario
+    const VerificarUser = async () => {
+        try {
+            const tipouser = await VerificarUsuario();
+            if (tipouser.data.success) {
+                setTipo(tipouser.data);
+            } else {
+                navigate('/login');
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/');
+            } else {
+                mostrarError('Error al verificar usuario');
+            }
+        }
+    }
+
+    // Estado de los datos
+    useEffect(() => {
+        VerificarUser();
+    }, []);
+
     // Obtener datos
     const cargarContenidosI = async () => {
         try {
@@ -61,10 +91,12 @@ export function ContenidoTipoTwo({ context, slugContenido }) {
         }
     }
 
+    // Cargar contenidos completos
     useEffect(() => {
         cargarContenidosI();
-    }, []);
+    }, [context]);
 
+    // Buscar slug
     useEffect(() => {
         if (contenidosI.length > 1) {
             buscarSlug();
@@ -73,35 +105,6 @@ export function ContenidoTipoTwo({ context, slugContenido }) {
             setSlugSiguiente("");
         }
     }, [contenidosI]);
-
-    /* *** Valores recuperados */
-    const {
-        nombre__contenido,
-    } = context;
-
-
-    // Verificar usuario
-    const VerificarUser = async () => {
-        try {
-            const tipouser = await VerificarUsuario();
-            if (tipouser.data.success) {
-                setTipo(tipouser.data);
-            } else {
-                navigate('/login');
-            }
-        } catch (error) {
-            if (error.message === "NOT_AUTHENTICATED") {
-                navigate('/');
-            } else {
-                mostrarError('Error al verificar usuario');
-            }
-        }
-    }
-
-    // Estado de los datos
-    useEffect(() => {
-        VerificarUser();
-    }, []);
 
     // Mostrar error
     const mostrarError = (message) => {
@@ -141,7 +144,7 @@ export function ContenidoTipoTwo({ context, slugContenido }) {
                 </div>
                 <div className="almacen__niveles row col-md-12">
                     <div className="contenedor__niveles mt-4 mb-4">
-                        
+
                     </div>
                 </div>
                 {/* Componente formulario */}

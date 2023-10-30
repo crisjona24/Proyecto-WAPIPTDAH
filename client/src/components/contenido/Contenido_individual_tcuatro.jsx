@@ -13,7 +13,12 @@ import { Formulariocuatro } from '../registro/Formulario_individual_4'
 import { VerificarUsuario } from "../../api/usuario.api"
 import { ContenidoIndividualTodo } from "../../api/contenidoindividual.api";
 
-export function ContenidoTipoFour({ context, slugContenido }) {
+export function ContenidoTipoFour({ context, slugContenido, tipoUsuarioP }) {
+    // Valores recuperados de context
+    const {
+        nombre__contenido,
+    } = context;
+
     // Verificacion de usuario
     const [tipoUsuario, setTipo] = useState([]);
     const navigate = useNavigate();
@@ -25,67 +30,6 @@ export function ContenidoTipoFour({ context, slugContenido }) {
     const [slugAnterior, setSlugAnterior] = useState("");
     let { slug2 } = useParams();
     let { slug } = useParams();
-
-    // Obtener datos
-    const cargarContenidosI = async () => {
-        try {
-            const cont = await ContenidoIndividualTodo(slug2);
-            setContenidos(cont.data);
-        } catch (error) {
-            if (error.message === "NOT_AUTHENTICATED") {
-                navigate('/');
-            } else {
-                mostrarError('Error al cargar contenidos');
-            }
-        }
-    }
-
-    // Buscar el slug siguiente y anterior
-    const buscarSlug = () => {
-        for (let i = 0; i < contenidosI.length; i++) {
-            if (contenidosI[i].slug_contenido_individual === slug) {
-                if (i === 0) {
-                    setSlugAnterior("");
-                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
-                    break;
-                } else if (i === contenidosI.length - 1) {
-                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
-                    setSlugSiguiente("");
-                    break;
-                } else {
-                    console.log("Me estoy actualizando")
-                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
-                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
-                    console.log("Anterior: " + contenidosI[i - 1].slug_contenido_individual);
-                    console.log("Siguiente: " + contenidosI[i + 1].slug_contenido_individual);
-                    break;
-                }
-            }
-        }
-    }
-
-    useEffect(() => {
-        cargarContenidosI();
-        // Tiempo
-        const interval = setInterval(() => {
-            cargarContenidosI();
-        }, 2000);
-        return () => clearInterval(interval);
-    }, []);
-
-    useEffect(() => {
-        if (contenidosI.length > 1) {
-            buscarSlug();
-        } else {
-            setSlugAnterior("");
-            setSlugSiguiente("");
-        }
-    }, [contenidosI]);
-
-    /* *** Valores recuperados */
-    const {
-        nombre__contenido,
-    } = context;
 
     // Verificar usuario
     const VerificarUser = async () => {
@@ -105,10 +49,66 @@ export function ContenidoTipoFour({ context, slugContenido }) {
         }
     }
 
-    // Estado de los datos
+    // Estado de los datos del usuario
     useEffect(() => {
         VerificarUser();
     }, []);
+
+    // Obtener datos
+    const cargarContenidosI = async () => {
+        try {
+            // Verificar tipo de paciente
+            if (tipoUsuarioP.tipo === "paciente") {
+                const cont = await ContenidoIndividualTodo(slug2);
+                setContenidos(cont.data);
+                console.log(cont.data);
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/');
+            } else {
+                mostrarError('Error al cargar contenidos');
+            }
+        }
+    }
+
+    // Buscar el slug siguiente y anterior
+    const buscarSlug = () => {
+        // Uso de maping para recorrer la lista de contenido consultada
+        contenidosI.map((contenido, i) => {
+            // Si el slug del contenido es igual al slug de la url en el momento
+            if (contenido.slug_contenido_individual === slug) {
+                // Si el indice es 0 o es el primer elemento, no hay anterior
+                if (i === 0) {
+                    setSlugAnterior("");
+                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
+                    // Si el indice es el ultimo, no hay siguiente
+                } else if (i === contenidosI.length - 1) {
+                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
+                    setSlugSiguiente("");
+                    // Si no es ninguno de los anteriores, hay anterior y siguiente
+                } else {
+                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
+                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
+                }
+            }
+        });
+    }
+
+    // Cargar contenidos completos
+    useEffect(() => {
+        cargarContenidosI();
+    }, [context]);
+
+    // Buscar slug
+    useEffect(() => {
+        if (contenidosI.length > 1) {
+            buscarSlug();
+        } else {
+            setSlugAnterior("");
+            setSlugSiguiente("");
+        }
+    }, [contenidosI]);
 
     // Mostrar error
     const mostrarError = (message) => {

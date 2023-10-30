@@ -7,23 +7,29 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from "react";
-import { faBackward, faQuestion, fa1, fa2, fa3, fa4, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faBackward, faQuestion, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 // Metodos
 import { FormularioSeis } from '../registro/Formulario_individual_6'
 import { VerificarUsuario } from "../../api/usuario.api"
 import { ContenidoIndividualTodo } from "../../api/contenidoindividual.api";
 
-export function ContenidoTipoSix({ context, slugContenido }) {
+export function ContenidoTipoSix({ context, slugContenido, tipoUsuarioP }) {
+    // Valores recuperados de context
+    const {
+        nombre__contenido,
+    } = context;
+
     // Verificacion de usuario
     const [tipoUsuario, setTipo] = useState([]);
     const navigate = useNavigate();
     const [error, setError] = useState("");
 
-
-    /* *** Valores recuperados */
-    const {
-        nombre__contenido,
-    } = context;
+    // NUEVO
+    const [contenidosI, setContenidos] = useState([]);
+    const [slugSiguiente, setSlugSiguiente] = useState("");
+    const [slugAnterior, setSlugAnterior] = useState("");
+    let { slug2 } = useParams();
+    let { slug } = useParams();
 
     // Verificar usuario
     const VerificarUser = async () => {
@@ -47,6 +53,62 @@ export function ContenidoTipoSix({ context, slugContenido }) {
     useEffect(() => {
         VerificarUser();
     }, []);
+
+    // Obtener datos
+    const cargarContenidosI = async () => {
+        try {
+            // Verificar tipo de paciente
+            if (tipoUsuarioP.tipo === "paciente") {
+                const cont = await ContenidoIndividualTodo(slug2);
+                setContenidos(cont.data);
+                console.log(cont.data);
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/');
+            } else {
+                mostrarError('Error al cargar contenidos');
+            }
+        }
+    }
+
+    // Buscar el slug siguiente y anterior
+    const buscarSlug = () => {
+        // Uso de maping para recorrer la lista de contenido consultada
+        contenidosI.map((contenido, i) => {
+            // Si el slug del contenido es igual al slug de la url en el momento
+            if (contenido.slug_contenido_individual === slug) {
+                // Si el indice es 0 o es el primer elemento, no hay anterior
+                if (i === 0) {
+                    setSlugAnterior("");
+                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
+                    // Si el indice es el ultimo, no hay siguiente
+                } else if (i === contenidosI.length - 1) {
+                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
+                    setSlugSiguiente("");
+                    // Si no es ninguno de los anteriores, hay anterior y siguiente
+                } else {
+                    setSlugAnterior(contenidosI[i - 1].slug_contenido_individual);
+                    setSlugSiguiente(contenidosI[i + 1].slug_contenido_individual);
+                }
+            }
+        });
+    }
+
+    // Cargar contenidos completos
+    useEffect(() => {
+        cargarContenidosI();
+    }, [context]);
+
+    // Buscar slug
+    useEffect(() => {
+        if (contenidosI.length > 1) {
+            buscarSlug();
+        } else {
+            setSlugAnterior("");
+            setSlugSiguiente("");
+        }
+    }, [contenidosI]);
 
     // Mostrar error
     const mostrarError = (message) => {
@@ -86,16 +148,38 @@ export function ContenidoTipoSix({ context, slugContenido }) {
                 </div>
                 <div className="almacen__niveles row col-md-12">
                     <div className="contenedor__niveles mt-4 mb-4">
-
-
-
                     </div>
                 </div>
                 {/* Componente formulario */}
                 <FormularioSeis context={context} usuario={tipoUsuario} slugContenido={slugContenido} />
                 <div className="row col-md-12 mt-4 mb-2">
+                    <>
+                        {
+                            tipoUsuario.tipo === "paciente" &&
+                            <div className="bajo__cuerpo">
+                                <div className="mt-2 mb-2">
+                                    {
+                                        slugAnterior !== "" &&
+                                        <Link to={`/individual/${slugAnterior}/${slug2}/`} className="boton__regreso btn btn-success">
+                                            <FontAwesomeIcon title="Anteior"
+                                                icon={faArrowLeft} />
+                                        </Link>
+                                    }
+                                </div>
+                                <div className="mt-2 mb-2">
+                                    {
+                                        slugSiguiente !== "" &&
+                                        <Link to={`/individual/${slugSiguiente}/${slug2}/`} className="boton__regreso btn btn-success">
+                                            <FontAwesomeIcon title="Siguiente"
+                                                icon={faArrowRight} />
+                                        </Link>
+                                    }
 
-                    
+                                </div>
+                            </div>
+                        }
+                    </>
+
 
                 </div>
 

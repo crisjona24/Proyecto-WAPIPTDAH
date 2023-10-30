@@ -213,7 +213,7 @@ export function ContenidoLista({ usuario }) {
                                     <div className="card" key={contenido.id} style={{ backgroundImage: `url(${contenido.portada})` }}>
                                         <div className="textos__ pt-1">
                                             <h3></h3>
-                                            <div className="d-flex flex-wrap justify-content-center">
+                                            <div className="orden_lista_contenido">
                                                 <div className="col-md-6 align-self-end">
                                                     <Link to={`/contenido/detalle/${contenido.slug_contenido}/`} className="btn btn-success">
                                                         Detalle
