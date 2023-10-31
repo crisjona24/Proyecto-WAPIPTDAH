@@ -14,13 +14,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 // Metodos
 import { ContenidoCuerpo } from '../../components/contenido/Contenido_individual_cuerpo';
-import { ContenidoTipoOne } from '../../components/contenido/Contenido_individual_tuno';
-import { ContenidoTipoTwo } from '../../components/contenido/Contenido_individual_tdos';
-import { ContenidoTipoThree } from '../../components/contenido/Contenido_individual_ttres';
-import { ContenidoTipoFour } from '../../components/contenido/Contenido_individual_tcuatro';
-import { ContenidoTipoSix } from '../../components/contenido/Contenido_individual_tseis';
-import { ContenidoTipoSeven } from '../../components/contenido/Contenido_individual_tsiete';
-import { ContenidoTipoNine } from '../../components/contenido/Contenido_individual_tnueve';
 import { CargarContenido, ObtenerSlugContenido } from "../../api/contenidoindividual.api";
 
 import { VerificarUsuario } from "../../api/usuario.api";
@@ -41,7 +34,6 @@ export function ContenidoIndividual() {
     const token = localStorage.getItem('token');
     const [isActive, setIsActive] = useState(false);
     let navbar;
-    let contenidoComponente;
     // Controlador para el evento de clic
     const activarSidebar = () => {
         setIsActive(!isActive);
@@ -120,35 +112,6 @@ export function ContenidoIndividual() {
             default:
                 navbar = <Navbar_Defect />;
                 break;
-        }
-    }
-
-    // Definir tipo de contenido
-    if (contenidosI) { // revisa si contenidosI tiene datos antes de acceder a su propiedad
-        switch (contenidosI.tipo) {
-            case 'selecion_individual':
-                contenidoComponente = <ContenidoTipoOne context={contenidosI} slugContenido={slugContenido} />;
-                break;
-            case 'verdadero_falso':
-                contenidoComponente = <ContenidoTipoTwo context={contenidosI} slugContenido={slugContenido} />;
-                break;
-            case 'selecion_multiple':
-                contenidoComponente = <ContenidoTipoThree context={contenidosI} slugContenido={slugContenido} />;
-                break;
-            case 'responder_preguntas':
-                contenidoComponente = <ContenidoTipoFour context={contenidosI} slugContenido={slugContenido} tipoUsuarioP={tipoUsuario} />;
-                break;
-            case 'seleccionar_imagen':
-                contenidoComponente = <ContenidoTipoSix context={contenidosI} slugContenido={slugContenido} tipoUsuarioP={tipoUsuario} />;
-                break;
-            case 'cuento':
-                contenidoComponente = <ContenidoTipoSeven context={contenidosI} slugContenido={slugContenido} tipoUsuarioP={tipoUsuario} />;
-                break;
-            case 'selecion_multiple_img':
-                contenidoComponente = <ContenidoTipoNine context={contenidosI} slugContenido={slugContenido} />;
-                break;
-            default:
-                contenidoComponente = <div>No se encontró contenido</div>;
         }
     }
 

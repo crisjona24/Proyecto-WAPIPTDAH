@@ -2,6 +2,7 @@
 // Estilos
 //import "../../styles/Cabecera.css";
 import "../../styles/Contenido_individual.css";
+import "../../styles/Varios.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 // Componentes
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
