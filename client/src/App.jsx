@@ -104,7 +104,7 @@ function App() {
         {/* RUTA DE EDICION DE INFORMACION */}
         <Route path="/dominio/editar/:slug" element={<DominioEdición />} />
         <Route path="/contenido/editar/:slug" element={<ContenidoEdición />} />
-        <Route path="/individual/editar/:slug" element={<IndividualEdición />} />
+        <Route path="/individual/editar/:slug/:slug2/" element={<IndividualEdición />} />
         <Route path="/nivel/editar/:slug" element={<NivelEdición />} />
         <Route path="/curso/editar/:slug" element={<CursoEdicion />} />
         <Route path="/resultado/editar/:id" element={<ResultadoEdicion />} />

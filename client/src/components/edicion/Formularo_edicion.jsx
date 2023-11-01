@@ -198,38 +198,10 @@ export function FormularioEdicion() {
     const [datos, setDatos] = useState([]);
     const [nombre_dominio, setNombreDominio] = useState("");
     const [descripcion_dominio, setDescripcionDominio] = useState("");
+    const [portada_dominio, setPortada] = useState("");
     const [error, setError] = useState("");
     const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
-
-    // Editar dominio
-    const enviarFDominio = async (e) => {
-        e.preventDefault();
-        // Verificar campos vacíos
-        if (!isValidForm()) {
-            Swal.fire("Por favor ingrese todos los campos", "", "warning");
-            return;
-        }
-        //Flujo normal
-        setHabilitado(true);
-        try {
-            if (token) {
-                //Flujo normal
-                const formData = new FormData(); // Crear un objeto FormData
-                formData.append('nombre', nombre_dominio);
-                formData.append('descripcion', descripcion_dominio);
-                // Realizar la petición POST al servidor
-                await confirmEdicion(formData);
-            }
-        } catch (error) {
-            if (error.message === "NOT_AUTHENTICATED") {
-                navigate('/login');
-            } else {
-                mostrarError('Error al editar dominio');
-            }
-        }
-        setHabilitado(false);
-    };
 
     // Datos
     const obtenerDatosDominio = async () => {
@@ -309,6 +281,42 @@ export function FormularioEdicion() {
         }, 5000);
     };
 
+    // Editar dominio
+    const enviarFDominio = async (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (!isValidForm()) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        //Flujo normal
+        setHabilitado(true);
+        try {
+            if (token) {
+                //Flujo normal
+                const formData = new FormData(); // Crear un objeto FormData
+                // Verificamos que portada no sea vacio
+                if (portada_dominio !== "") {
+                    formData.append('portada_dominio', portada_dominio);
+                    formData.append('nombre', nombre_dominio);
+                    formData.append('descripcion', descripcion_dominio);
+                } else {
+                    formData.append('nombre', nombre_dominio);
+                    formData.append('descripcion', descripcion_dominio);
+                }
+                // Realizar la petición POST al servidor
+                await confirmEdicion(formData);
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                mostrarError('Error al editar dominio');
+            }
+        }
+        setHabilitado(false);
+    };
+
     return (
         <form onSubmit={enviarFDominio} encType='multipart/form-data'>
             {error && <p>{error}</p>}
@@ -323,6 +331,11 @@ export function FormularioEdicion() {
                     placeholder="Ingrese una descripción corta**"
                     id="descripcion" name="descripcion"
                     value={descripcion_dominio} onChange={e => setDescripcionDominio(e.target.value)} />
+            </div>
+            <div className="form-group">
+                <label className='label' htmlFor="portada_dominio">Portada:</label>
+                <input className='form-control w-100' type="file" id="portada_dominio"
+                    onChange={e => { setPortada(e.target.files[0]); validarTamanoImagen(e.target) }} name='portada_dominio' accept="image/*" />
             </div>
             <Button type="submit" variant="success" disabled={habilitado}>
                 {habilitado ? 'Actualizando...' : 'Actualizar'}
@@ -346,35 +359,6 @@ export function FormularioEdicionContenido({ slugDominio }) {
     const [error, setError] = useState("");
     const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
-
-    // Envio de datos
-    const enviarFContenido = async (e) => {
-        e.preventDefault();
-        // Verificar campos vacíos
-        if (!isValidForm()) {
-            Swal.fire("Por favor ingrese todos los campos", "", "warning");
-            return;
-        }
-        //Flujo normal
-        setHabilitado(true);
-        try {
-            if (token) {
-                // Flujo normal
-                const formData = new FormData(); // Crear un objeto FormData
-                formData.append('nombre', nombre_contenido);
-                formData.append('dominio_tipo', dominio_tipo);
-                // Realizar la petición de edicion
-                await confirmEdicion(formData);
-            }
-        } catch (err) {
-            if (err.message === "NOT_AUTHENTICATED") {
-                navigate('/');
-            } else {
-                mostrarError('Error al editar contenido');
-            }
-        }
-        setHabilitado(false);
-    };
 
     // Datos
     const obtenerDatosContenido = async () => {
@@ -455,6 +439,42 @@ export function FormularioEdicionContenido({ slugDominio }) {
         }, 5000);
     };
 
+    // Envio de datos
+    const enviarFContenido = async (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (!isValidForm()) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        //Flujo normal
+        setHabilitado(true);
+        try {
+            if (token) {
+                // Flujo normal
+                const formData = new FormData(); // Crear un objeto FormData
+                // Verificamos que portaa no este vacio
+                if (portada !== "") {
+                    formData.append('portada', portada);
+                    formData.append('nombre', nombre_contenido);
+                    formData.append('dominio_tipo', dominio_tipo);
+                } else {
+                    formData.append('nombre', nombre_contenido);
+                    formData.append('dominio_tipo', dominio_tipo);
+                }
+                // Realizar la petición de edicion
+                await confirmEdicion(formData);
+            }
+        } catch (err) {
+            if (err.message === "NOT_AUTHENTICATED") {
+                navigate('/');
+            } else {
+                mostrarError('Error al editar contenido');
+            }
+        }
+        setHabilitado(false);
+    };
+
     return (
         <form onSubmit={enviarFContenido} encType='multipart/form-data'>
             {error && <p>{error}</p>}
@@ -474,16 +494,11 @@ export function FormularioEdicionContenido({ slugDominio }) {
                     <option value="Psicomotriz">Tipo Psicomotriz</option>
                 </select>
             </div>
-            <>
-                {
-                    !datos?.id &&
-                    <div className="form-group">
-                        <label className='label' htmlFor="portada_contenido">Portada:</label>
-                        <input className='form-control w-100' type="file" id="portada_contenido"
-                            onChange={e => { setPortada(e.target.files[0]); validarTamanoImagen(e.target) }} name='portada_contenido' accept="image/*" />
-                    </div>
-                }
-            </>
+            <div className="form-group">
+                <label className='label' htmlFor="portada_contenido">Portada:</label>
+                <input className='form-control w-100' type="file" id="portada_contenido"
+                    onChange={e => { setPortada(e.target.files[0]); validarTamanoImagen(e.target) }} name='portada_contenido' accept="image/*" />
+            </div>
             <Button type="submit" variant="success" disabled={habilitado}>
                 {habilitado ? 'Actualizando...' : 'Actualizar'}
             </Button>
@@ -503,43 +518,20 @@ export function FormularioEdicionIndividual({ slugContenido }) {
     const [nombre_nivel, setNombreNivel] = useState("");
     const [datos, setDatos] = useState([]);
     const [descripcion_individual, setDescripcion] = useState("");
+    const [preguntas, setPreguntas] = useState("");
     const [tipo_contenido, setTipo] = useState("");
     const [contenido_individual, setContenido] = useState("");
     const [portada_individual, setPortada] = useState("");
     const [respuesta, setRespuesta] = useState("");
+    const [color, setColor] = useState("");
     const [error, setError] = useState("");
     const [habilitado, setHabilitado] = useState(false);
+    const [activo, setActivo] = useState(false);
+    const [actColor, setActColor] = useState(false);
     const navigate = useNavigate();
 
-    // Envio de datos
-    const enviarFCont = async (e) => {
-        e.preventDefault();
-        // Verificar campos vacíos
-        if (!isValidForm()) {
-            Swal.fire("Por favor ingrese todos los campos", "", "warning");
-            return;
-        }
-        //Flujo normal
-        setHabilitado(true);
-        try {
-            if (token) {
-                const formData = new FormData(); // Crear un objeto FormData
-                formData.append('descripcion_individual', descripcion_individual);
-                formData.append('tipo_contenido', tipo_contenido);
-                formData.append('respuesta', respuesta);
-                formData.append('nivel', nombre_nivel);
-                // Realizar la petición de edicion
-                await confirmEdicion(formData);
-            }
-        } catch (error) {
-            if (error.message === "NOT_AUTHENTICATED") {
-                navigate('/login');
-            } else {
-                mostrarError('Error al editar contenido individual');
-            }
-        }
-        setHabilitado(false);
-    };
+    const [nuevaDescripcion, setNuevaDescripcion] = useState("");
+    const [nuevoRespuesta, setNuevaRespuesta] = useState("");
 
     // Datos
     const obtenerDatosInd = async () => {
@@ -553,10 +545,41 @@ export function FormularioEdicionIndividual({ slugContenido }) {
                 const datos__user = await ContenidoDatosIndividual(contI.data.identificador);
                 console.log(datos__user.data)
                 setDatos(datos__user.data);
-                setDescripcion(datos__user.data.descripcion_individual);
                 setTipo(datos__user.data.tipo_contenido);
-                setRespuesta(datos__user.data.respuesta);
+                //setRespuesta(datos__user.data.respuesta);
                 setNombreNivel(datos__user.data.nivel);
+                //setDescripcion(datos__user.data.descripcion_individual);
+
+                // Verificacion de descripcion de actividad
+                const descrip_completa = datos__user.data.descripcion_individual;
+                // Corroborar la existencia de coma como divisor
+                if (descrip_completa.includes(',')) {
+                    // Para las comas
+                    const particion = descrip_completa.split(',');
+                    setDescripcion(particion[0].trim());
+                    // Adjuntar asi sea 1 o mas restantes
+                    setPreguntas(particion.slice(1).join(',').trim());
+                } else {
+                    // Si no hay comas, todo es parte de la descripción
+                    setDescripcion(descrip_completa);
+                }
+                const respuesta_completa = datos__user.data.respuesta;
+                // Verificar tipo de contenido
+                if (datos__user.data.tipo_contenido === "pintar_imagen") {
+                    // Corroborar la existencia de coma como divisor
+                    if (respuesta_completa.includes(',')) {
+                        // Para las comas
+                        const particion_color = respuesta_completa.split(',');
+                        // El ultimo valor sera setcolor
+                        setColor(particion_color.pop().trim());
+                        // El resto de valores seran setrespuesta
+                        setRespuesta(particion_color.join(',').trim());
+                    }
+                } else {
+                    // Si no hay comas, todo es parte de la descripción
+                    setRespuesta(respuesta_completa);
+                }
+
             } else {
                 if (contI.data.error) {
                     Swal.fire(contI.data.error, "", "warning");
@@ -611,7 +634,7 @@ export function FormularioEdicionIndividual({ slugContenido }) {
     const isValidForm = () => {
         if (
             descripcion_individual.trim() === "" ||
-            tipo_contenido.trim() === "" ||
+            tipo_contenido.trim() === "" || tipo_contenido === "none" ||
             nombre_nivel.trim() === "" ||
             respuesta.trim() === ""
         ) {
@@ -628,19 +651,143 @@ export function FormularioEdicionIndividual({ slugContenido }) {
         }, 5000);
     };
 
+    // Método para combinar descripcion_individual y preguntas
+    const combinarDescripcionYPreguntas = () => {
+        // Combinar los valores y regresar
+        return `${descripcion_individual}, ${preguntas}`;
+    }
+
+    // Método para combinar respuesta y color
+    const combinarRespuestayColor = () => {
+        // Combinar los valores y regresar
+        return `${respuesta}, ${color}`;
+    }
+
+    // Respuestas y preguntas
+    useEffect(() => {
+        if (datos.tipo_contenido === "responder_preguntas" ||
+            datos.tipo_contenido === "pintar_imagen" ||
+            datos.tipo_contenido === "cuento") {
+            const com = combinarDescripcionYPreguntas();
+            setNuevaDescripcion(com);
+            setActivo(true);
+        }
+    }, [datos, descripcion_individual, preguntas]);
+
+    // Control de tipo de contenido pinta imagen
+    useEffect(() => {
+        if (datos.tipo_contenido === "pintar_imagen") {
+            const colornew = combinarRespuestayColor();
+            setNuevaRespuesta(colornew);
+            setActColor(true);
+        }
+    }, [datos, respuesta, color]);
+
+    // Envio de datos
+    const enviarFCont = async (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (!isValidForm()) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+
+        //Flujo normal
+        setHabilitado(true);
+        try {
+            if (token) {
+                const formData = new FormData(); // Crear un objeto FormData
+                console.log("hola", nuevaDescripcion)
+                // Cambio de descripcion
+                if (activo) {
+                    formData.append('descripcion_individual', nuevaDescripcion);
+                } else {
+                    formData.append('descripcion_individual', descripcion_individual);
+                }
+                // Cambio de respuesta
+                if (actColor) {
+                    formData.append('respuesta', nuevoRespuesta);
+                } else {
+                    formData.append('respuesta', respuesta);
+                }
+                // Controlar que contenido_individual no sea vacio para enviar
+                if (contenido_individual !== "" && portada_individual === "") {
+                    formData.append('tipo_contenido', tipo_contenido);
+                    formData.append('nivel', nombre_nivel);
+                    formData.append('contenido_individual', contenido_individual);
+                } else if (contenido_individual === "" && portada_individual !== "") {
+                    formData.append('tipo_contenido', tipo_contenido);
+                    formData.append('nivel', nombre_nivel);
+                    formData.append('portada_individual', portada_individual);
+                } else if (contenido_individual !== "" && portada_individual !== "") {
+                    formData.append('tipo_contenido', tipo_contenido);
+                    formData.append('nivel', nombre_nivel);
+                    formData.append('portada_individual', portada_individual);
+                    formData.append('contenido_individual', contenido_individual);
+                } else {
+                    formData.append('tipo_contenido', tipo_contenido);
+                    formData.append('nivel', nombre_nivel);
+                }
+                // Realizar la petición de edicion
+                await confirmEdicion(formData);
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                mostrarError('Error al editar contenido individual');
+            }
+        }
+        setHabilitado(false);
+
+    };
+
     return (
         <form onSubmit={enviarFCont} encType='multipart/form-data'>
             {error && <p>{error}</p>}
             <div className="form-group">
                 <label className='label' htmlFor="descripcion">Indicación:</label>
-                <input onClick={info__contenido} className='form-control w-100' type="text" placeholder="Ingresa la indicación de la actividad**" id="descripcion" name="descripcion"
-                    value={descripcion_individual} onChange={e => setDescripcion(e.target.value)} />
+                <textarea onClick={info__contenido} className='form-control w-100 tamanio-text-area'
+                    type="text" id="descripcion"
+                    value={descripcion_individual} onChange={e => setDescripcion(e.target.value)}
+                    name='descripcion'
+                    placeholder="Ingresa la indicación de la actividad**"
+                />
             </div>
+            <>
+                {
+                    datos.tipo_contenido === "responder_preguntas" || datos.tipo_contenido === "pintar_imagen" ||
+                        datos.tipo_contenido === "cuento" ? (
+                        <div className="form-group">
+                            <label className='label' htmlFor="preguntas">Preguntas:</label>
+                            <textarea onClick={info__contenido} className='form-control w-100 tamanio-text-area'
+                                type="text" id="preguntas"
+                                value={preguntas} onChange={e => setPreguntas(e.target.value)}
+                                name='preguntas'
+                                placeholder="Ingresa la indicación de la actividad**"
+                            />
+                        </div>
+                    ) : <> </>
+                }
+            </>
+
             <div className="form-group">
                 <label className='label' htmlFor="respuesta">Respuesta:</label>
                 <input onClick={info__contenido__respuesta} className='form-control w-100' type="text" placeholder="Ingresa la respuesta**" id="respuesta" name="respuesta"
                     value={respuesta} onChange={e => setRespuesta(e.target.value)} />
             </div>
+            <>
+                {
+                    tipo_contenido === "pintar_imagen" &&
+                    <>
+                        <div className="form-group">
+                            <label className='label' htmlFor="color">Color:</label>
+                            <input className='form-control w-100' type="text" placeholder="Ingresa el color a completar en la imagen**" id="color" name="color"
+                                value={color} onChange={e => setColor(e.target.value)} />
+                        </div>
+                    </>
+                }
+            </>
             <>
                 {
                     !datos?.id &&
@@ -659,7 +806,16 @@ export function FormularioEdicionIndividual({ slugContenido }) {
                     </div>
                 }
             </>
-
+            <div className="form-group">
+                <label className='label' htmlFor="portada_individual">Portada:</label>
+                <input className='form-control w-100' type="file" id="portada_individual"
+                    onChange={(e) => { setPortada(e.target.files[0]); validarTamanoImagen(e.target) }} name='portada_individual' accept="image/*" />
+            </div>
+            <div className="form-group">
+                <label className='label' htmlFor="contenido_individual">Contenido:</label>
+                <input className='form-control w-100' type="file" id="contenido_individual"
+                    onChange={(e) => { setContenido(e.target.files[0]); validarTamanoImagen(e.target) }} name='contenido_individual' accept="image/*" />
+            </div>
             <div className="form-group">
                 <label className='label' htmlFor="tipo">Tipo de contenido:</label>
                 <select className="form-control w-100" id="tipo" name="tipo"

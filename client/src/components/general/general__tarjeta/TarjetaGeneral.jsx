@@ -464,7 +464,7 @@ export function Individual({ datos, slug }) {
                                         <>
                                             {
                                                 tipoUsuario.tipo === "tecnico" ? (
-                                                    <Link to={`/individual/editar/${datos.slug_contenido_individual}/`} title="Editar contenido"
+                                                    <Link to={`/individual/editar/${datos.slug_contenido_individual}/${slugContenido}/`} title="Editar contenido"
                                                         className="btn btn-primary"><FontAwesomeIcon icon={faPencil} /></Link>
                                                 ) : (
                                                     <></>

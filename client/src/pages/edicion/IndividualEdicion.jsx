@@ -19,6 +19,7 @@ export function IndividualEdición() {
 
     // Slug
     let { slug } = useParams();
+    let { slug2 } = useParams();
     // Slug del dominio
     const [error, setError] = useState("");
     const [slugContenido, setSlugContenido] = useState("");
@@ -97,10 +98,10 @@ export function IndividualEdición() {
             </>
             {/* FIN MODAL */}
             <CabeceraRegister />
-            <Container className="contenedor__edicion">
+            <Container className="contenedor__ancho">
                 <Container className='barraSup mt-5' >
                     <Row className='col-md-12'>
-                        <div className="card-body col-md-7">
+                        <div className="card-body col-md-8">
                             <h4 className="titulo__CE"> Edición de contenido</h4>
                         </div>
                         <div className='card-body col-md-2'>
@@ -109,7 +110,7 @@ export function IndividualEdición() {
                             </Button>
                         </div>
                         <div className='card-body col-md-2'>
-                            <Link to={`/individual/detalle/${slug}/`} className='btn btn-danger mt-2'>
+                            <Link to={`/individual/detalle/${slug}/${slug2}/`} className='btn btn-danger mt-2'>
                                 Cancelar
                             </Link>
                         </div>

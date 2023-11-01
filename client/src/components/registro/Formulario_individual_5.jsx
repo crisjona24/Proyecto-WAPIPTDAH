@@ -2,6 +2,7 @@
 // Estilos
 import "../../styles/Cabecera.css";
 import "../../styles/Contenido_individual.css";
+import "../../styles/Varios.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 // Componentes
 import React, { useState, useRef, useEffect } from 'react';
@@ -21,11 +22,32 @@ const convertirMilisegundosAMinutosYSegundos = (milisegundos) => {
     return { minutos, segundos: segundosRestantes };
 };
 
+// Verificar si contenedor tiene un formato palabra1, palabra2 y retorne palabra2
+const obtenerColor = (contenedor) => {
+    let palabra_color = "";
+    if (typeof contenedor === 'string') { // Verifica que contenedor sea una cadena
+        const pal = contenedor.split(",");
+        if (pal.length > 1) {
+            // Seleccionar siempre el ultimo item
+            palabra_color = pal[pal.length - 1].trim();
+        }
+    } else {
+        // Recorrer contenedor y seleccionar el ultimo valor
+        for (let i = 0; i < contenedor.length; i++) {
+            if (contenedor.length > 1) {
+                // Seleccionar siempre el ultimo item
+                palabra_color = contenedor[contenedor.length - 1].trim();
+            }
+        }
+    }
+    return palabra_color;
+};
+
 export function FormularioCinco({ context, usuario, slugContenido }) {
     /* *** Valores recuperados *** */
     const {
         url__contenido, descripcion__contenido, identificador,
-        tipo__contenido, slug, url_c1
+        tipo__contenido, slug, url_c1, contenedor
     } = context;
     const tipo = usuario.tipo;
 
@@ -47,6 +69,8 @@ export function FormularioCinco({ context, usuario, slugContenido }) {
     const [respuestas, setRespuestas] = useState([]);
     const [tiempoTranscurrido__minutos, setMinutos] = useState(0);
     const [tiempoTranscurrido__segundos, setSegundos] = useState(0);
+    const imagenRef = useRef(null);
+    const [color, setColor] = useState(obtenerColor(contenedor));
     // Formulario    
     const [slug__, setSlug] = useState(slug);
     const [error, setError] = useState("");
@@ -191,6 +215,33 @@ export function FormularioCinco({ context, usuario, slugContenido }) {
         }, 5000);
     };
 
+    // Función para manejar el evento de soltar el color en la imagen
+    const pintar = (e) => {
+        e.preventDefault();
+        const color_arrastre = e.dataTransfer.getData('color');
+        // Verificar si color es el mismo del color obtenido de contenedor
+        if (color_arrastre === color) {
+            // Mostrar un gif
+            Swal.fire("Correcto!", "", "success");
+            // Cambiar la img
+            imagenRef.current.src = url_c1;
+        } else {
+            //Swal.fire("Ese no es el color adecuado!", "", "info");
+            Swal.fire({
+                imageUrl: '/gif/Error-Respuesta.gif',
+                imageHeight: 350,
+                // tiempo de duracin
+                timer: 1500, // 1.5 segundos
+                imageAlt: 'A tall image'
+            })
+        }
+    };
+
+    // Evitar el comportamiento predeterminado de arrastrar y soltar
+    const arrastrar = (e) => {
+        e.preventDefault();
+    };
+
     return (
         <div style={{ margin: '0', padding: '0' }}>
             <div className="container row col-md-12">
@@ -246,12 +297,44 @@ export function FormularioCinco({ context, usuario, slugContenido }) {
                         {/* <!-- Contenido de url--> */}
                         <div className="contenedor__imagen_tipo4 espacio-tipo4">
                             <div className="conten__tipo4 mt-4">
+
                                 <div className="contenedor__colorear">
                                     <div className="imagen_tipo4 mt-1 ml-5 mb-1 d-flex justify-content-center">
-                                        <img src={url__contenido} alt="" />
+                                        <img src={url__contenido} alt=""
+                                            ref={imagenRef}
+                                            onDrop={pintar}
+                                            onDragOver={arrastrar}
+                                        />
                                     </div>
-                                    <div className="d-flex justify-content-center">
-                                        <span>Hola</span>
+                                    <div className="alineacion__paleta">
+                                        <ul className="list-unstyled mt-3 lista-paleta">
+                                            <li style={{ padding: '5px 0' }}>
+                                                <div className="color-box" style={{ backgroundColor: 'red' }} draggable={true}
+                                                    onDragStart={(e) => {
+                                                        e.dataTransfer.setData('color', 'Rojo');
+                                                    }}></div>
+                                                <div className="color-box" style={{ backgroundColor: 'yellow' }} draggable={true}
+                                                    onDragStart={(e) => {
+                                                        e.dataTransfer.setData('color', 'Amarillo');
+                                                    }}></div>
+                                                <div className="color-box" style={{ backgroundColor: 'green' }} draggable={true}
+                                                    onDragStart={(e) => {
+                                                        e.dataTransfer.setData('color', 'Verde');
+                                                    }}></div>
+                                                <div className="color-box" style={{ backgroundColor: 'brown' }} draggable={true}
+                                                    onDragStart={(e) => {
+                                                        e.dataTransfer.setData('color', 'Rojo bajo');
+                                                    }}></div>
+                                                <div className="color-box" style={{ backgroundColor: 'violet' }} draggable={true}
+                                                    onDragStart={(e) => {
+                                                        e.dataTransfer.setData('color', 'Violeta');
+                                                    }}></div>
+                                                <div className="color-box" style={{ backgroundColor: 'salmon' }} draggable={true}
+                                                    onDragStart={(e) => {
+                                                        e.dataTransfer.setData('color', 'Cobrizo');
+                                                    }}></div>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>

@@ -20,6 +20,7 @@ export function FormularioContenidoIndividual({ slug }) {
     const [conten, setConten] = useState("");
     const [descripcion_individual, setDescripcion] = useState("");
     const [preguntas, setPreguntas] = useState("");
+    const [color, setColor] = useState("");
     const [tipo_contenido, setTipo] = useState("");
     const [contenido_individual, setContenido] = useState("");
     const [img1, setImg1] = useState("");
@@ -46,6 +47,11 @@ export function FormularioContenidoIndividual({ slug }) {
         try {
             // Obtenemos los combinados de preguntas y descripcion_individual
             const descripcion_individual_ = combinarDescripcionYPreguntas();
+            // Obtenemos los combinados de respuestas y color si color no es vacio
+            if (color.trim() !== "") {
+                const respuesta_ = combinarRespuestas();
+                setRespuesta(respuesta_);
+            }
             const formData = new FormData(); // Crear un objeto FormData
             formData.append('descripcion_individual', descripcion_individual_);
             formData.append('tipo_contenido', tipo_contenido);
@@ -154,6 +160,12 @@ export function FormularioContenidoIndividual({ slug }) {
         return `${descripcion_individual}, ${preguntas}`;
     }
 
+    // Método para combinar descripcion_individual y preguntas
+    const combinarRespuestas = () => {
+        // Combinar los valores y regresar
+        return `${respuesta}, ${color}`;
+    }
+
     return (
         <form onSubmit={enviarFContenido} encType='multipart/form-data'>
             {error && <p>{error}</p>}
@@ -179,6 +191,18 @@ export function FormularioContenidoIndividual({ slug }) {
                 <input onClick={info__contenido__respuesta} className='form-control w-100' type="text" placeholder="Ingresa la respuesta**" id="respuesta" name="respuesta"
                     value={respuesta} onChange={e => setRespuesta(e.target.value)} />
             </div>
+            <>
+                {
+                    tipo_contenido === "pintar_imagen" &&
+                    <>
+                        <div className="form-group">
+                            <label className='label' htmlFor="color">Color:</label>
+                            <input className='form-control w-100' type="text" placeholder="Ingresa el color a completar en la imagen**" id="color" name="color"
+                                value={color} onChange={e => setColor(e.target.value)} />
+                        </div>
+                    </>
+                }
+            </>
             <div className="form-group">
                 <label className='label' htmlFor="portada_individual">Portada:</label>
                 <input className='form-control w-100' type="file" id="portada_individual"

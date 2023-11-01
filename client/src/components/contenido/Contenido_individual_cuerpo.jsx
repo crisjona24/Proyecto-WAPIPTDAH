@@ -8,7 +8,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from "react";
-import { faBackward, faQuestion, fa1, fa2, fa3, fa4, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faBackward, faQuestion, faArrowRight, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import Swal from "sweetalert2";
 // Metodos
 import { FormularioUno } from '../registro/Formulario_individual_1';
 import { FormularioDos } from '../registro/Formulario_individual_2';
@@ -193,7 +194,13 @@ export function ContenidoCuerpo({ context, slugContenido, tipoUsuarioP }) {
                     <div className="contenedor__niveles mt-4 mb-4">
                     </div>
                 </div>
-
+                {/* Mostramos el error el error */}
+                {
+                    error &&
+                    <div className="alert alert-danger" role="alert">
+                        {error}
+                    </div>
+                }
                 {/* Componente formulario */}
                 {tipoFormulario}
                 {/* Fin componente formulario */}
