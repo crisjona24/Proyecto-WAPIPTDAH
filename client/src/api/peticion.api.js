@@ -199,7 +199,7 @@ export const AtenderPeticion = async (datos__post) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.post('wapiptdah/atender/peticion/', datos__post, 
+        return await baseurl.post('wapiptdah/atender/peticion/', datos__post,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -284,5 +284,119 @@ export const ReinicioContadorAtendidas = async () => {
             })
     } catch (error) {
         throw new Error("No se puede acceder a la petición: " + error.message);
+    }
+};
+
+// Peticion por fecha
+export const PeticionporFecha = async (fecha, id, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/peticion/fecha/${fecha}/${id}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                    //'Authorization': `Token ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a las peticiones: " + error.message);
+    }
+};
+
+// Peticion por fecha
+export const PeticionporRango = async (rango, id, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/peticion/rango/${rango}/${id}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                    //'Authorization': `Token ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a las peticiones: " + error.message);
+    }
+};
+
+// Peticion por fecha
+export const PeticionPendienteporFecha = async (fecha, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/peticion/fecha/pendiente/${fecha}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                    //'Authorization': `Token ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a las peticiones: " + error.message);
+    }
+};
+
+// Peticion por fecha
+export const PeticionPendienteporRango = async (rango, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/peticion/rango/pendiente/${rango}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                    //'Authorization': `Token ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a las peticiones: " + error.message);
+    }
+};
+
+// Peticion por fecha
+export const PeticionAtendidaporFecha = async (fecha, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/peticion/fecha/atendida/${fecha}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                    //'Authorization': `Token ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a las peticiones: " + error.message);
+    }
+};
+
+// Peticion por fecha
+export const PeticionAtendidaporRango = async (rango, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/peticion/rango/atendida/${rango}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                    //'Authorization': `Token ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a las peticiones: " + error.message);
     }
 };

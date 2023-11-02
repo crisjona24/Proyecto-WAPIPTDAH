@@ -161,7 +161,7 @@ class Dominio(models.Model):
     slug_dominio = models.SlugField(unique=True, blank=True)
     portada_dominio = models.ImageField( upload_to='samples/fondo_dominio_react/', storage=MediaCloudinaryStorage(), null=True, blank=True)
     # Llave foranea
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, blank=True, null=True)
+    usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         self.slug_dominio = slugify(self.nombre + "-" + self.descripcion)
@@ -255,9 +255,9 @@ class Resultado(models.Model):
     estado_reporte = models.BooleanField(default=False)
     # Foranea
     contenido_individual = models.ForeignKey(
-        ContenidoIndividual, on_delete=models.CASCADE, blank=True, null=True)
+        ContenidoIndividual, on_delete=models.SET_NULL, blank=True, null=True)
     paciente = models.ForeignKey(
-        Paciente, on_delete=models.CASCADE, blank=True, null=True)
+        Paciente, on_delete=models.SET_NULL, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         # Formatear el tiempo como cadenas de texto
@@ -304,12 +304,11 @@ class Peticion(models.Model):
     motivo_peticion = models.CharField(max_length=250, blank=False, null=True)
     tipo_peticion = models.CharField(max_length=80, blank=False, null=True)
     peticion_cuerpo = models.TextField(max_length=250, blank=False, null=True)
-    #peticion_cuerpo = models.FileField(upload_to='samples/peticion/', storage=RawMediaCloudinaryStorage(), null=True, blank=True)
-    #peticion_cuerpo = models.FileField(upload_to='wapiptdah/', storage=gd_storage)
     estado_peticion = models.BooleanField(default=True)
     estado_revision= models.BooleanField(default=False)
     fecha_registro_peticion = models.DateField(auto_now=True)
     slug_peticion = models.SlugField(unique=True, blank=True)
+    # Foraneas
     usuario_comun = models.ForeignKey(UsuarioComun, on_delete=models.CASCADE, blank=True, null=True)
 
     def save(self, *args, **kwargs):

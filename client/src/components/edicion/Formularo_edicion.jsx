@@ -853,6 +853,7 @@ export function FormularioEdicionIndividual({ slugContenido }) {
 }
 
 
+
 /* EDICION DE CURSO */
 export function FormularioEdicionCurso() {
     // Obtener el parametro de la URL

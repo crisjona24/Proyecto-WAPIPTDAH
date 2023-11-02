@@ -73,6 +73,34 @@
 }
 
 
+/* LISTAS */
+.alienacion-externa {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 10px;
+}
+
+.alineacion-triple{
+    display: grid;
+    grid-template-columns: 4fr 2fr;
+    grid-gap: 5px;
+
+}
+
+.alineacion-3{
+    display: grid;
+    grid-template-columns: 3fr 2fr 2fr;
+    grid-gap: 5px;
+
+}
+
+.alineacion-lista-busqueda {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: start;
+}
+
 /* MEDIAS */
 @media (max-width: 975px) {
     .orden_lista_contenido {

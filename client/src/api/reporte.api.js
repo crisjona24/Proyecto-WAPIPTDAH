@@ -191,3 +191,76 @@ export const ReportesPaciente = async (nombre, page = 1) => {
         throw new Error("No se puede acceder a las peticiones: " + error.message);
     }
 };
+
+
+// Buscar reportes por fecha para usuario comun
+export const ReporteporFecha = async (fecha, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/reporte/fecha/${fecha}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a los reportes: " + error.message);
+    }
+};
+
+// Buscar reportes por fecha para usuario comun
+export const ReporteporFechaTecnico = async (fecha, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/reporte/fecha/tecnico/${fecha}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a los reportes: " + error.message);
+    }
+};
+
+// Buscar reportes por fecha para usuario comun
+export const ReporteporRango = async (fecha, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/reporte/rango/${fecha}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a los reportes: " + error.message);
+    }
+};
+
+// Buscar reportes por fecha para usuario comun
+export const ReporteporRangoTecnico = async (fecha, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/reporte/rango/tecnico/${fecha}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a los reportes: " + error.message);
+    }
+};

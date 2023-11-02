@@ -32,7 +32,7 @@ export function ListaPeticion({ peticiones, page, setPage, numeroPag }) {
 
     return (
 
-        <div className="cuerpo-tabla">
+        <div className="cuerpo-tabla-2">
             <div className="row">
                 <div className="col-md-offset-1 col-md-11">
                     <div className="panel">
@@ -294,7 +294,7 @@ export function ListaPeticionesUsuario({ peticiones, page, setPage, numeroPag })
     };
 
     return (
-        <div className="cuerpo-tabla">
+        <div className="cuerpo-tabla-2">
             <div className="row">
                 <div className="col-md-offset-1 col-md-11">
                     <div className="panel">

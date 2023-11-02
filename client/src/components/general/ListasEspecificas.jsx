@@ -46,13 +46,20 @@ export function ListadodeSala({ salas, usuario, page, setPage, numeroPag }) {
                                 </div>
                             </div>
                         </div>
-                        <div className="panel-body_2 table-responsive">
+                        <div className="panel-body_5 table-responsive">
                             <Table responsive="sm" className="table">
                                 <thead>
                                     <tr>
 
                                         <th>Nombre</th>
-                                        <th className="text-center">Código</th>
+                                        <th className="text-center">
+                                            {
+                                                usuario.tipo === "comun" ?
+                                                    "Código" :
+                                                    "Estado"
+                                            }
+
+                                        </th>
                                         <th>Anotaciones</th>
                                         <th className="text-center">Fecha</th>
                                         <th className="text-center">Opciones</th>
@@ -64,8 +71,23 @@ export function ListadodeSala({ salas, usuario, page, setPage, numeroPag }) {
                                             salas.map((sala) => (
                                                 <tr key={sala.id}>
                                                     <td>{sala.nombre_sala}</td>
-                                                    <td className="text-center">{sala.codigo_identificador}</td>
-                                                    <td style={{ textAlign: 'justify' }}>{sala.anotaciones}</td>
+                                                    <td className="text-center">
+                                                        {
+                                                            usuario.tipo === "comun" ?
+                                                                sala.codigo_identificador :
+                                                                sala.sala_atendida === true ?
+                                                                    <span className="label label-success">Atendida</span>
+                                                                    :
+                                                                    <span className="label label-danger">Sin atender</span>
+                                                        }
+                                                    </td>
+                                                    <td style={{ textAlign: 'justify' }}>
+                                                        {
+                                                            usuario.tipo === "comun" ?
+                                                                sala.anotaciones :
+                                                                sala.anotaciones + ". Con los códigos/o: " + sala.codigo_identificador
+                                                        }
+                                                    </td>
                                                     <td className="text-center">{sala.fecha_registro_sala}</td>
                                                     <td >
                                                         <ul
@@ -145,7 +167,7 @@ export function ListadodeSala({ salas, usuario, page, setPage, numeroPag }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
 
     )
 }
@@ -302,7 +324,7 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                 <thead>
                                     <tr>
 
-                                        <th>Paciente</th>
+                                        <th>Estudiante</th>
                                         <th>Tiempo</th>
                                         <th>Observación</th>
                                         <th style={{ textAlign: 'center' }}>Fecha</th>
@@ -475,7 +497,7 @@ export function ListadodeReportes({ reportes, usuario, page, setPage, numeroPag 
                                 <thead>
                                     <tr>
 
-                                        <th>Paciente</th>
+                                        <th>Estudiante</th>
                                         <th >Tiempo</th>
                                         <th>Correo</th>
                                         <th className="text-center">Fecha</th>

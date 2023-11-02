@@ -691,7 +691,7 @@ export function Paciente({ datosPaciente }) {
                     <div className="row">
                         <div className="col-md-12">
                             <h4 className="display-7 mt-2">
-                                Información - Paciente inscrito
+                                Información - Estudiante inscrito
                             </h4>
                         </div>
                     </div>
@@ -712,7 +712,7 @@ export function Paciente({ datosPaciente }) {
                         </Col>
                         <Col md={8}>
                             <Card.Body>
-                                <Card.Title className="titulo-peticion">Datos del paciente</Card.Title>
+                                <Card.Title className="titulo-peticion">Datos del estudiante</Card.Title>
                                 <Row className="mb-2">
                                     <Col md={6}>
                                         <Card.Title style={{ fontSize: '1rem' }}>Nombres :</Card.Title>
@@ -1169,7 +1169,7 @@ export function Resultado({ datosResultado }) {
                         </Col>
                         <Col md={8}>
                             <Card.Body>
-                                <Card.Title className="titulo-peticion">Información del paciente</Card.Title>
+                                <Card.Title className="titulo-peticion">Información del estudiante</Card.Title>
                                 <Row className="mb-1">
                                     <Col md={6}>
                                         <Card.Title style={{ fontSize: '1rem' }}>Nombres :</Card.Title>

@@ -70,7 +70,7 @@ export function ListadodeCursos({ cursos, page, setPage, numeroPag }) {
                                 <thead>
                                     <tr>
 
-                                        <th>Nombre</th>
+                                        <th className="text-center">Nombre</th>
                                         <th className="text-center">Fecha</th>
                                         <th>Descripción</th>
                                         <th className="text-center">Identificador</th>
@@ -82,7 +82,7 @@ export function ListadodeCursos({ cursos, page, setPage, numeroPag }) {
                                         {
                                             cursos.map((curso) => (
                                                 <tr key={curso.id}>
-                                                    <td>{curso.nombre_curso}</td>
+                                                    <td className="text-center">{curso.nombre_curso}</td>
                                                     <td className="text-center">{curso.fecha_registro_curso}</td>
                                                     <td style={{ textAlign: 'justify' }}>{curso.descripcion_curso}</td>
                                                     <td className="text-center">{curso.identificador_curso}</td>

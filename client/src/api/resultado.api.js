@@ -192,3 +192,76 @@ export const PacientesResultados = async (nombre, page = 1) => {
         throw new Error("No se puede acceder a las peticiones: " + error.message);
     }
 };
+
+
+// Buscar resultados por fecha para usuario comun
+export const ResultadoporFecha = async (fecha, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/resultado/fecha/${fecha}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a los resultados: " + error.message);
+    }
+};
+
+// Buscar resultados por fecha para usuario comun
+export const ResultadoporFechaTecnico = async (fecha, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/resultado/fecha/tecnico/${fecha}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a los resultados: " + error.message);
+    }
+};
+
+// Buscar resultados por fecha para usuario comun
+export const ResultadoporRango = async (rango, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/resultado/rango/${rango}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a los resultados: " + error.message);
+    }
+};
+
+// Buscar resultados por fecha para usuario comun
+export const ResultadoporRangoTecnico = async (rango, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/resultado/rango/tecnico/${rango}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a los resultados: " + error.message);
+    }
+};

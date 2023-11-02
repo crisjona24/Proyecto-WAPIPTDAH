@@ -482,3 +482,81 @@
     border-radius: 0;
     transition: all 0.3s ease 0s;
 }
+
+/* OTRO TIPO DE TABLA 5*/
+
+.panel .panel-body_5 {
+    padding: 0;
+    border-radius: 0;
+}
+
+.panel .panel-body_5 .table thead tr th {
+    color: #fff;
+    background: #8D8D8D;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 12px;
+    border-bottom: none;
+}
+
+.panel .panel-body_5 .table thead tr th:nth-of-type(3) {
+    width: 35%;
+    text-align: justify;
+}
+
+.panel .panel-body_5 .table thead tr th:nth-of-type(2) {
+    width: 8%;
+    text-align: justify;
+}
+
+.panel .panel-body_5 .table thead tr th:nth-of-type(1) {
+    width: 15%;
+    text-align: justify;
+}
+
+
+
+.panel .panel-body_5 .table tbody tr td {
+    color: #555;
+    background: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 13px;
+    vertical-align: middle;
+    border-color: #e7e7e7;
+}
+
+.panel .panel-body_5 .table tbody tr td p {
+    margin: 0;
+    padding: 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: #555;
+    text-align: justify;
+    line-height: 25px;
+}
+
+.panel .panel-body_5 .table tbody tr:nth-child(odd) td {
+    background: #f5f5f5;
+}
+
+.panel .panel-body_5 .table tbody .action-list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.panel .panel-body_5 .table tbody .action-list li {
+    display: inline-block;
+}
+
+.panel .panel-body_5 .table tbody .action-list li a {
+    color: #fff;
+    font-size: 13px;
+    line-height: 28px;
+    height: 28px;
+    width: 33px;
+    padding: 0;
+    border-radius: 0;
+    transition: all 0.3s ease 0s;
+}

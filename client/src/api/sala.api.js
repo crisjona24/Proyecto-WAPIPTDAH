@@ -344,3 +344,58 @@ export const ReinicioContadorSalasAtendidas = async () => {
         throw new Error("No se puede acceder a la peticion: " + error.message);
     }
 };
+
+// Buscar salas por fecha para usuario comun
+export const SalaporFecha = async (fecha, id, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/sala/fecha/${fecha}/${id}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                    //'Authorization': `Token ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a las peticiones: " + error.message);
+    }
+};
+
+// Buscar salas por fecha para usuario tecnico
+export const SalaFecha = async (fecha, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/sala/fecha/tecnico/${fecha}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a las peticiones: " + error.message);
+    }
+};
+
+// Buscar salas atendidas por fecha para usuario comun
+export const SalaporFechaAtendida = async (fecha, id, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/sala/fecha/atendida/${fecha}/${id}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a las peticiones: " + error.message);
+    }
+};

@@ -9,11 +9,14 @@ import Swal from "sweetalert2";
 // Metodos
 import { VerificarUsuario, BusquedaPacientesCurso } from "../../api/usuario.api";
 import { NivelListado } from "../../api/grado.api";
-import { PacientesInscritos, VerificarCurso, CursoListado, CursosUsuarioComun, BusquedaCurso } from "../../api/curso.api";
+import { PacientesInscritos, VerificarCurso, CursoListado, CursosUsuarioComun } from "../../api/curso.api";
+import { BusquedaCurso, CursoporFecha, CursoporFechaTecnico } from "../../api/curso.api";
 import { ResultadosListado, PacientesResultados, ResultadosListaUsuario } from "../../api/resultado.api";
-import { SalasUsuarioComun, SalaListado, SalasPaciente, BusquedaSalas, AccederSala } from "../../api/sala.api";
+import { ResultadoporFecha, ResultadoporFechaTecnico, ResultadoporRango, ResultadoporRangoTecnico } from "../../api/resultado.api";
+import { SalasUsuarioComun, SalaListado, SalasPaciente, BusquedaSalas, AccederSala, SalaporFecha } from "../../api/sala.api";
 import { ReporteListado, ReporteListadoUsuarioComun, ReportesPaciente } from "../../api/reporte.api";
-import { SalasUsuarioComunAtendidas } from "../../api/sala.api";
+import { ReporteporFecha, ReporteporFechaTecnico, ReporteporRango, ReporteporRangoTecnico } from "../../api/reporte.api";
+import { SalasUsuarioComunAtendidas, SalaFecha, SalaporFechaAtendida } from "../../api/sala.api";
 
 import { ListadodePacientes } from "../general/ListaPaciente";
 import { OpcionesTecnico, OpcionesComun, OpcionesPaciente } from '../general/OpcionesNivel';
@@ -339,7 +342,6 @@ export function PacienteListado() {
         try {
             const busqueda_paciente = await BusquedaPacientesCurso(nombrebuscarP, slug, page);
             if (busqueda_paciente.data.results.length === 0) {
-                setNumeropag(1);
                 Swal.fire("No existe un paciente con ese nombre. Ingresa un nombre válido", "", "warning");
                 return;
             } else {
@@ -387,7 +389,7 @@ export function PacienteListado() {
                     <div className="row">
                         <div className="col-md-12">
                             <h4 className="display-7 mt-2">
-                                Pacientes inscritos
+                                Estudiantes inscritos
                             </h4>
                         </div>
                     </div>
@@ -444,6 +446,11 @@ export function ResultadoLista({ usuario }) {
     const [entradaValida, setEntradavaldia] = useState(true);
     const [numeroPag, setNumeropag] = useState(1);
     const elementosPorPagina = 8;
+    // Filtro de fecha
+    const [fecha, setFecha] = useState("");
+    const [limite, setLimite] = useState("");
+    const [estadoBusqueda, setEstadoBusqueda] = useState(false);
+    const [estadoBusquedaSel, setEstadoBusquedaSel] = useState(false);
 
     // Obtener resultados
     const cargarResultados = async () => {
@@ -529,8 +536,8 @@ export function ResultadoLista({ usuario }) {
         try {
             const datos_obtenidos = await PacientesResultados(nombrebuscar, page);
             if (datos_obtenidos.data.results.length === 0) {
-                setNumeropag(1);
                 Swal.fire("No existen resultados con ese nombre de paciente. Ingresa un nombre válido", "", "warning");
+                resetearBusqueda();
                 return;
             } else {
                 setResultados(datos_obtenidos.data.results);
@@ -551,6 +558,10 @@ export function ResultadoLista({ usuario }) {
     const resetearBusqueda = () => {
         setMostrarBusqueda(false);
         setNombreBuscar("");
+        setEstadoBusqueda(false);
+        setFecha("");
+        setEstadoBusquedaSel(false);
+        setLimite("");
     }
 
     // Funcion para validar la entreada
@@ -569,6 +580,145 @@ export function ResultadoLista({ usuario }) {
         const generar = /^[a-zA-Z]+ [a-zA-Z]+$/;
         return generar.test(value);
     };
+
+    // Metodo de busqueda
+    const buscarResultadosFecha = async () => {
+        // Verificar campos vacíos
+        if (isEmptyField(fecha)) {
+            Swal.fire("Por favor ingrese el campo de fecha", "", "warning");
+            return;
+        }
+        // Verificar fecha
+        try {
+            if (fecha !== "") {
+                // Verificar usuario
+                const usuarioC = await VerificarUsuario();
+                if (usuarioC.data.success) {
+                    // Verificar tipo de usuario
+                    if (usuarioC.data.tipo === "tecnico") {
+                        const resultadoTecnico = await ResultadoporFechaTecnico(fecha, page);
+                        if (resultadoTecnico.data.results.length === 0) {
+                            Swal.fire("No existen resultados de esa fecha. Ingresa una válida", "", "warning");
+                            resetearBusqueda();
+                            return;
+                        } else {
+                            setResultados(resultadoTecnico.data.results);
+                            setNumeropag(Math.ceil(resultadoTecnico.data.count / elementosPorPagina));
+                            setEstadoBusqueda(true);
+                        }
+                    } else {
+                        // cargar datos de cursos
+                        const resultado = await ResultadoporFecha(fecha, page);
+                        if (resultado.data.results.length === 0) {
+                            Swal.fire("No existen resultados de esa fecha. Ingresa una válida", "", "warning");
+                            resetearBusqueda();
+                            return;
+                        } else {
+                            setResultados(resultado.data.results);
+                            setNumeropag(Math.ceil(resultado.data.count / elementosPorPagina));
+                            setEstadoBusqueda(true);
+                        }
+                    }
+                } else {
+                    navigate('/login');
+                }
+            } else {
+                cargarResultados();
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                Swal.fire("No existen resultados de esa fecha. Ingresa una válida", "", "warning");
+            }
+        }
+    }
+
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (!estadoBusqueda) {
+            cargarResultados();
+        } else {
+            buscarResultadosFecha();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (!estadoBusqueda) {
+                cargarResultados();
+            } else {
+                buscarResultadosFecha();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+
+    }, [estadoBusqueda, page]);
+
+    // Metodo de busqueda
+    const buscarResultadosRango = async () => {
+        // Verificar fecha
+        try {
+            if (limite !== "") {
+                // Verificar usuario
+                const usuarioC = await VerificarUsuario();
+                if (usuarioC.data.success) {
+                    // Verificar tipo de usuario
+                    if (usuarioC.data.tipo === "tecnico") {
+                        const resultadoTecnicoRango = await ResultadoporRangoTecnico(limite, page);
+                        if (resultadoTecnicoRango.data.results.length === 0) {
+                            Swal.fire("No existen resultados de ese rango de días. Escoja otro", "", "warning");
+                            resetearBusqueda();
+                            return;
+                        } else {
+                            setResultados(resultadoTecnicoRango.data.results);
+                            setNumeropag(Math.ceil(resultadoTecnicoRango.data.count / elementosPorPagina));
+                            setEstadoBusquedaSel(true);
+                        }
+                    } else {
+                        // cargar datos de cursos
+                        const resultadoRango = await ResultadoporRango(limite, page);
+                        if (resultadoRango.data.results.length === 0) {
+                            Swal.fire("No existen resultados de ese rango de días. Escoja otro", "", "warning");
+                            resetearBusqueda();
+                            return;
+                        } else {
+                            setResultados(resultadoRango.data.results);
+                            setNumeropag(Math.ceil(resultadoRango.data.count / elementosPorPagina));
+                            setEstadoBusquedaSel(true);
+                        }
+                    }
+                } else {
+                    navigate('/login');
+                }
+            } else {
+                cargarResultados();
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                Swal.fire("No existen resultados en el rango especificado. Ingresa una válida", "", "warning");
+            }
+        }
+    }
+
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (limite === "0") {
+            cargarResultados();
+        } else {
+            buscarResultadosRango();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (limite === "0") {
+                cargarResultados();
+            } else {
+                buscarResultadosRango();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+
+    }, [limite, page]);
 
     return (
         <div>
@@ -589,25 +739,93 @@ export function ResultadoLista({ usuario }) {
                     <p className="mb-0">{error}</p>
                 </div>
             }
-            <div className="mt-4 container" style={{ height: '50px', borderRadius: '10px' }}>
-                <div className="d-flex flex-row justify-content-left w-100" style={{ alignItems: 'center', marginLeft: '1px' }}>
-                    <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar</a>
-                    <form className="d-flex flex-row justify-content-between w-50">
-                        <input className="form-control mr-sm-2 w-100" type="search" name="nombre" id="nombre"
-                            placeholder="Nombre del paciente.." aria-label="Search" value={nombrebuscar}
-                            onChange={cambioEntrada} disabled={isTamanio} />
-                        <>
-                            {
-                                mostrarBusqueda
-                                    ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
-                                        X
-                                    </Button>
-                                    : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaResultado} disabled={isTamanio}>
-                                        Ir
-                                    </Button>
-                            }
-                        </>
-                    </form>
+            <div className="mt-5 container alineacion-3" style={{ height: '50px', borderRadius: '10px' }}>
+                <div className="alineacion-lista-busqueda">
+                    <div className="col-md-12">
+                        <form>
+                            <div className="row form-group">
+                                <div className="col-2 d-flex justify-content-center mt-2">
+                                    <label htmlFor="nombre" style={{ fontFamily: 'Pacifico' }}
+                                    >Nombre</label>
+                                </div>
+                                <div className="col-9 d-flex flex-row">
+                                    <input type="text" className="form-control" id="nombre"
+                                        value={nombrebuscar} onChange={cambioEntrada} placeholder="Ingrese el nombre.." />
+                                    <>
+                                        {
+                                            mostrarBusqueda
+                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                    X
+                                                </Button>
+                                                : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaResultado} disabled={isTamanio}>
+                                                    Buscar
+                                                </Button>
+                                        }
+                                    </>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div className="alineacion-lista-busqueda">
+                    <div className="col-md-12">
+                        <form>
+                            <div className="row form-group">
+                                <div className="col-2 d-flex justify-content-center mt-2">
+                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                </div>
+                                <div className="col-9 d-flex flex-row">
+                                    <input type="date" className="form-control" id="fecha"
+                                        value={fecha} onChange={(e) => setFecha(e.target.value)} />
+                                    <>
+                                        {
+                                            estadoBusqueda
+                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                    X
+                                                </Button>
+                                                : <Button variant="success" className="my-2 my-sm-0" onClick={buscarResultadosFecha} disabled={isTamanio}>
+                                                    Buscar
+                                                </Button>
+                                        }
+                                    </>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div className="alineacion-lista-busqueda">
+                    <div className="col-md-12">
+                        <form>
+                            <div className="row form-group">
+                                <div className="col-2 d-flex justify-content-center mt-2">
+                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Rango</label>
+                                </div>
+                                <div className="col-9 d-flex flex-row">
+                                    <select name="fecha" id="fecha"
+                                        value={limite} onChange={(e) => setLimite(e.target.value)} className="form-control"
+                                    >
+                                        <option value="0">Ninguno</option>
+                                        <option value="7">Últimos 7 días</option>
+                                        <option value="15">Últimos 15 días</option>
+                                        <option value="30">Últimos 30 días</option>
+                                        <option value="60">Últimos 60 días</option>
+                                    </select>
+                                    <>
+                                        {
+                                            estadoBusquedaSel
+                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                    X
+                                                </Button>
+                                                : <> </>
+                                        }
+                                    </>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
             {/* Table */}
@@ -634,6 +852,9 @@ export function CursoLista() {
     const [nombrebuscar, setNombreBuscar] = useState("");
     const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
     const [isTamanio, setIstamanio] = useState(false);
+    // Filtro de fecha
+    const [fecha, setFecha] = useState("");
+    const [estadoBusqueda, setEstadoBusqueda] = useState(false);
 
     // Datos de curso
     const cargarCursos = async () => {
@@ -714,8 +935,8 @@ export function CursoLista() {
         try {
             const datos_obtenidos = await BusquedaCurso(nombrebuscar, page);
             if (datos_obtenidos.data.results.length === 0) {
-                setNumeropag(1);
                 Swal.fire("No existen cursos con ese nombre. Ingresa un nombre válido", "", "warning");
+                resetearBusqueda();
                 return;
             } else {
                 setCursos(datos_obtenidos.data.results);
@@ -736,7 +957,81 @@ export function CursoLista() {
     const resetearBusqueda = () => {
         setMostrarBusqueda(false);
         setNombreBuscar("");
+        setEstadoBusqueda(false);
+        setFecha("");
     }
+
+    // Metodo de busqueda
+    const buscarCursosFecha = async () => {
+        // Verificar campos vacíos
+        if (isEmptyField(fecha)) {
+            Swal.fire("Por favor ingrese el campo de fecha", "", "warning");
+            return;
+        }
+        // Verificar fecha
+        try {
+            if (fecha !== "") {
+                // Verificar usuario
+                const usuarioC = await VerificarUsuario();
+                if (usuarioC.data.success) {
+                    // Verificar tipo de usuario
+                    if (usuarioC.data.tipo === "tecnico") {
+                        const cursoTecnico = await CursoporFechaTecnico(fecha, page);
+                        if (cursoTecnico.data.results.length === 0) {
+                            Swal.fire("No existen cursos de esa fecha. Ingresa una válida", "", "warning");
+                            resetearBusqueda();
+                            return;
+                        } else {
+                            setCursos(cursoTecnico.data.results);
+                            setNumeropag(Math.ceil(cursoTecnico.data.count / elementosPorPagina));
+                            setEstadoBusqueda(true);
+                        }
+                    } else {
+                        // cargar datos de cursos
+                        const curso = await CursoporFecha(fecha, page);
+                        if (curso.data.results.length === 0) {
+                            Swal.fire("No existen cursos de esa fecha. Ingresa una válida", "", "warning");
+                            resetearBusqueda();
+                            return;
+                        } else {
+                            setCursos(curso.data.results);
+                            setNumeropag(Math.ceil(curso.data.count / elementosPorPagina));
+                            setEstadoBusqueda(true);
+                        }
+                    }
+                } else {
+                    navigate('/login');
+                }
+            } else {
+                cargarCursos();
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                Swal.fire("No existen cursos de esa fecha. Ingresa una válida", "", "warning");
+            }
+        }
+    }
+
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (!estadoBusqueda) {
+            cargarCursos();
+        } else {
+            buscarCursosFecha();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (!estadoBusqueda) {
+                cargarCursos();
+            } else {
+                buscarCursosFecha();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+
+    }, [estadoBusqueda, page]);
 
     return (
         <div>
@@ -757,7 +1052,7 @@ export function CursoLista() {
                     <p className="mb-0">{error}</p>
                 </div>
             }
-            <div className="mt-4 container" style={{ height: '50px', borderRadius: '10px' }}>
+            <div className="mt-4 container alineacion-triple" style={{ height: '50px', borderRadius: '10px' }}>
                 <div className="d-flex flex-row justify-content-left w-100" style={{ alignItems: 'center', marginLeft: '1px' }}>
                     <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar</a>
                     <form className="d-flex flex-row justify-content-between w-50">
@@ -776,6 +1071,33 @@ export function CursoLista() {
                             }
                         </>
                     </form>
+                </div>
+                <div className="alineacion-lista-busqueda" style={{ marginTop: '5%' }}>
+                    <div className="col-md-12">
+                        <form>
+                            <div className="row form-group">
+                                <div className="col-2 d-flex justify-content-center mt-2">
+                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                </div>
+                                <div className="col-9 d-flex flex-row">
+                                    <input type="date" className="form-control" id="fecha"
+                                        value={fecha} onChange={(e) => setFecha(e.target.value)} />
+                                    <>
+                                        {
+                                            estadoBusqueda
+                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                    X
+                                                </Button>
+                                                : <Button variant="success" className="my-2 my-sm-0" onClick={buscarCursosFecha} disabled={isTamanio}>
+                                                    Buscar
+                                                </Button>
+                                        }
+                                    </>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
             {/* Table */}
@@ -801,6 +1123,9 @@ export function SalaLista({ usuario }) {
     const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
     const [numeroPag, setNumeropag] = useState(1);
     const elementosPorPagina = 8;
+    // Filtro de fecha
+    const [fecha, setFecha] = useState("");
+    const [estadoBusqueda, setEstadoBusqueda] = useState(false);
 
     // Obtener resultados
     const cargarSala = async () => {
@@ -880,8 +1205,8 @@ export function SalaLista({ usuario }) {
         try {
             const busqueda_sala = await BusquedaSalas(nombrebuscar, page);
             if (busqueda_sala.data.results.length === 0) {
-                setNumeropag(1);
                 Swal.fire("No existen salas con ese nombre. Ingresa un nombre válido", "", "warning");
+                resetearBusqueda();
                 return;
             } else {
                 setSalas(busqueda_sala.data.results);
@@ -897,12 +1222,86 @@ export function SalaLista({ usuario }) {
     const resetearBusqueda = () => {
         setMostrarBusqueda(false);
         setNombreBuscar("");
+        setFecha("");
+        setEstadoBusqueda(false);
     }
 
     // Control de entrada de datos
     const isEmptyField = (...fields) => {
         return fields.some(field => field.trim() === "");
     }
+
+    // Metodo de busqueda
+    const buscarSalasFecha = async () => {
+        // Verificar campos vacíos
+        if (isEmptyField(fecha)) {
+            Swal.fire("Por favor ingrese el campo de fecha", "", "warning");
+            return;
+        }
+        // Verificar fecha
+        try {
+            if (fecha !== "") {
+                // Verificar usuario
+                const usuarioC = await VerificarUsuario();
+                if (usuarioC.data.success) {
+                    // Verificar tipo de usuario
+                    if (usuarioC.data.tipo === "tecnico") {
+                        const salaTecnico = await SalaFecha(fecha, page);
+                        if (salaTecnico.data.results.length === 0) {
+                            Swal.fire("No existen peticiones de esa fecha. Ingresa una válida", "", "warning");
+                            resetearBusqueda();
+                            return;
+                        } else {
+                            setSalas(salaTecnico.data.results);
+                            setNumeropag(Math.ceil(salaTecnico.data.count / elementosPorPagina));
+                            setEstadoBusqueda(true);
+                        }
+                    } else {
+                        // cargar datos de cursos
+                        const sala = await SalaporFecha(fecha, usuarioC.data.identificador, page);
+                        if (sala.data.results.length === 0) {
+                            Swal.fire("No existen peticiones de esa fecha. Ingresa una válida", "", "warning");
+                            resetearBusqueda();
+                            return;
+                        } else {
+                            setSalas(sala.data.results);
+                            setNumeropag(Math.ceil(sala.data.count / elementosPorPagina));
+                            setEstadoBusqueda(true);
+                        }
+                    }
+                } else {
+                    navigate('/login');
+                }
+            } else {
+                cargarSala();
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                Swal.fire("No existen salas de esa fecha. Ingresa una válida", "", "warning");
+            }
+        }
+    }
+
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (!estadoBusqueda) {
+            cargarSala();
+        } else {
+            buscarSalasFecha();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (!estadoBusqueda) {
+                cargarSala();
+            } else {
+                buscarSalasFecha();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+
+    }, [estadoBusqueda, page]);
 
     return (
         <div>
@@ -923,7 +1322,7 @@ export function SalaLista({ usuario }) {
                     <p className="mb-0">{error}</p>
                 </div>
             }
-            <div className="mt-4 container" style={{ height: '50px', borderRadius: '10px' }}>
+            <div className="mt-4 container alineacion-triple" style={{ height: '50px', borderRadius: '10px' }}>
                 <div className="d-flex flex-row justify-content-left w-100" style={{ alignItems: 'center', marginLeft: '1px' }}>
                     <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar</a>
                     <form className="d-flex flex-row justify-content-between w-50">
@@ -937,11 +1336,38 @@ export function SalaLista({ usuario }) {
                                         X
                                     </Button>
                                     : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaClick} disabled={isTamanio}>
-                                        Ir
+                                        Buscar
                                     </Button>
                             }
                         </>
                     </form>
+                </div>
+                <div className="alineacion-lista-busqueda" style={{ marginTop: '5%' }}>
+                    <div className="col-md-12">
+                        <form>
+                            <div className="row form-group">
+                                <div className="col-2 d-flex justify-content-center mt-2">
+                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                </div>
+                                <div className="col-9 d-flex flex-row">
+                                    <input type="date" className="form-control" id="fecha"
+                                        value={fecha} onChange={(e) => setFecha(e.target.value)} />
+                                    <>
+                                        {
+                                            estadoBusqueda
+                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                    X
+                                                </Button>
+                                                : <Button variant="success" className="my-2 my-sm-0" onClick={buscarSalasFecha} disabled={isTamanio}>
+                                                    Buscar
+                                                </Button>
+                                        }
+                                    </>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
             {/* Table */}
@@ -1079,7 +1505,7 @@ export function SalaPacienteLista() {
             <div className="d-flex flex-row mt-4">
                 <div className="card-body">
                     <form className="d-flex flex-row" >
-                        <div className="input-group" style={{marginLeft:'8%', width: '85%'}}>
+                        <div className="input-group" style={{ marginLeft: '8%', width: '85%' }}>
                             <input type="search" className="form-control rounded" placeholder="Inserta código de sala"
                                 aria-label="Search" aria-describedby="search-addon" value={codigosala}
                                 onChange={e => {
@@ -1142,6 +1568,9 @@ export function SalaListaAtendidas({ usuario }) {
     const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
     const [numeroPag, setNumeropag] = useState(1);
     const elementosPorPagina = 8;
+    // Filtro de fecha
+    const [fecha, setFecha] = useState("");
+    const [estadoBusqueda, setEstadoBusqueda] = useState(false);
 
     // Obtener resultados
     const cargarSalaAtendi = async () => {
@@ -1211,8 +1640,8 @@ export function SalaListaAtendidas({ usuario }) {
         try {
             const busqueda_sala = await BusquedaSalas(nombrebuscar, page);
             if (busqueda_sala.data.results.length === 0) {
-                setNumeropag(1);
                 Swal.fire("No existen salas con ese nombre. Ingresa un nombre válido", "", "warning");
+                resetearBusqueda();
                 return;
             } else {
                 setSalas(busqueda_sala.data.results);
@@ -1228,12 +1657,72 @@ export function SalaListaAtendidas({ usuario }) {
     const resetearBusqueda = () => {
         setMostrarBusqueda(false);
         setNombreBuscar("");
+        setEstadoBusqueda(false);
+        setFecha("");
     }
 
     // Control de entrada de datos
     const isEmptyField = (...fields) => {
         return fields.some(field => field.trim() === "");
     }
+
+    // Metodo de busqueda
+    const buscarSalasFechaAtendidas = async () => {
+        // Verificar campos vacíos
+        if (isEmptyField(fecha)) {
+            Swal.fire("Por favor ingrese el campo de fecha", "", "warning");
+            return;
+        }
+        // Verificar fecha
+        try {
+            if (fecha !== "") {
+                // Verificar usuario
+                const usuarioC = await VerificarUsuario();
+                if (usuarioC.data.success) {
+                    // cargar datos de salas atendidas por busqueda
+                    const salatendias = await SalaporFechaAtendida(fecha, usuarioC.data.identificador, page);
+                    if (salatendias.data.results.length === 0) {
+                        Swal.fire("No existen peticiones de esa fecha. Ingresa una válida", "", "warning");
+                        resetearBusqueda();
+                        return;
+                    } else {
+                        setSalas(salatendias.data.results);
+                        setNumeropag(Math.ceil(salatendias.data.count / elementosPorPagina));
+                        setEstadoBusqueda(true);
+                    }
+                } else {
+                    navigate('/login');
+                }
+            } else {
+                cargarSalaAtendi();
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                Swal.fire("No existen salas de esa fecha. Ingresa una válida", "", "warning");
+            }
+        }
+    }
+
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (!estadoBusqueda) {
+            cargarSalaAtendi();
+        } else {
+            buscarSalasFechaAtendidas();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (!estadoBusqueda) {
+                cargarSalaAtendi();
+            } else {
+                buscarSalasFechaAtendidas();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+
+    }, [estadoBusqueda, page]);
 
     return (
         <div>
@@ -1254,12 +1743,12 @@ export function SalaListaAtendidas({ usuario }) {
                     <p className="mb-0">{error}</p>
                 </div>
             }
-            <div className="mt-4 container" style={{ height: '50px', borderRadius: '10px' }}>
+            <div className="mt-4 container alineacion-triple" style={{ height: '50px', borderRadius: '10px' }}>
                 <div className="d-flex flex-row justify-content-left w-100" style={{ alignItems: 'center', marginLeft: '1px' }}>
                     <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar</a>
                     <form className="d-flex flex-row justify-content-between w-50">
                         <input className="form-control mr-sm-2 w-100" type="search" name="nombre" id="nombre"
-                            placeholder="Nombre de sala.." aria-label="Search" value={nombrebuscar}
+                            placeholder="Nombre de sala.. Ejm: Sala 1" aria-label="Search" value={nombrebuscar}
                             onChange={e => setNombreBuscar(e.target.value)} disabled={isTamanio} />
                         <>
                             {
@@ -1268,11 +1757,38 @@ export function SalaListaAtendidas({ usuario }) {
                                         X
                                     </Button>
                                     : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaDeSala} disabled={isTamanio}>
-                                        Ir
+                                        Buscar
                                     </Button>
                             }
                         </>
                     </form>
+                </div>
+                <div className="alineacion-lista-busqueda" style={{ marginTop: '5%' }}>
+                    <div className="col-md-12">
+                        <form>
+                            <div className="row form-group">
+                                <div className="col-2 d-flex justify-content-center mt-2">
+                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                </div>
+                                <div className="col-9 d-flex flex-row">
+                                    <input type="date" className="form-control" id="fecha"
+                                        value={fecha} onChange={(e) => setFecha(e.target.value)} />
+                                    <>
+                                        {
+                                            estadoBusqueda
+                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                    X
+                                                </Button>
+                                                : <Button variant="success" className="my-2 my-sm-0" onClick={buscarSalasFechaAtendidas} disabled={isTamanio}>
+                                                    Buscar
+                                                </Button>
+                                        }
+                                    </>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
             {/* Table */}
@@ -1299,6 +1815,11 @@ export function ReporteLista({ usuario }) {
     const [isTamanio, setIstamanio] = useState(false);
     const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
     const [entradaValida, setEntradavaldia] = useState(true);
+    // Filtro de fecha
+    const [fecha, setFecha] = useState("");
+    const [limite, setLimite] = useState("");
+    const [estadoBusqueda, setEstadoBusqueda] = useState(false);
+    const [estadoBusquedaSel, setEstadoBusquedaSel] = useState(false);
 
     // Obtener resultados
     const cargarReporte = async () => {
@@ -1378,8 +1899,8 @@ export function ReporteLista({ usuario }) {
         try {
             const datos_obtenidos_repor = await ReportesPaciente(nombrebuscar, page);
             if (datos_obtenidos_repor.data.results.length === 0) {
-                setNumeropag(1);
                 Swal.fire("No existen reportes con ese nombre de paciente. Ingresa un nombre válido", "", "warning");
+                resetearBusqueda();
                 return;
             } else {
                 setReportes(datos_obtenidos_repor.data.results);
@@ -1399,6 +1920,10 @@ export function ReporteLista({ usuario }) {
     const resetearBusqueda = () => {
         setMostrarBusqueda(false);
         setNombreBuscar("");
+        setEstadoBusqueda(false);
+        setFecha("");
+        setEstadoBusquedaSel(false);
+        setLimite("");
     }
 
     // Funcion para validar la entreada
@@ -1419,6 +1944,145 @@ export function ReporteLista({ usuario }) {
         return generar.test(value);
     };
 
+    // Metodo de busqueda
+    const buscarReportesFecha = async () => {
+        // Verificar campos vacíos
+        if (isEmptyField(fecha)) {
+            Swal.fire("Por favor ingrese el campo de fecha", "", "warning");
+            return;
+        }
+        // Verificar fecha
+        try {
+            if (fecha !== "") {
+                // Verificar usuario
+                const usuarioC = await VerificarUsuario();
+                if (usuarioC.data.success) {
+                    // Verificar tipo de usuario
+                    if (usuarioC.data.tipo === "tecnico") {
+                        const reporteTecnico = await ReporteporFechaTecnico(fecha, page);
+                        if (reporteTecnico.data.results.length === 0) {
+                            Swal.fire("No existen reportes de esa fecha. Ingresa una válida", "", "warning");
+                            resetearBusqueda();
+                            return;
+                        } else {
+                            setReportes(reporteTecnico.data.results);
+                            setNumeropag(Math.ceil(reporteTecnico.data.count / elementosPorPagina));
+                            setEstadoBusqueda(true);
+                        }
+                    } else {
+                        // cargar datos de cursos
+                        const reporte = await ReporteporFecha(fecha, page);
+                        if (reporte.data.results.length === 0) {
+                            Swal.fire("No existen reportes de esa fecha. Ingresa una válida", "", "warning");
+                            resetearBusqueda();
+                            return;
+                        } else {
+                            setReportes(reporte.data.results);
+                            setNumeropag(Math.ceil(reporte.data.count / elementosPorPagina));
+                            setEstadoBusqueda(true);
+                        }
+                    }
+                } else {
+                    navigate('/login');
+                }
+            } else {
+                cargarReporte();
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                Swal.fire("No existen reportes de esa fecha. Ingresa una válida", "", "warning");
+            }
+        }
+    }
+
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (!estadoBusqueda) {
+            cargarReporte();
+        } else {
+            buscarReportesFecha();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (!estadoBusqueda) {
+                cargarReporte();
+            } else {
+                buscarReportesFecha();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+
+    }, [estadoBusqueda, page]);
+
+    // Metodo de busqueda
+    const buscarReporteRango = async () => {
+        // Verificar fecha
+        try {
+            if (limite !== "") {
+                // Verificar usuario
+                const usuarioC = await VerificarUsuario();
+                if (usuarioC.data.success) {
+                    // Verificar tipo de usuario
+                    if (usuarioC.data.tipo === "tecnico") {
+                        const reporTecnicoRango = await ReporteporRangoTecnico(limite, page);
+                        if (reporTecnicoRango.data.results.length === 0) {
+                            Swal.fire("No existen reportes de ese rango de días. Escoja otro", "", "warning");
+                            resetearBusqueda();
+                            return;
+                        } else {
+                            setReportes(reporTecnicoRango.data.results);
+                            setNumeropag(Math.ceil(reporTecnicoRango.data.count / elementosPorPagina));
+                            setEstadoBusquedaSel(true);
+                        }
+                    } else {
+                        // cargar datos de cursos
+                        const reporteRango = await ReporteporRango(limite, page);
+                        if (reporteRango.data.results.length === 0) {
+                            Swal.fire("No existen reportes de ese rango de días. Escoja otro", "", "warning");
+                            resetearBusqueda();
+                            return;
+                        } else {
+                            setReportes(reporteRango.data.results);
+                            setNumeropag(Math.ceil(reporteRango.data.count / elementosPorPagina));
+                            setEstadoBusquedaSel(true);
+                        }
+                    }
+                } else {
+                    navigate('/login');
+                }
+            } else {
+                cargarReporte();
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                Swal.fire("No existen reportes en el rango especificadooo. Ingresa una válida", "", "warning");
+            }
+        }
+    }
+
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (limite === "0") {
+            cargarReporte();
+        } else {
+            buscarReporteRango();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (limite === "0") {
+                cargarReporte();
+            } else {
+                buscarReporteRango();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+
+    }, [limite, page]);
+
     return (
         <div>
             <div className="cabeza__Nivel">
@@ -1438,25 +2102,93 @@ export function ReporteLista({ usuario }) {
                     <p className="mb-0">{error}</p>
                 </div>
             }
-            <div className="mt-4 container" style={{ height: '50px', borderRadius: '10px' }}>
-                <div className="d-flex flex-row justify-content-left w-100" style={{ alignItems: 'center', marginLeft: '1px' }}>
-                    <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar</a>
-                    <form className="d-flex flex-row justify-content-between w-50">
-                        <input className="form-control mr-sm-2 w-100" type="search" name="nombre" id="nombre"
-                            placeholder="Nombre del paciente.." aria-label="Search" value={nombrebuscar}
-                            onChange={cambioEntrada} disabled={isTamanio} />
-                        <>
-                            {
-                                mostrarBusqueda
-                                    ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
-                                        X
-                                    </Button>
-                                    : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaReporte} disabled={isTamanio}>
-                                        Ir
-                                    </Button>
-                            }
-                        </>
-                    </form>
+            <div className="mt-5 container alineacion-3" style={{ height: '50px', borderRadius: '10px' }}>
+                <div className="alineacion-lista-busqueda">
+                    <div className="col-md-12">
+                        <form>
+                            <div className="row form-group">
+                                <div className="col-2 d-flex justify-content-center mt-2">
+                                    <label htmlFor="nombre" style={{ fontFamily: 'Pacifico' }}
+                                    >Nombre</label>
+                                </div>
+                                <div className="col-9 d-flex flex-row">
+                                    <input type="text" className="form-control" id="nombre"
+                                        value={nombrebuscar} onChange={cambioEntrada} placeholder="Ingrese el nombre.." />
+                                    <>
+                                        {
+                                            mostrarBusqueda
+                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                    X
+                                                </Button>
+                                                : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaReporte} disabled={isTamanio}>
+                                                    Buscar
+                                                </Button>
+                                        }
+                                    </>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div className="alineacion-lista-busqueda">
+                    <div className="col-md-12">
+                        <form>
+                            <div className="row form-group">
+                                <div className="col-2 d-flex justify-content-center mt-2">
+                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                </div>
+                                <div className="col-9 d-flex flex-row">
+                                    <input type="date" className="form-control" id="fecha"
+                                        value={fecha} onChange={(e) => setFecha(e.target.value)} />
+                                    <>
+                                        {
+                                            estadoBusqueda
+                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                    X
+                                                </Button>
+                                                : <Button variant="success" className="my-2 my-sm-0" onClick={buscarReportesFecha} disabled={isTamanio}>
+                                                    Buscar
+                                                </Button>
+                                        }
+                                    </>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div className="alineacion-lista-busqueda">
+                    <div className="col-md-12">
+                        <form>
+                            <div className="row form-group">
+                                <div className="col-2 d-flex justify-content-center mt-2">
+                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Rango</label>
+                                </div>
+                                <div className="col-9 d-flex flex-row">
+                                    <select name="fecha" id="fecha"
+                                        value={limite} onChange={(e) => setLimite(e.target.value)} className="form-control"
+                                    >
+                                        <option value="0">Ninguno</option>
+                                        <option value="7">Últimos 7 días</option>
+                                        <option value="15">Últimos 15 días</option>
+                                        <option value="30">Últimos 30 días</option>
+                                        <option value="60">Últimos 60 días</option>
+                                    </select>
+                                    <>
+                                        {
+                                            estadoBusquedaSel
+                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                    X
+                                                </Button>
+                                                : <> </>
+                                        }
+                                    </>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
             {/* Table */}

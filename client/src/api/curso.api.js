@@ -225,3 +225,39 @@ export const BusquedaCurso = (nombre, page = 1) => {
         throw new Error("No se puede acceder a las salas: " + error.message);
     }
 };
+
+// Buscar cursos por fecha para usuario comun
+export const CursoporFecha = async (fecha, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/curso/fecha/${fecha}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a los cursos: " + error.message);
+    }
+};
+
+// Buscar cursos por fecha para usuario comun
+export const CursoporFechaTecnico = async (fecha, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/lista/curso/fecha/tecnico/${fecha}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a los cursos: " + error.message);
+    }
+};

@@ -36,7 +36,7 @@ export function ListadodePacientes({ pacientes, page, setPage, numeroPag }) {
                                 <thead>
                                     <tr>
 
-                                        <th>Nombre</th>
+                                        <th>Estudiante</th>
                                         <th>Contacto</th>
                                         <th>Email</th>
                                         <th>Emergencia</th>
