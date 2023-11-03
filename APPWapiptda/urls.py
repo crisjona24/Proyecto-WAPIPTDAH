@@ -31,6 +31,7 @@ urlpatterns = [
     path('aplicacion/', include(router.urls)),
     # Token
     path('verificar/cuenta/', verificar_email_firmado, name='verificar-cuenta'),
+    
     ### LISTADOS PERSONALIZADOS ###
     path('contenidos/<str:slug>/', ContenidoListView.as_view(), name='contenidos-list'),
     path('contenidos/individuales/<str:slug>/', ContenidoIndividualListView.as_view(), name='contenidos-individuales-list'),
@@ -71,12 +72,12 @@ urlpatterns = [
     path('lista/salas/atendidas/<int:id>/', SalasAtendidasListView.as_view(), name='sala-list-atendidas'),
     path('lista/salas/paciente/<int:id>/', SalasPacienteListView.as_view(), name='sala-list-paciente'),
     path('busqueda/salas/<str:nombre>/', BusquedaSalasListView.as_view(), name='salas-busqueda'),
-    ########## LISTA DE CURSOS
+    ########### LISTA DE CURSOS
     path('lista/cursos/', CursosListView.as_view(), name='cursos-list'),
-    ########## LISTA DE RESULTADO
+    ########### LISTA DE RESULTADO
     path('lista/resultado/usuario/<int:id>/', ResultadoListaUsuario.as_view(), name='resultado-list-usuario'),
     path('lista/reporte/usuario/<int:id>/', ListaReporteUsuarioComun.as_view(), name='reporte-list'),
-    ########## LISTA Y BUSQUEDA DE REGISTROS
+    ########### LISTA Y BUSQUEDA DE REGISTROS
     path('busqueda/paciente/curso/<str:nombre>/<str:slug>/', BusquedaPacienteCursoListView.as_view(), name='paciente-curso-busqueda'),
     path('busqueda/contenido/<str:nombre>/<str:slug>/', BusquedaContenidoListView.as_view(), name='contenido-busqueda'),
     path('busqueda/curso/<str:nombre>/', BusquedaCursoListView.as_view(), name='curso-busqueda'),
@@ -84,23 +85,37 @@ urlpatterns = [
 
     ### REGISTRO ###
     path('registro_usuario/', api_user_register, name='api_user_register'),
+    ############ Registro de estudiantes
     path('registro_paciente/', api_paciente_register, name='api_paciente_register'),
+    ############ Registro de usuario comun
     path('registro_comun/', api_comun_register, name='api_comun_register'),
+    ############ Registro de contenido
     path('registro_contenido/', api_contenido_register, name='api_contenido_register'),
+    ############ Registro de nivel
     path('registro_nivel/', api_nivel_register, name='api_nivel_register'),
+    ############ Registro de dominio
     path('registro_dominio/', api_dominio_register, name='api_dominio_register'),
+    ############ Registro de actividades
     path('registro_contenido_individual/', api_contenido_individual_register, name='registro_individual'),
+    ############ Registro de curso
     path('registro_curso/', api_curso_register, name='curso-registro'),
     path('registro/curso/<int:id>/', api_curso_inscripcion, name='inscripcion-registro'),
+    ############ Registro de petición
     path('registro_peticion/', api_peticion_register, name='peticion-registro'),
+    ############ Registro de resultado
     path('registro_resultado/', save_resultado, name='registro-resultado'),
+    ############ Registro & Edicion de sala
     path('registro_sala/', api_sala_register, name='registro-sala'),
     path('edicion_sala/', api_sala_edicion, name='edicion-sala'),
-    path('contacto/', api_enviar_contacto, name='enviar-contacto'),
+    ############ Registro de reporte
     path('registro/reporte/<int:id>/', generar_reporte_resultado, name='registro-reporte'),
     path('generar/reporte/all/', generar_reporte_all, name='registro-reporte-all'),
+    ############ Envio de correo de contacto
+    path('contacto/', api_enviar_contacto, name='enviar-contacto'),
+
     ### OBTENER DATOS ###
     path('datos/usuario/', datos_usuario, name='datos_usuario'),
+    ########### Verificaciones
     path('verificar/usuario/', verificar_usuario, name='verificar_usuario'),
     path('verificar/nivel/<str:slug>/', verificar_nivel, name='verificar_nivel'),
     path('verificar/dominio/<str:slug>/', verificar_dominio, name='verificar_dominio'),
@@ -111,9 +126,11 @@ urlpatterns = [
     path('verificar/sala/<str:slug>/', verificar_sala, name='verificar-sala'),
     path('verificar/reporte/<str:slug>/', verificar_reporte, name='verificar-reporte'),
     path('verificar/contenido/individual/<str:slug>/', verificar_contenido_individual, name='verificar_contenido_individual'),
+    ########### Cargado de contenido
     path('cargar_contenido_individual/<str:slug>/', contenido_individual, name='cargar_individual'),
     path('cargar_contenido_principal/<str:slug>/', contenido_principal, name='cargar_principal'),
     path('codigo/contenido/<int:codigo>/', obtener_contenido_individual, name='obtener-contenido-individual'),
+    ########### Obtención de slug
     path('obtener/curso/<int:id>/', obtener_slug_curso, name='obtener-slug-curso'),
     path('obtener/dominio/<str:slug>/', obtener_slug_dominio, name='obtener-slug-dominio'),
     path('obtener/contenido/<str:slug>/', obtener_slug_contenido, name='obtener-slug-contenido'),

@@ -438,7 +438,7 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                             resultados.map((resultado) => (
                                                 <tr key={resultado.id}>
                                                     <td>{resultado.nombre_paciente} {resultado.apellido_paciente}</td>
-                                                    <td>{resultado.tiempo_m} m {resultado.tiempo_s} s</td>
+                                                    <td>{resultado.tiempo_m}m {resultado.tiempo_s}s</td>
                                                     <>
                                                         {
                                                             resultado.observacion === null ?

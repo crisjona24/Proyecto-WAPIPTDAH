@@ -1008,7 +1008,7 @@ export function FormularioEdicionResultado() {
     const token = localStorage.getItem('token');
     const [datosResultado, setDatosResultado] = useState([]);
     const [observacion, setObservacion] = useState("");
-    const [fecha, setFecha] = useState("");
+    //const [fecha, setFecha] = useState("");
     const [error, setError] = useState("");
     const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
@@ -1019,7 +1019,7 @@ export function FormularioEdicionResultado() {
             const datos__resultado = await ResultadoIndividual(id);
             setDatosResultado(datos__resultado.data);
             setObservacion(datos__resultado.data.observacion);
-            setFecha(datos__resultado.data.fecha_registro_resultado);
+            //setFecha(datos__resultado.data.fecha_registro_resultado);
         } catch (error) {
             if (error.message === "NOT_AUTHENTICATED") {
                 navigate('/login');
@@ -1052,7 +1052,7 @@ export function FormularioEdicionResultado() {
             if (token) {
                 // Obtenemos los datos
                 const datos__post = {
-                    observacion, fecha
+                    observacion
                 };
                 // Llamamos a la función de editar nivel
                 await confirmEdicion(datos__post);

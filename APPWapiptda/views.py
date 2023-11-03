@@ -6,8 +6,9 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import viewsets, generics
 from django.contrib.auth import authenticate, login, logout
 import re
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.urls import reverse
+from datetime import datetime
 
 # from django.views.decorators.csrf import csrf_exempt
 import json
@@ -810,6 +811,9 @@ def api_user_register(request):
         return JsonResponse({'error': 'Error al crear el usuario'})
 
 def crear_usuario_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7):
+    # Capturamos el la fecha de registro
+    fecha_registro_usuario_ = datetime.now().date()
+    # Guardamos el registro
     usuario__model = Usuario.objects.create(
         nombre_usuario=ob1,
         apellido_usuario=ob2,
@@ -817,7 +821,8 @@ def crear_usuario_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7):
         username_usuario=ob4,
         fecha_nacimiento=ob5,
         celular=ob6,
-        user=ob7
+        user=ob7,
+        fecha_registro_usuario=fecha_registro_usuario_
     )
     # Añadimos a usuario
     usuario__model.save()
@@ -871,6 +876,9 @@ def api_paciente_register(request):
         return JsonResponse({'error': 'Error al crear el usuario'})
 
 def crear_paciente_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9):
+    # Capturamos el la fecha de registro
+    fecha_registro_usuario_ = datetime.now().date()
+    # Guardamos el registro
     usuario__model = Paciente.objects.create(
         nombre_usuario=ob1,
         apellido_usuario=ob2,
@@ -880,7 +888,8 @@ def crear_paciente_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9):
         contacto_emergencia=ob6,
         fecha_nacimiento=ob7,
         direccion=ob8,
-        user=ob9
+        user=ob9,
+        fecha_registro_usuario=fecha_registro_usuario_
     )
     # Añadimos a usuario
     usuario__model.save()
@@ -934,6 +943,9 @@ def api_comun_register(request):
         return JsonResponse({'error': 'Error al crear el usuario'})
 
 def crear_comun_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9):
+    # Capturamos el la fecha de registro
+    fecha_registro_usuario_ = datetime.now().date()
+    # Gaurdamos el registro
     usuario__model = UsuarioComun.objects.create(
         nombre_usuario=ob1,
         apellido_usuario=ob2,
@@ -943,7 +955,8 @@ def crear_comun_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9):
         fecha_nacimiento=ob6,
         genero=ob7,
         area_estudio=ob8,
-        user=ob9
+        user=ob9,
+        fecha_registro_usuario=fecha_registro_usuario_
     )
     # Añadimos a usuario
     usuario__model.save()
@@ -996,12 +1009,16 @@ def api_nivel_register(request):
 
 def guardar_nivel(ob1, ob2, ob3, ob4, ob5):
     try:
+        # Capturamos la fecha de registro del nivel
+        fecha_registro_grado_ = datetime.now().date()
+        # Guardamos el registro
         grado = GradoTDAH.objects.create(
             nombre_nivel=ob1,
             descripcion_grado=ob2,
             numero_categorias=ob3,
             grado_dificultad=ob4,
-            usuario_tecnico=ob5
+            usuario_tecnico=ob5,
+            fecha_registro_grado=fecha_registro_grado_
         )
         # Añadimos a contenido
         grado.save()
@@ -1068,13 +1085,16 @@ def api_dominio_register(request):
         return JsonResponse({'error': 'El usuario no esta autenticado'})
 
 def guardar_dominio(ob1, ob2, ob3, ob4, ob5):
-    try: 
+    try:
+        # Capturamos la fecha del registro de dominio
+        fecha_registro_dominio_ = datetime.now().date()
         dominio = Dominio.objects.create(
             nombre=ob1,
             identificador_dominio=ob2,
             descripcion=ob3,
             portada_dominio=ob4,
-            usuario=ob5
+            usuario=ob5,
+            fecha_registro_dominio=fecha_registro_dominio_
             )
         # Añadimos a contenido
         dominio.save()
@@ -1151,12 +1171,16 @@ def api_contenido_register(request):
 
 def guardar_contenido(ob1, ob2, ob3, ob4, ob5):
     try:
+        # Capturamos la fecha de registro del contenido
+        fecha_registro_contenido_ = datetime.now().date()
+        # Guardamos el registro
         contenido = Contenido.objects.create(
             nombre=ob1,
             identificador_contenido=ob2,
             dominio_tipo=ob3,
             portada=ob4,
-            dominio=ob5
+            dominio=ob5,
+            fecha_registro_contenido=fecha_registro_contenido_
         )
         # Añadimos a contenido
         contenido.save()
@@ -1243,6 +1267,8 @@ def api_contenido_individual_register(request):
 
 def guardar_contenido_individual(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8):
     try:
+        # Obtenemos la fecha actual de registro de la actividad
+        fecha_registro_individual_ = datetime.now().date()
         contenido_individual = ContenidoIndividual.objects.create(
             descripcion_individual=ob1,
             identificador_individual=ob2,
@@ -1251,7 +1277,8 @@ def guardar_contenido_individual(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8):
             portada_individual=ob5,
             respuesta=ob6,
             nivel=ob7,
-            contenido=ob8
+            contenido=ob8,
+            fecha_registro_individual=fecha_registro_individual_
         )
         # Añadimos a contenido
         contenido_individual.save()
@@ -1261,6 +1288,8 @@ def guardar_contenido_individual(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8):
 
 def guardar_contenido_individual_2(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, ob10, ob11):
     try:
+        # Obtenemos la fecha actual de registro de la actividad
+        fecha_registro_individual_ = datetime.now().date()
         contenido_individual = ContenidoIndividual.objects.create(
             descripcion_individual=ob1,
             identificador_individual=ob2,
@@ -1272,7 +1301,8 @@ def guardar_contenido_individual_2(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, 
             portada_individual=ob5,
             respuesta=ob6,
             nivel=ob7,
-            contenido=ob8
+            contenido=ob8,
+            fecha_registro_individual=fecha_registro_individual_
         )
         # Añadimos a contenido
         contenido_individual.save()
@@ -1282,6 +1312,8 @@ def guardar_contenido_individual_2(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, 
 
 def guardar_contenido_individual_3(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, ob10, ob11, ob12, ob13):
     try:
+        # Obtenemos la fecha actual de registro de la actividad
+        fecha_registro_individual_ = datetime.now().date()
         contenido_individual = ContenidoIndividual.objects.create(
             descripcion_individual=ob1,
             identificador_individual=ob2,
@@ -1295,7 +1327,8 @@ def guardar_contenido_individual_3(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, 
             portada_individual=ob5,
             respuesta=ob6,
             nivel=ob7,
-            contenido=ob8
+            contenido=ob8,
+            fecha_registro_individual=fecha_registro_individual_
         )
         # Añadimos a contenido
         contenido_individual.save()
@@ -1305,6 +1338,8 @@ def guardar_contenido_individual_3(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, 
 
 def guardar_contenido_individual_4(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9):
     try:
+        # Obtenemos la fecha actual de registro de la actividad
+        fecha_registro_individual_ = datetime.now().date()
         contenido_individual = ContenidoIndividual.objects.create(
             descripcion_individual=ob1,
             identificador_individual=ob2,
@@ -1314,7 +1349,8 @@ def guardar_contenido_individual_4(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9):
             portada_individual=ob5,
             respuesta=ob6,
             nivel=ob7,
-            contenido=ob8
+            contenido=ob8,
+            fecha_registro_individual=fecha_registro_individual_
         )
         # Añadimos a contenido
         contenido_individual.save()
@@ -1437,11 +1473,14 @@ def api_curso_register(request):
 
 def guardar_curso(ob1, ob2, ob3, ob4):
     try:
+        # Obtenemos la fecha actual de registro
+        fecha_registro_curso_ = datetime.now().date()
         curso = Curso.objects.create(
             nombre_curso=ob1,
             descripcion_curso=ob2,
             identificador_curso=ob3,
-            usuario_comun=ob4
+            usuario_comun=ob4,
+            fecha_registro_curso=fecha_registro_curso_
         )
         # Añadimos a contenido
         curso.save()
@@ -1611,6 +1650,9 @@ def save_resultado(request):
                 contenido__ob = ContenidoIndividual.objects.get(slug_contenido_individual=slug__con)
                 # Obtenemos el objeto paciente
                 paciente__ob = Paciente.objects.get(user=user)
+                # Capturamos la fecha actual o del momento de registro
+                # Obtiene la fecha actual sin la hora
+                fecha_registro_resultado_ = datetime.now().date()
                 # Captura de respuesta
                 if tiempo_transcurrido_m == 0 and tiempo_transcurrido_s == 0:
                     tiempo_transcurrido_m_ = 40
@@ -1620,7 +1662,7 @@ def save_resultado(request):
                     # Guardamos el resultado
                     if guardar_resultado_no(
                         tiempo_transcurrido_m_, tiempo_transcurrido_s_, respuesta__contenido_,
-                        observacion, contenido__ob, paciente__ob):
+                        observacion, contenido__ob, paciente__ob, fecha_registro_resultado_):
                         # Enviamos una respuesta al front
                         return JsonResponse({'success': True})
                     else:
@@ -1632,7 +1674,7 @@ def save_resultado(request):
                     if tiempo_transcurrido_m or tiempo_transcurrido_s:
                         # Guardamos el resultado
                         if guardar_resultado(tiempo_transcurrido_m, tiempo_transcurrido_s, 
-                                          respuesta__contenido, contenido__ob, paciente__ob):
+                                          respuesta__contenido, contenido__ob, paciente__ob, fecha_registro_resultado_):
                             # Enviamos una respuesta al front
                             return JsonResponse({'success': True})
                         else:
@@ -1654,21 +1696,22 @@ def save_resultado(request):
         context = {'error': error_message, 'success': False}
         return JsonResponse(context)
 
-def guardar_resultado(ob1, ob2, ob3, ob4, ob5):
+def guardar_resultado(ob1, ob2, ob3, ob4, ob5, ob6):
     try:
         resultado_obj = Resultado.objects.create(
             tiempo_m=ob1,
             tiempo_s=ob2,
             respuesta=ob3,
             contenido_individual=ob4,
-            paciente=ob5
+            paciente=ob5,
+            fecha_registro_resultado=ob6
         )
         resultado_obj.save()
         return True
     except Exception as e:
         return False
 
-def guardar_resultado_no(ob1, ob2, ob3, ob4, ob5, ob6):
+def guardar_resultado_no(ob1, ob2, ob3, ob4, ob5, ob6, ob7):
     try:
         resultado_obj = Resultado.objects.create(
             tiempo_m=ob1,
@@ -1676,7 +1719,8 @@ def guardar_resultado_no(ob1, ob2, ob3, ob4, ob5, ob6):
             respuesta=ob3,
             observacion=ob4,
             contenido_individual=ob5,
-            paciente=ob6
+            paciente=ob6,
+            fecha_registro_resultado=ob7
         )
         resultado_obj.save()
         return True
@@ -1725,11 +1769,14 @@ def api_peticion_register(request):
 
 def guardar_peticion(ob1, ob2, ob3, ob4):
     try:
+        # Capturamos la fecha actual de registro de petición
+        fecha_registro_peticion_ = datetime.now().date()
         peticion = Peticion.objects.create(
             motivo_peticion=ob1,
             tipo_peticion=ob2,
             peticion_cuerpo=ob3,
-            usuario_comun=ob4
+            usuario_comun=ob4,
+            fecha_registro_peticion=fecha_registro_peticion_
         )
         # Añadimos a peticion
         peticion.save()
@@ -2064,11 +2111,15 @@ def api_sala_register(request):
 
 def guardar_sala (ob1, ob2, ob3, ob4, ob5):
     try:
+        # Capturamos la fecha actual de registro
+        fecha_registro_sala_ = datetime.now().date
+        # Guardamos el objeto de sala
         sala_obj = Sala.objects.create(
             nombre_sala=ob1,
             anotaciones=ob2,
             codigo_identificador=ob3,
-            paciente=ob5
+            paciente=ob5,
+            fecha_registro_sala=fecha_registro_sala_,
         )
         sala_obj.save()
         # Creamos el detalle de sala
@@ -2698,6 +2749,8 @@ def guardar_reporte(ob1, ob2):
         paciente_ob = resultado_ob.paciente
         contenido_individual_ob = resultado_ob.contenido_individual
         usuario_comun_ob = UsuarioComun.objects.get(user=ob2)
+        # Capturamos la fecha del momento de registro
+        fecha_registro_reporte_ = datetime.now().date()
         # Creamos el reporte
         reporte_ob = Reporte.objects.create(
             titulo_reporte = "Reporte de Resultado",
@@ -2705,7 +2758,8 @@ def guardar_reporte(ob1, ob2):
             usuario_comun = usuario_comun_ob,
             contenido_individual = contenido_individual_ob,
             paciente = paciente_ob,
-            resultado = resultado_ob
+            resultado = resultado_ob,
+            fecha_registro_reporte = fecha_registro_reporte_
         )
         reporte_ob.save()
         # Modifiamos el estado de reporte del resultado

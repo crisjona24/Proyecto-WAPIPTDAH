@@ -943,7 +943,7 @@ export function Reporte({ datosReporte }) {
                                     <strong style={{ fontSize: '0.8rem' }}>Fecha de finalización</strong>
                                 </span>
                                 <span style={{ fontSize: '0.8rem' }}>
-                                    {datosReporte.fecha_registro_reporte}
+                                    {datosReporte.fecha_edicion_reporte}
                                 </span>
                             </div>
                             <div class="p-2 d-flex flex-column">
