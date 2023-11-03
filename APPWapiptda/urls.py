@@ -98,7 +98,7 @@ urlpatterns = [
     path('edicion_sala/', api_sala_edicion, name='edicion-sala'),
     path('contacto/', api_enviar_contacto, name='enviar-contacto'),
     path('registro/reporte/<int:id>/', generar_reporte_resultado, name='registro-reporte'),
-
+    path('generar/reporte/all/', generar_reporte_all, name='registro-reporte-all'),
     ### OBTENER DATOS ###
     path('datos/usuario/', datos_usuario, name='datos_usuario'),
     path('verificar/usuario/', verificar_usuario, name='verificar_usuario'),

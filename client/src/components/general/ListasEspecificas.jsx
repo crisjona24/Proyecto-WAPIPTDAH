@@ -1,17 +1,16 @@
 // Estilos
 import "../../styles/Lista.css"
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Button, Table } from "react-bootstrap";
+import { Button, Table, Modal } from "react-bootstrap";
 // Componentes
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBackward, faCheckDouble, faPencil, faTrash, faPlusCircle, faEye } from '@fortawesome/free-solid-svg-icons';
 import { Link, useNavigate } from 'react-router-dom';
-//import { useState } from "react";
-import React from 'react';
+import { useState } from "react";
 import Swal from "sweetalert2";
 // Metodos
 import { SalaEliminar, AtenderSala } from "../../api/sala.api"
-import { ReporteEliminar, CrearReporteNuevo, ModificarEstadoResultado } from "../../api/reporte.api"
+import { ReporteEliminar, CrearReporteNuevo, ModificarEstadoResultado, GenerarReporteAll } from "../../api/reporte.api"
 import { ResultadoEliminar } from "../../api/resultado.api"
 
 
@@ -310,6 +309,80 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
         setPage(prevPage => (prevPage < numeroPag ? prevPage + 1 : prevPage));
     };
 
+    // Modal
+    const [habilitado, setHabilitado] = useState(false);
+    const [verModal, setVerModal] = useState(false);
+    const [nombre, setNombre] = useState('');
+    const cerrarModal = () => setVerModal(false);
+    const abrirModal = () => setVerModal(true);
+
+    // Formulario
+    const enviarFormulario = (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (isEmptyField(nombre)) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Flujo normal
+        setHabilitado(true);
+        try {
+            // Obtenemos los datos
+            const datos__post = {
+                nombre
+            };
+            // Guardamos
+            guardar(datos__post);
+        } catch (error) {
+            Swal.fire("Error al generar el reporte", "", "error");
+        }
+        // Cerrar modal
+        setHabilitado(false);
+        cerrarModal();
+    };
+
+    // Funcion para guardar
+    const guardar = async (datos__post) => {
+        // Swall de confirmacion
+        Swal.fire({
+            title: '¿Está seguro que desea generar los reportes de todos los resultados del estudiante?',
+            text: "Generar reportes",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, generar'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await GenerarReporteAll(datos__post);
+                    if (response.data.success) {
+                        Swal.fire("Reportes registrados correctamente", "", "success");
+                        navigate('/reporte/all');
+                    } else {
+                        if (response.data.error) {
+                            Swal.fire(response.data.error, '', 'error')
+                        } else {
+                            Swal.fire('Generación de reporte fallido', '', 'error')
+                        }
+                    }
+                } catch (error) {
+                    Swal.fire("Error al generar el reporte", "", "error");
+                }
+            }
+        })
+    }
+
+    // Control de entrada de datos
+    const isEmptyField = (...fields) => {
+        return fields.some(field => field.trim() === "");
+    }
+
+    // Reseteo
+    const resetear = () => {
+        setNombre('');
+    }
+
     return (
         <div className="cuerpo-tabla-2">
             <div className="row">
@@ -317,6 +390,34 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                     <div className="panel">
                         <div className="panel-heading">
                             <div className="row">
+                                <Modal show={verModal} onHide={cerrarModal}>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>Generación de reporte</Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body>
+                                        <form onSubmit={enviarFormulario}>
+                                            <div className="form-group">
+                                                <label className='label' htmlFor="nombre">Nombre de estudiante:</label>
+                                                <input className='form-control w-100' type="text"
+                                                    placeholder="Ingrese el nombre del estudiante. Ejm: Luis Perez**" id="nombre"
+                                                    value={nombre} onChange={e => setNombre(e.target.value)} />
+                                            </div>
+                                            <Button type="submit" variant="success" disabled={habilitado}>
+                                                {habilitado ? 'Generando...' : 'Generar'}
+                                            </Button>
+                                        </form>
+                                    </Modal.Body>
+                                </Modal>
+                                <div className="col-sm-12 col-xs-12">
+                                    <>
+                                        {
+                                            usuario.tipo === "comun" &&
+                                            <Button className="btn btn-sm btn-primary pull-left" onClick={abrirModal}>
+                                                <FontAwesomeIcon icon={faPlusCircle} title="Agregar sala" /> Generar Reporte
+                                            </Button>
+                                        }
+                                    </>
+                                </div>
                             </div>
                         </div>
                         <div className="panel-body_2_2 table-responsive">
@@ -354,7 +455,7 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                                                 {
                                                                     resultado.estado_reporte === false && usuario.tipo === "comun" &&
                                                                     <Button title="Generar Reporte" variant="success"
-                                                                        className="separacion--boton h" disabled={resultado.observacion === null}
+                                                                        className="separacion--boton h" disabled={resultado.observacion === null || resultado.observacion === "No resuelto"}
                                                                         onClick={() => {
                                                                             Swal.fire({
                                                                                 title: '¿Está seguro que desea generar el reporte?',

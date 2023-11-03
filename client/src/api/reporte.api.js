@@ -80,6 +80,23 @@ export const CrearReporteNuevo = (id) => {
 };
 
 
+export const GenerarReporteAll = (datos__post) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return baseurl.post('wapiptdah/generar/reporte/all/', datos__post,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+    } catch (error) {
+        throw new Error("No se puede crear el reporte: " + error.message);
+    }
+};
+
 // Acceso a datos individuales
 export const ReporteIndividual = (id) => {
     const token = localStorage.getItem('token');
@@ -188,7 +205,7 @@ export const ReportesPaciente = async (nombre, page = 1) => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a las peticiones: " + error.message);
+        throw new Error("No se puede acceder a los reportes: " + error.message);
     }
 };
 

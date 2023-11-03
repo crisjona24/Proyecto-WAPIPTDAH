@@ -225,7 +225,7 @@ export function PeticionLista() {
                                 </div>
                                 <div className="col-9 d-flex flex-row">
                                     <select name="fecha" id="fecha"
-                                        value={limite} onChange={(e) => setLimite(e.target.value)} className="form-control"
+                                        value={limite} onChange={(e) => setLimite(e.target.value)} className="form-select"
                                     >
                                         <option value="0">Ninguno</option>
                                         <option value="7">Últimos 7 días</option>
@@ -470,7 +470,7 @@ export function PeticionListaAtendi() {
                                 </div>
                                 <div className="col-9 d-flex flex-row">
                                     <select name="fecha" id="fecha"
-                                        value={limite} onChange={(e) => setLimite(e.target.value)} className="form-control"
+                                        value={limite} onChange={(e) => setLimite(e.target.value)} className="form-select"
                                     >
                                         <option value="0">Ninguno</option>
                                         <option value="7">Últimos 7 días</option>
@@ -733,7 +733,7 @@ export function PeticionListaUsuario() {
                                 </div>
                                 <div className="col-9 d-flex flex-row">
                                     <select name="fecha" id="fecha"
-                                        value={limite} onChange={(e) => setLimite(e.target.value)} className="form-control"
+                                        value={limite} onChange={(e) => setLimite(e.target.value)} className="form-select"
                                     >
                                         <option value="0">Ninguno</option>
                                         <option value="7">Últimos 7 días</option>

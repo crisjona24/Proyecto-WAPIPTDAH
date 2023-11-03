@@ -858,6 +858,36 @@ export function Reporte({ datosReporte }) {
     // Control de tiempo
     const ctrTiempo = datosReporte.tiempo_m_ * 60 + datosReporte.tiempo_s_;
 
+    // Ordenador tipo de contenido
+    let contenido_tipo = "";
+    // Usamos case para formatear los valores
+    switch (datosReporte.tipo_contenido) {
+        case "selecion_individual":
+            contenido_tipo = " Selección Individual";
+            break;
+        case "verdadero_falso":
+            contenido_tipo = "Verdadero o Falso";
+            break;
+        case "selecion_multiple":
+            contenido_tipo = "Selección Múltiple";
+            break;
+        case "responder_preguntas":
+            contenido_tipo = "Respuesta a preguntas";
+            break;
+        case "seleccionar_imagen":
+            contenido_tipo = "Selección de Imágenes";
+            break;
+        case "cuento":
+            contenido_tipo = "Lectura Comprensiva";
+            break;
+        case "selecion_multiple_img":
+            contenido_tipo = " Selección con Imagen";
+            break;
+        default:
+            contenido_tipo = "No definido";
+            break;
+    }
+    
     return (
         <div>
             <div className="cabeza__Nivel">
@@ -1014,7 +1044,7 @@ export function Reporte({ datosReporte }) {
                                     <Col md={5}>
                                         <Card.Title style={{ fontSize: '1rem' }}>Tipo de contenido:</Card.Title>
                                         <Card.Text className="texto-peticion">
-                                            Tipo {datosReporte.tipo_contenido}
+                                            {contenido_tipo}
                                         </Card.Text>
                                     </Col>
                                 </Row>

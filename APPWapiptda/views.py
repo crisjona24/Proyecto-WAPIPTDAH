@@ -2755,3 +2755,71 @@ def modificar_estado_resultado(ob1):
         return True
     except Exception as e:
         return False
+
+
+## GENERAR REPORTE POR NOMBRE DE PACIENTE ##
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def generar_reporte_all(request):
+    try: 
+        # Decodifica el token
+        token = request.headers.get('Authorization').split(" ")[1]
+        user = get_user_from_token_jwt(token)
+        # Verificar existencia del usuario
+        if user and token:
+            # Verificar que sea usuario comun
+            if (is_comun(user)):
+                if request.method == 'POST':
+                    # Obtener el valor del nombre del paciente
+                    data = json.loads(request.body)
+                    nombre_paciente_ = data.get('nombre')
+                    # Obtener el nombre y apellido del paciente de nombre_paciente
+                    nombres_apellido = nombre_paciente_.split(' ')
+                    nombre = nombres_apellido[0]
+                    apellido = nombres_apellido[1]
+                    # Obtener el paciente
+                    paciente_ob = Paciente.objects.get(nombre_usuario__iexact=nombre, apellido_usuario__iexact=apellido)
+                    # Obtener los resultados del paciente filtrando la observacion en no nulo o la obseravion diga No resuelto
+                    resultados = Resultado.objects.filter(paciente=paciente_ob, observacion__isnull=False, estado_reporte=False).exclude(observacion__iexact="No resuelto")
+                    print("nombre :", nombre)
+                    print("apellido :", apellido)
+                    if (verificar_paciente_curso(nombre, apellido, user)):
+                        # Se crea el reporte por cada resultado
+                        for resultado in resultados:
+                            guardar_reporte(resultado.id, user)
+                        return JsonResponse({'success': True})
+                    else:
+                        error_message = "El estudiante no se encuentra inscrito en un curso o no existe."
+                        context = {'error': error_message}
+                        return JsonResponse(context)
+                else:
+                    return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
+            else:
+                return JsonResponse({'error': 'El usuario no ha autenticado'})
+        else:
+            return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
+    except Exception as e:
+        return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+
+def verificar_paciente_curso(ob1, ob2, ob3):
+    try:
+        # Obtenemos el paciente
+        paciente_ = Paciente.objects.get(nombre_usuario__iexact=ob1, apellido_usuario__iexact=ob2)
+        # Obtenemos el usuario comun asociado
+        usuario_comun_ = UsuarioComun.objects.get(user=ob3)
+        # Obtener los cursos registrados por el usuario
+        cursos = Curso.objects.filter(usuario_comun=usuario_comun_)
+        # Obtener los paciente inscritos en los cursos creados por el usuario comun
+        for curso in cursos:
+            if DetalleInscripcionCurso.objects.filter(curso=curso, paciente=paciente_).exists():
+                return True
+        return False
+    except Paciente.DoesNotExist:
+        return False
+    except UsuarioComun.DoesNotExist:
+        return False
+    except Curso.DoesNotExist:
+        return False
+    except DetalleInscripcionCurso.DoesNotExist:
+        return False

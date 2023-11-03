@@ -189,7 +189,7 @@ export const PacientesResultados = async (nombre, page = 1) => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a las peticiones: " + error.message);
+        throw new Error("No se puede acceder a los resultados: " + error.message);
     }
 };
 
@@ -265,3 +265,4 @@ export const ResultadoporRangoTecnico = async (rango, page = 1) => {
         throw new Error("No se puede acceder a los resultados: " + error.message);
     }
 };
+
