@@ -14,11 +14,11 @@ import {
 // Metodos
 import { LogoutNew } from './Logout'
 import { cambiarColorFondo } from "../../controles/alert_user";
-import { VerificarInscripcion } from "../../api/curso.api"
+import { VerificarInscripcion } from "../../api/curso.api";
 import {
     ContadorPeticiones, ReinicioContador,
     ContadorPeticionesAtendidas, ReinicioContadorAtendidas
-} from "../../api/peticion.api"
+} from "../../api/peticion.api";
 import { ContadorSalas, ReinicioContadorSalas, ContadorSalasAtendida, ReinicioContadorSalasAtendidas } from "../../api/sala.api"
 import Swal from 'sweetalert2';
 
@@ -37,14 +37,11 @@ export function Navbar_T() {
 
     // Use Effect
     const [contador, setContador] = useState(0);
-    const [showModal, setShowModal] = useState(false);
+    const [verModal, setVerModal] = useState(false);
     const token = localStorage.getItem('token');
 
     // Verificar usuario
     const verificacion = async () => {
-        if (!token) {
-            navigate('/login');
-        }
         try {
             const cont = await ContadorPeticiones();
             if (cont.data.contador) {
@@ -63,20 +60,22 @@ export function Navbar_T() {
 
     // Datos
     useEffect(() => {
+        if (!token) {
+            navigate('/login');
+        }
         verificacion();
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
             verificacion();
         }, 300000); // 5 minutos
         return () => clearInterval(interval);
-
     }, []);
 
     // Reseteo de contador
     const reseteo = async () => {
         try {
             if (contador.contador > 0) {
-                setShowModal(true);
+                setVerModal(true);
                 const response = await ReinicioContador();
                 if (response.data.error) {
                     Swal.fire("Error al resetear el contador", "", "warning");
@@ -88,13 +87,13 @@ export function Navbar_T() {
     };
 
     // Modal
-    const handleCloseModal = () => {
-        setShowModal(false);
+    const cerrarModal = () => {
+        setVerModal(false);
     };
 
     // funcion de cierre
-    const handleButtonClick = () => {
-        handleCloseModal();
+    const botonCerrar = () => {
+        cerrarModal();
         setContador(0);
     }
 
@@ -174,15 +173,15 @@ export function Navbar_T() {
                         </Button>
                         {
                             contador.contador > 0 &&
-                            <Modal show={showModal} onHide={handleCloseModal}>
+                            <Modal show={verModal} onHide={cerrarModal}>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Notificación</Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    Tiene peticiones nuevas, acceda al listado de peticiones pendientes.
+                                    Tiene {contador.contador} peticiones nuevas, acceda al listado de peticiones pendientes.
                                 </Modal.Body>
                                 <Modal.Footer>
-                                    <Button variant="secondary" onClick={handleButtonClick}>
+                                    <Button variant="secondary" onClick={botonCerrar}>
                                         Entendido
                                     </Button>
                                 </Modal.Footer>
@@ -222,7 +221,6 @@ export function Navbar_C() {
     const navigate = useNavigate();
 
     // Menu
-    const token = localStorage.getItem('token');
     const [expandedMenu, setExpandedMenu] = useState(null);
     const toggleMenu = (menuName) => {
         if (expandedMenu === menuName) {
@@ -234,20 +232,21 @@ export function Navbar_C() {
 
     // Use Effect
     const [contadorAtendidas, setContador] = useState(0);
-    const [showModal, setShowModal] = useState(false);
+    const [verModal, setVermodal] = useState(false);
     const [contadorSaAtendidas, setContadorSaAtendidas] = useState(0);
+    const [verModal2, setVerModal2] = useState(false);
+    const [activo1, setActivo1] = useState(false);
+    const [activo2, setActivo2] = useState(false);
 
-    // Veiiricacion de contador
+    // Verificacion de contador para peticiones atendidas
     const verificacionAtendidas = async () => {
-        if (!token) {
-            navigate('/login');
-        }
         // Flujo normal
         try {
             const cont = await ContadorPeticionesAtendidas();
             setContador(cont.data);
-            const contSa = await ContadorSalasAtendida();
-            setContadorSaAtendidas(contSa.data);
+            if (cont.data.contador > 0) {
+                setActivo1(true);
+            }
         } catch (error) {
             if (error.message === "NOT_AUTHENTICATED") {
                 navigate('/login');
@@ -255,7 +254,23 @@ export function Navbar_C() {
         }
     }
 
-    // Datos
+    // Verificacion de contador para salas atendidas
+    const verificacionSalasAtendidas = async () => {
+        // Flujo normal
+        try {
+            const contSa = await ContadorSalasAtendida();
+            setContadorSaAtendidas(contSa.data);
+            if (contSa.data.contador > 0) {
+                setActivo2(true);
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            }
+        }
+    }
+
+    // Verificacion de peticiones que han sido atendidas atendidas
     useEffect(() => {
         verificacionAtendidas();
         //Controla el tiempo de actualizacion de la pagina
@@ -263,35 +278,69 @@ export function Navbar_C() {
             verificacionAtendidas();
         }, 300000); // 5 minutos
         return () => clearInterval(interval);
-
     }, []);
 
-    // Reseteo de contador
-    const reseteo = async () => {
+    // Verificacion de salas que han sido atendidas 
+    useEffect(() => {
+        if (!activo1) {
+            verificacionSalasAtendidas();
+            //Controla el tiempo de actualizacion de la pagina
+            const interval = setInterval(() => {
+                verificacionSalasAtendidas();
+                // 6 minutos
+            }, 360000);
+            return () => clearInterval(interval);
+        }
+    }, [activo1]);
+
+    // Reseteo de contador de peticiones atendidas
+    const reseteoSAtendidas = async () => {
         try {
-            if (contadorAtendidas.contador > 0) {
-                setShowModal(true);
-                await ReinicioContadorAtendidas();
-            } else if (contadorSaAtendidas.contador > 0) {
-                setShowModal(true);
+            if (contadorSaAtendidas.contador > 0) {
+                setVerModal2(true);
+                setActivo2(false);
                 await ReinicioContadorSalasAtendidas();
             }
         } catch (error) {
-            Swal.fire("Error al resetear el contador", "", "warning");
+            Swal.fire("Error al resetear el contador salas atendidas", "", "warning");
+        }
+    };
+
+    // Reseteo de contador de peticiones atendidas
+    const reseteoPAtendidas = async () => {
+        try {
+            if (contadorAtendidas.contador > 0) {
+                setVermodal(true);
+                setActivo1(false);
+                await ReinicioContadorAtendidas();
+            }
+        } catch (error) {
+            Swal.fire("Error al resetear el contador de peticiones", "", "warning");
         }
     };
 
     // Modal
-    const handleCloseModal = () => {
-        setShowModal(false);
+    const cerrarModal = () => {
+        setVermodal(false);
     };
 
     // funcion de cierre
-    const handleButtonClick = () => {
-        handleCloseModal();
+    const botonCerrarModal1 = () => {
+        cerrarModal();
         setContador(0);
+    }
+
+    // Modal
+    const cerrarModal2 = () => {
+        setVerModal2(false);
+    };
+
+    // funcion de cierre
+    const botonCerrarModal2 = () => {
+        cerrarModal2();
         setContadorSaAtendidas(0);
     }
+
 
     return (
         <nav id="sidebar__">
@@ -360,24 +409,30 @@ export function Navbar_C() {
                 <li>
                     <>
                         <Button
-                            onClick={reseteo}
-                            className={`w-100 ${contadorAtendidas.contador > 0 ? 'boton-parpadeo' : contadorSaAtendidas.contador > 0 ? 'boton-parpadeo' : ''}`}
+                            onClick={
+                                contadorAtendidas.contador > 0
+                                    ? reseteoPAtendidas
+                                    : contadorSaAtendidas.contador > 0
+                                        ? reseteoSAtendidas
+                                        : () => { } // Esto es para evitar una función vacía
+                            }
+                            className={`w-100 ${contadorAtendidas.contador > 0 || contadorSaAtendidas.contador > 0 ? 'boton-parpadeo' : ''}`}
                             style={{ textAlign: 'left', background: '#fff', border: '#fff', color: '#333' }}
                         >
                             <FontAwesomeIcon icon={faBell} style={{ marginRight: '4%' }} />
-                            {contadorAtendidas.contador > 0 && contadorAtendidas.contador} Notificaciones
+                            {contadorAtendidas.contador > 0 || contadorSaAtendidas.contador > 0} Notificaciones
                         </Button>
                         {
                             contadorAtendidas.contador > 0 &&
-                            <Modal show={showModal} onHide={handleCloseModal}>
+                            <Modal show={verModal} onHide={cerrarModal}>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Notificación</Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    Tiene peticiones atendidas, acceda a su listado de peticiones.
+                                    Tiene {contadorAtendidas.contador} peticiones atendidas, acceda a su listado de peticiones.
                                 </Modal.Body>
                                 <Modal.Footer>
-                                    <Button variant="secondary" onClick={handleButtonClick} >
+                                    <Button variant="secondary" onClick={botonCerrarModal1} >
                                         Entendido
                                     </Button>
                                 </Modal.Footer>
@@ -385,7 +440,7 @@ export function Navbar_C() {
                         }
                         {
                             contadorSaAtendidas.contador > 0 &&
-                            <Modal show={showModal} onHide={handleCloseModal}>
+                            <Modal show={verModal2} onHide={cerrarModal2}>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Notificación</Modal.Title>
                                 </Modal.Header>
@@ -393,7 +448,7 @@ export function Navbar_C() {
                                     Una o varia de las salas creadas ha sido atendida, acceda a su listado de salas.
                                 </Modal.Body>
                                 <Modal.Footer>
-                                    <Button variant="secondary" onClick={handleButtonClick} >
+                                    <Button variant="secondary" onClick={botonCerrarModal2} >
                                         Entendido
                                     </Button>
                                 </Modal.Footer>
@@ -444,20 +499,15 @@ export function Navbar_Paci() {
 
     // Contador
     const [contador, setContador] = useState(0);
-    const [showModal, setShowModal] = useState(false);
+    const [verModal, setVerModal] = useState(false);
 
+    // Verificar inscripcion de estudiante en curso 
     const verificar = async () => {
-        if (!token) {
-            navigate('/login');
-        }
         try {
             // Verificar si esta inscrito
             const cont = await VerificarInscripcion();
             if (cont.data.success) {
                 setVerificacion(cont.data);
-                // Contador de salas
-                const contSalas = await ContadorSalas();
-                setContador(contSalas.data);
             } else {
                 if (cont.data.error) {
                     Swal.fire(cont.data.error, "", "error")
@@ -476,16 +526,44 @@ export function Navbar_Paci() {
         }
     }
 
-    // Datos
+    // Verifiar contador de salas nuevas para estudiante
+    const verificar_contador = async () => {
+        try {
+            // Contador de salas
+            const contSalas = await ContadorSalas();
+            setContador(contSalas.data);
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            }
+        }
+    }
+
+    // Datos de inscripcion: Verificacion
     useEffect(() => {
+        if (!token) {
+            navigate('/login');
+        }
         verificar();
     }, []);
+
+    // Verificacion de contador de salas
+    useEffect(() => {
+        if (verificacion.inscrito === "1") {
+            verificar_contador();
+            //Controla el tiempo de actualizacion de la pagina
+            const interval = setInterval(() => {
+                verificar_contador();
+            }, 300000); // 5 minutos
+            return () => clearInterval(interval);
+        }
+    }, [verificacion]);
 
     // Reseteo de contador
     const reseteo = async () => {
         try {
             if (contador.contador > 0) {
-                setShowModal(true);
+                setVerModal(true);
                 await ReinicioContadorSalas();
             }
         } catch (err) {
@@ -494,13 +572,13 @@ export function Navbar_Paci() {
     };
 
     // Modal
-    const handleCloseModal = () => {
-        setShowModal(false);
+    const cerrarModal = () => {
+        setVerModal(false);
     };
 
     // funcion de cierre
-    const handleButtonClick = () => {
-        handleCloseModal();
+    const bontonCerrar = () => {
+        cerrarModal();
         setContador(0);
     }
 
@@ -573,15 +651,15 @@ export function Navbar_Paci() {
                         </Button>
                         {
                             contador.contador > 0 &&
-                            <Modal show={showModal} onHide={handleCloseModal}>
+                            <Modal show={verModal} onHide={cerrarModal}>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Notificación</Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
-                                    Tiene salas nuevas, acceda al listado de salas.
+                                    Tiene un total de {contador.contador} salas nuevas, acceda al listado de salas.
                                 </Modal.Body>
                                 <Modal.Footer>
-                                    <Button variant="secondary" onClick={handleButtonClick}>
+                                    <Button variant="secondary" onClick={bontonCerrar}>
                                         Entendido
                                     </Button>
                                 </Modal.Footer>

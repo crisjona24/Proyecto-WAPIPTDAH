@@ -6,7 +6,7 @@ import { Card, Col, Row, Image, Button } from 'react-bootstrap';
 // Componentes
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faPencil, faBackward, faCheckCircle, faCheckDouble } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faPencil, faBackward, faCheckCircle, faCheckDouble, faExchange } from '@fortawesome/free-solid-svg-icons';
 import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
 // Metodos
@@ -14,7 +14,7 @@ import { DominioEliminar } from '../../../api/dominio.api';
 import { ContenidoEliminar } from '../../../api/contenido.api';
 import { IndividualEliminar, ObtenerSlugDominio, ObtenerSlugContenido } from '../../../api/contenidoindividual.api';
 import { VerificarUsuario } from "../../../api/usuario.api";
-//import { AtenderPeticion } from "../../../api/peticion.api"
+import { RevisorPeticion } from "../../../api/peticion.api"
 import { ObtenerSlugCurso } from "../../../api/curso.api"
 import { ReporteEliminar, ModificarEstadoResultado, CrearReporteNuevo } from "../../../api/reporte.api"
 
@@ -55,24 +55,30 @@ export function Dominio({ datos }) {
                     </div>
                 </div>
             </div>
-            <div className="mt-5 align-items-center" style={{ height: '100vh', marginLeft: '20%' }}>
+            <div className="mt-5 align-items-center" style={{ height: '100vh', marginLeft: '22%' }}>
                 <Card className="mb-3" style={{ maxWidth: '75%' }}>
                     <Row>
                         <Col md={4}>
                             <Image
-                                className="img-fluid"
-                                style={{ borderRadius: '10px', height: '75%', marginTop: '20%' }}
+                                className="img-fluid img-ref-tarjeta"
                                 src="/img/tarjeta-datos.png"
                                 alt="Sample"
                                 fluid
                             />
+                            <hr />
+                            <Row className="mb-3">
+                                <Card.Title style={{ fontSize: '0.8rem' }}>Fecha de registro</Card.Title>
+                                <Card.Text style={{ color: '#333', fontFamily: 'Roboto', fontSize: '0.8rem' }}>
+                                    {datos.fecha_registro_dominio}
+                                </Card.Text>
+                            </Row>
                         </Col>
                         <Col md={8}>
                             <Card.Body>
                                 <Card.Title className="titulo-peticion mb-3">Dominio</Card.Title>
                                 <Row className="mb-3" >
                                     <Col md={6}>
-                                        <Card.Title style={{ fontSize: '1rem' }}>Nombre:</Card.Title>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Nombre</Card.Title>
                                         <Card.Text className="texto-peticion">
                                             {datos.nombre}
                                         </Card.Text>
@@ -86,10 +92,20 @@ export function Dominio({ datos }) {
                                 </Row>
                                 <hr />
                                 <Row className="mb-3">
-                                    <Card.Title style={{ fontSize: '1rem' }}>Descripción:</Card.Title>
+                                    <Card.Title style={{ fontSize: '1rem' }}>Descripción</Card.Title>
                                     <Card.Text className="texto-peticion">
                                         {datos.descripcion}
                                     </Card.Text>
+                                </Row>
+                                <hr />
+                                <Row className="mb-3">
+                                    <Card.Title style={{ fontSize: '1rem' }}>Imagen de portada</Card.Title>
+                                    <Image
+                                        className="img-fluid img-tarjeta"
+                                        src={datos.portada_dominio}
+                                        alt="Sample"
+                                        fluid
+                                    />
                                 </Row>
                                 <Card.Text>
                                     <small className="text-muted" style={{ fontFamily: 'Roboto' }}>Acciones</small>
@@ -222,25 +238,31 @@ export function Contenido({ datos, slug }) {
                     <Row >
                         <Col md={4}>
                             <Image
-                                className="img-fluid"
-                                style={{ borderRadius: '10px', height: '75%', marginTop: '20%' }}
+                                className="img-fluid img-ref-tarjeta"
                                 src="/img/tarjeta-datos.png"
                                 alt="Sample"
                                 fluid
                             />
+                            <hr />
+                            <Row className="mb-3">
+                                <Card.Title style={{ fontSize: '0.8rem' }}>Fecha de registro</Card.Title>
+                                <Card.Text style={{ color: '#333', fontFamily: 'Roboto', fontSize: '0.8rem' }}>
+                                    {datos.fecha_registro_contenido}
+                                </Card.Text>
+                            </Row>
                         </Col>
                         <Col md={8}>
                             <Card.Body>
                                 <Card.Title className="titulo-peticion mb-4">Contenido</Card.Title>
                                 <Row className="mb-3">
                                     <Col md={6}>
-                                        <Card.Title style={{ fontSize: '1rem' }}>Nombre :</Card.Title>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Nombre</Card.Title>
                                         <Card.Text className="texto-peticion">
                                             {datos.nombre}
                                         </Card.Text>
                                     </Col>
                                     <Col md={6}>
-                                        <Card.Title style={{ fontSize: '1rem' }}>Tipo de contenido :</Card.Title>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Tipo de contenido</Card.Title>
                                         <Card.Text className="texto-peticion">
                                             {datos.dominio_tipo}
                                         </Card.Text>
@@ -248,10 +270,20 @@ export function Contenido({ datos, slug }) {
                                 </Row>
                                 <hr />
                                 <Row className="mb-3">
-                                    <Card.Title style={{ fontSize: '1rem' }}>Identificador : </Card.Title>
+                                    <Card.Title style={{ fontSize: '1rem' }}>Identificador</Card.Title>
                                     <Card.Text className="texto-peticion">
                                         {datos.identificador_contenido}
                                     </Card.Text>
+                                </Row>
+                                <hr />
+                                <Row className="mb-3">
+                                    <Card.Title style={{ fontSize: '1rem' }}>Imagen de portada</Card.Title>
+                                    <Image
+                                        className="img-fluid img-tarjeta"
+                                        src={datos.portada}
+                                        alt="Sample"
+                                        fluid
+                                    />
                                 </Row>
                                 <Card.Text>
                                     <small className="text-muted" style={{ fontFamily: 'Roboto' }}>Acciones</small>
@@ -416,45 +448,68 @@ export function Individual({ datos, slug }) {
                     <Row >
                         <Col md={4}>
                             <Image
-                                className="img-fluid"
-                                style={{ borderRadius: '10px', height: '60%', marginTop: '50%' }}
+                                className="img-fluid img-ref-tarjeta"
                                 src="/img/tarjeta-datos.png"
                                 alt="Sample"
                                 fluid
                             />
+                            <hr />
+                            <Row className="mb-3">
+                                <Card.Title style={{ fontSize: '0.8rem' }}>Fecha de registro</Card.Title>
+                                <Card.Text style={{ color: '#333', fontFamily: 'Roboto', fontSize: '0.8rem' }}>
+                                    {datos.fecha_registro_individual}
+                                </Card.Text>
+                            </Row>
                         </Col>
                         <Col md={8}>
                             <Card.Body>
                                 <Card.Title className="titulo-peticion mb-3">Actividad</Card.Title>
                                 <Row className="mb-3">
-                                    <Card.Title style={{ fontSize: '1rem' }}>Descripción:</Card.Title>
+                                    <Card.Title style={{ fontSize: '1rem' }}>Descripción</Card.Title>
                                     <Card.Text className="texto-peticion">
                                         {datos.descripcion_individual}
                                     </Card.Text>
                                 </Row>
                                 <hr />
                                 <Row className="mb-3">
-                                    <Card.Title style={{ fontSize: '1rem' }}>Respuesta:</Card.Title>
-                                    <Card.Text className="texto-peticion">
-                                        {datos.respuesta}
-                                    </Card.Text>
+                                    <Col md={6}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Respuesta</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datos.respuesta}
+                                        </Card.Text>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Nivel</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datos.nivel}
+                                        </Card.Text>
+                                    </Col>
                                 </Row>
                                 <hr />
                                 <Row className="mb-3">
                                     <Col md={7}>
-                                        <Card.Title style={{ fontSize: '1rem' }}>Tipo contenido:</Card.Title>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Tipo contenido</Card.Title>
                                         <Card.Text className="texto-peticion">
                                             {tipoContenido}
                                         </Card.Text>
                                     </Col>
                                     <Col md={5}>
-                                        <Card.Title style={{ fontSize: '1rem' }}>Identificador:</Card.Title>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Identificador</Card.Title>
                                         <Card.Text className="texto-peticion">
                                             {datos.identificador_individual}
                                         </Card.Text>
                                     </Col>
                                 </Row>
-
+                                <hr />
+                                <Row className="mb-3">
+                                    <Card.Title style={{ fontSize: '1rem' }}>Imagen de portada</Card.Title>
+                                    <Image
+                                        className="img-fluid img-tarjeta-2"
+                                        src={datos.portada_individual}
+                                        alt="Sample"
+                                        fluid
+                                    />
+                                </Row>
                                 <Card.Text>
                                     <small className="text-muted" style={{ fontFamily: 'Roboto' }}>Acciones</small>
                                     <div className='d-flex justify-content-between align-items-center'>
@@ -519,6 +574,8 @@ export function Peticion({ datos }) {
     const navigate = useNavigate();
     /* *** Control de usuario *** */
     const [tipoUsuario, setTipo] = useState([]);
+    const [revisorN, setRevisorN] = useState("");
+    const [revisorA, setRevisorA] = useState("");
 
     // Obtener tipo de usuario
     const verificacion = async () => {
@@ -532,10 +589,35 @@ export function Peticion({ datos }) {
         }
     }
 
+    // Obtener datos de revisor
+    const obtenerRevisor = async () => {
+        try {
+            // Peticion de revisor
+            let datosRevisor = await RevisorPeticion(datos.id);
+            if (datosRevisor.data.success) {
+                setRevisorN(datosRevisor.data.nombre_u);
+                setRevisorA(datosRevisor.data.apellido_u);
+            } else {
+                if (datosRevisor.data.error) {
+                    Swal.fire(datosRevisor.data.error, "", "warning");
+                }
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            }
+        }
+    }
+
     // Obtener tipo de usuario
     useEffect(() => {
         verificacion();
     }, []);
+
+    // Datos de revisor
+    useEffect(() => {
+        obtenerRevisor();
+    }, [datos.id]);
 
     return (
         <div>
@@ -567,13 +649,13 @@ export function Peticion({ datos }) {
                                 <Card.Title className="titulo-peticion mb-3">Petición</Card.Title>
                                 <Row className="mb-1">
                                     <Col md={8}>
-                                        <Card.Title style={{ fontSize: '1rem' }}>Motivo de petición:</Card.Title>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Motivo de petición</Card.Title>
                                         <Card.Text className="texto-peticion">
                                             {datos.motivo_peticion}
                                         </Card.Text>
                                     </Col>
                                     <Col md={4}>
-                                        <Card.Title style={{ fontSize: '1rem' }} className="text-center">Tipo:</Card.Title>
+                                        <Card.Title style={{ fontSize: '1rem' }} className="text-center">Tipo</Card.Title>
                                         <Card.Text className="texto-peticion-c">
                                             {datos.tipo_peticion}
                                         </Card.Text>
@@ -581,17 +663,51 @@ export function Peticion({ datos }) {
                                 </Row>
                                 <hr />
                                 <Row className="mb-1">
-                                    <Card.Title style={{ fontSize: '1rem' }}>Descripción:</Card.Title>
+                                    <Card.Title style={{ fontSize: '1rem' }}>Descripción</Card.Title>
                                     <Card.Text className="texto-peticion" >
                                         {datos.peticion_cuerpo}
                                     </Card.Text>
                                 </Row>
                                 <hr />
                                 <Row className="mb-1">
-                                    <Card.Title style={{ fontSize: '1rem' }}>Fecha de registro:</Card.Title>
-                                    <Card.Text className="texto-peticion">
-                                        {datos.fecha_registro_peticion}
-                                    </Card.Text>
+                                    <Col md={8}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Fecha de registro</Card.Title>
+                                        <Card.Text className="texto-peticion">
+                                            {datos.fecha_registro_peticion}
+                                        </Card.Text>
+                                    </Col>
+                                    <Col md={4}>
+                                        <Card.Title className="text-center" style={{ fontSize: '1rem' }}>Estado</Card.Title>
+                                        <Card.Text className="texto-peticion text-center">
+                                            {
+                                                datos.estado_revision === false ? (
+                                                    <span className="text-danger">Sin revisar</span>
+                                                ) : (
+                                                    <span className="text-success">Revisada</span>
+                                                )
+                                            }
+                                        </Card.Text>
+                                    </Col>
+                                </Row>
+                                <hr />
+                                <Row className="mb-1">
+                                    {
+                                        tipoUsuario.tipo === "tecnico" ? (
+                                            <>
+                                                <Card.Title style={{ fontSize: '1rem' }}>Registrado por</Card.Title>
+                                                <Card.Text className="texto-peticion" >
+                                                    {datos.nombre_usuario} {datos.apellido_usuario}
+                                                </Card.Text>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Card.Title style={{ fontSize: '1rem' }}>Revisador por</Card.Title>
+                                                <Card.Text className="texto-peticion" >
+                                                    {revisorN} {revisorA}
+                                                </Card.Text>
+                                            </>
+                                        )
+                                    }
                                 </Row>
                                 <Card.Text>
                                     <small className="text-muted" style={{ fontFamily: 'Roboto' }}>Acciones</small>
@@ -619,7 +735,7 @@ export function Peticion({ datos }) {
                                                 tipoUsuario.tipo === "tecnico"
                                                     && datos.estado_revision === false ?
                                                     (
-                                                        <Button title="Marcar revisión" className="btn btn-primary"
+                                                        <Button title="Marcar revisión" className="btn btn-success"
                                                             onClick={() => {
                                                                 Swal.fire({
                                                                     title: '¿Estás seguro de marcar revisión?',
@@ -657,30 +773,35 @@ export function Peticion({ datos }) {
 
 
 // Paciente 
-export function Paciente({ datosPaciente }) {
+export function Paciente({ datosPaciente, fecha }) {
     const [slugCurso, setSlugCurso] = useState("");
 
-    useEffect(() => {
-        async function obtenerSlug() {
-            try {
-                let datosSlug = await ObtenerSlugCurso(datosPaciente.id);
-                if (datosSlug.data.success) {
-                    setSlugCurso(datosSlug.data.slug);
-                } else {
-                    if (datosSlug.data.message === "NOT_AUTHENTICATED") {
-                        navigate('/login');
-                    } else if (datosSlug.data.error) {
-                        Swal.fire(datosSlug.data.error, "", "warning");
-                    } else {
-                        Swal.fire("No se pudo obtener el slug del curso", "", "warning");
-                    }
-                }
-            } catch (error) {
-                if (error.message === "NOT_AUTHENTICATED") {
+    const navigate = useNavigate();
+
+    // Obtener slug del curso
+    const obtenerSlug = async () => {
+        try {
+            let datosSlug = await ObtenerSlugCurso(datosPaciente.id);
+            if (datosSlug.data.success) {
+                setSlugCurso(datosSlug.data.slug);
+            } else {
+                if (datosSlug.data.message === "NOT_AUTHENTICATED") {
                     navigate('/login');
+                } else if (datosSlug.data.error) {
+                    Swal.fire(datosSlug.data.error, "", "warning");
+                } else {
+                    Swal.fire("No se pudo obtener el slug del curso", "", "warning");
                 }
             }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            }
         }
+    }
+
+    // Obtener datos del slug del curso
+    useEffect(() => {
         obtenerSlug();
     }, [datosPaciente.id]);
 
@@ -709,27 +830,34 @@ export function Paciente({ datosPaciente }) {
                                 alt="Sample"
                                 fluid
                             />
+                            <hr />
+                            <Row className="mb-3">
+                                <Card.Title style={{ fontSize: '0.8rem' }}>Fecha de inscripción</Card.Title>
+                                <Card.Text style={{ color: '#333', fontFamily: 'Roboto', fontSize: '0.8rem' }}>
+                                    {fecha}
+                                </Card.Text>
+                            </Row>
                         </Col>
                         <Col md={8}>
                             <Card.Body>
                                 <Card.Title className="titulo-peticion">Datos del estudiante</Card.Title>
                                 <Row className="mb-2">
                                     <Col md={6}>
-                                        <Card.Title style={{ fontSize: '1rem' }}>Nombres :</Card.Title>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Nombre y Apellido</Card.Title>
                                         <Card.Text className="texto-peticion">
                                             {datosPaciente.nombre_usuario} {datosPaciente.apellido_usuario}
                                         </Card.Text>
                                     </Col>
                                     <Col md={6}>
-                                        <Card.Title style={{ fontSize: '1rem' }}>Edad :</Card.Title>
-                                        <Card.Text className="texto-peticion">
+                                        <Card.Title className="text-center" style={{ fontSize: '1rem' }}>Edad</Card.Title>
+                                        <Card.Text className="texto-peticion text-center">
                                             {datosPaciente.edad} años
                                         </Card.Text>
                                     </Col>
                                 </Row>
                                 <hr />
                                 <Row className="mb-2">
-                                    <Card.Title style={{ fontSize: '1rem' }}>Correo Electrónico :</Card.Title>
+                                    <Card.Title style={{ fontSize: '1rem' }}>Correo Electrónico</Card.Title>
                                     <Card.Text className="texto-peticion">
                                         {datosPaciente.email_usuario}
                                     </Card.Text>
@@ -737,13 +865,13 @@ export function Paciente({ datosPaciente }) {
                                 <hr />
                                 <Row className="mb-2" >
                                     <Col md={5}>
-                                        <Card.Title style={{ fontSize: '1rem' }}>Celular :</Card.Title>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Celular</Card.Title>
                                         <Card.Text className="texto-peticion">
                                             {datosPaciente.celular}
                                         </Card.Text>
                                     </Col>
                                     <Col md={7}>
-                                        <Card.Title style={{ fontSize: '1rem' }}>Cto. de Emergencia :</Card.Title>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Número de Emergencia</Card.Title>
                                         <Card.Text className="texto-peticion">
                                             {datosPaciente.contacto_emergencia}
                                         </Card.Text>
@@ -751,7 +879,7 @@ export function Paciente({ datosPaciente }) {
                                 </Row>
                                 <hr />
                                 <Row className="mb-2">
-                                    <Card.Title style={{ fontSize: '1rem' }}>Dirección :</Card.Title>
+                                    <Card.Title style={{ fontSize: '1rem' }}>Dirección</Card.Title>
                                     <Card.Text className="texto-peticion">
                                         {datosPaciente.direccion}
                                     </Card.Text>
@@ -887,7 +1015,7 @@ export function Reporte({ datosReporte }) {
             contenido_tipo = "No definido";
             break;
     }
-    
+
     return (
         <div>
             <div className="cabeza__Nivel">
@@ -1050,14 +1178,21 @@ export function Reporte({ datosReporte }) {
                                 </Row>
                                 <hr />
                                 <Row className="mb-1">
-                                    <Col md={7}>
-                                        <Card.Title style={{ fontSize: '1rem' }}>Observación de actividad realizada:</Card.Title>
+                                    <Card.Title style={{ fontSize: '1rem' }}>Observación de actividad realizada:</Card.Title>
+                                    <Card.Text className="texto-peticion">
+                                        {datosReporte.observacion_}
+                                    </Card.Text>
+                                </Row>
+                                <hr />
+                                <Row className="mb-1">
+                                    <Col md={6}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Respuesta esperada :</Card.Title>
                                         <Card.Text className="texto-peticion">
-                                            {datosReporte.observacion_}
+                                            {datosReporte.respuesta_r}
                                         </Card.Text>
                                     </Col>
-                                    <Col md={5}>
-                                        <Card.Title style={{ fontSize: '1rem' }}>Respuesta ingresada:</Card.Title>
+                                    <Col md={6}>
+                                        <Card.Title style={{ fontSize: '1rem' }}>Respuesta proporcionada :</Card.Title>
                                         <Card.Text className="texto-peticion">
                                             {datosReporte.respuesta}
                                         </Card.Text>

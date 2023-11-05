@@ -39,9 +39,7 @@ export function Peticionall() {
 
     // Verificar usuario
     const verificacion = async () => {
-        if (!token) {
-            navigate('/login');
-        }
+        
         // Flujo normal
         try {
             const cont = await VerificarUsuario();
@@ -60,6 +58,9 @@ export function Peticionall() {
 
     // Verificar usuario
     useEffect(() => {
+        if (!token) {
+            navigate('/login');
+        }
         verificacion();
     }, []);
 
@@ -101,7 +102,7 @@ export function Peticionall() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
@@ -141,9 +142,6 @@ export function PeticionAllAtendida() {
 
     // Verificar usuario
     const verificacion = async () => {
-        if (!token) {
-            navigate('/');
-        }
         // Flujo normal
         try {
             const cont = await VerificarUsuario();
@@ -162,6 +160,9 @@ export function PeticionAllAtendida() {
 
     // Verificar usuario
     useEffect(() => {
+        if (!token) {
+            navigate('/login');
+        }
         verificacion();
     }, []);
 
@@ -203,7 +204,7 @@ export function PeticionAllAtendida() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
@@ -243,9 +244,6 @@ export function PeticionUC() {
 
     // Verificar usuario
     const verificacion = async () => {
-        if (!token) {
-            navigate('/');
-        }
         // Flujo normal
         try {
             const cont = await VerificarUsuario();
@@ -264,6 +262,9 @@ export function PeticionUC() {
 
     // Verificar usuario
     useEffect(() => {
+        if (!token) {
+            navigate('/login');
+        }
         verificacion();
     }, []);
 
@@ -305,7 +306,7 @@ export function PeticionUC() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}

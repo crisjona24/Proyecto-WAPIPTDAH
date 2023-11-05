@@ -288,7 +288,39 @@ export const InscripcionCurso = (id) => {
     }
 };
 
+export const FechaInscripcionCurso = (id) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return baseurl.get(`obtener/fecha/inscripcion/${id}/`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede obtener la fecha de inscripción: " + error.message);
+    }
+};
+
 // Verificacion de cuenta
 export const VerificarCuenta = async (datos__post) => {
     return await baseurl.post('verificar/cuenta/', datos__post);
+};
+
+// Cambiar clave de cuenta
+export const CambiarClaveCuenta = async (datos__post) => {
+    return await baseurl.post('cambiar/clave/', datos__post);
+};
+
+// Cambiar clave de cuenta
+export const EnviarCodigoRecuperacion = async (datos__post) => {
+    return await baseurl.post('verificar/codigo/cuenta/', datos__post);
+};
+
+// Envio de nuevas claves
+export const EnvioNuevaClave = async (datos__post) => {
+    return await baseurl.post('registro/nueva/clave/', datos__post);
 };

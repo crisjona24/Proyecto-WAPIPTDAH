@@ -142,7 +142,7 @@ export function ContenidoIndividual() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}

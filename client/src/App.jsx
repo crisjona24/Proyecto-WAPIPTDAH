@@ -7,7 +7,7 @@ import { IniciarSesion } from "./pages/login/LoginUser";
 import { Perfil_User } from "./pages/general/Perfil"
 
 {/* Registro */ }
-import { UsuarioRegistro, ConfirmacionCuenta } from "./pages/registro/UsuarioRegistro";
+import { UsuarioRegistro, ConfirmacionCuenta, RecuperacionCuenta, CambioClave } from "./pages/registro/UsuarioRegistro";
 import { UsuarioPacienteRegistro } from "./pages/registro/UsuarioPacienteRegistro";
 import { UsuarioComunRegistro } from "./pages/registro/UsuarioComunRegistro";
 import { DominioRegistro } from "./pages/registro/DominioRegistro";
@@ -60,6 +60,8 @@ function App() {
         <Route path="/login" element={<IniciarSesion />} />
         {/* RUTA DE REGISTRO */}
         <Route path="/verificar/cuenta" element={<ConfirmacionCuenta />} />
+        <Route path="/recuperar/cuenta" element={<RecuperacionCuenta />} />
+        <Route path="/cambio/clave/cuenta" element={<CambioClave />} />
         <Route path="/registro" element={<SeleccionActividad />} />
         <Route path="/usuario/paciente/registro" element={<UsuarioPacienteRegistro />} />
         <Route path="/usuario/comun/registro" element={<UsuarioComunRegistro />} />

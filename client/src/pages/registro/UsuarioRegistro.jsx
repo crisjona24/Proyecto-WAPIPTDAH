@@ -10,7 +10,7 @@ import { PieRegister } from '../../components/partes/PieRegister'
 import { Link } from 'react-router-dom';
 // Metodos
 import { FormularioUsuario } from '../../components/registro/Formulario_usuario'
-import { FormularioConfirmacion } from '../../components/registro/Formularios'
+import { FormularioConfirmacion, FormularioRecuperacion, FormularioCambio } from '../../components/registro/Formularios'
 
 export function UsuarioRegistro() {
     // Obtener token
@@ -76,6 +76,68 @@ export function ConfirmacionCuenta() {
                     <h6 className='pl-0 pt-3 pb-3'> Ingrese los datos solicitados</h6>
                     <div className='pb-2'>
                         < FormularioConfirmacion />
+                    </div>
+                </Container>
+            </Container>
+            <PieRegister />
+        </div>
+    )
+}
+
+
+// Formulario de cambio de clave
+export function RecuperacionCuenta() {
+    return (
+        <div className="cuerpo_general">
+            <CabeceraRegister />
+            <Container className="cuerpo_form">
+                <Container className='barraSup mt-5' >
+                    <Row className='col-md-12'>
+                        <div className="card-body col-md-9">
+                            <h4 style={{ padding: '10px' }}> Recuperación de cuenta</h4>
+                        </div>
+                        <div className='card-body col-md-2'>
+                            <Link to={'/login'} className='btn btn-danger mt-2'>
+                                Cancelar
+                            </Link>
+                        </div>
+                    </Row>
+                </Container>
+                <Container className='form container pb-1 borde__CE'>
+                    <h6 className='pl-0 pt-3 pb-3'> Ingrese los datos solicitados</h6>
+                    <div className='pb-2'>
+                        < FormularioRecuperacion />
+                    </div>
+                </Container>
+            </Container>
+            <PieRegister />
+        </div>
+    )
+}
+
+
+// Formulario de cambio completo
+export function CambioClave() {
+    return (
+        <div className="cuerpo_general">
+            <CabeceraRegister />
+            <Container className="cuerpo_form">
+                <Container className='barraSup mt-5' >
+                    <Row className='col-md-12'>
+                        <div className="card-body col-md-9">
+                            <h4 style={{ padding: '10px' }}> Recuperación de cuenta</h4>
+                        </div>
+                        <div className='card-body col-md-2'>
+                            <Link to={'/login'} className='btn btn-danger mt-2'>
+                                Cancelar
+                            </Link>
+                        </div>
+                    </Row>
+                </Container>
+                <Container className='form container pb-1 borde__CE'>
+                    <h6 className='pl-0 pt-3 pb-3'> Ingrese los datos solicitados</h6>
+                    <div className='pb-2'>
+                        < FormularioCambio />
                     </div>
                 </Container>
             </Container>

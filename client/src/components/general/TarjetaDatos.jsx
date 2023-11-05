@@ -12,7 +12,7 @@ import { VerificarContenido, ContenidoIndividual } from "../../api/contenido.api
 import { Contenido } from "./general__tarjeta/TarjetaGeneral";
 import { VerificarContenidoIndividual, ContenidoDatosIndividual } from "../../api/contenidoindividual.api";
 import { Individual, Peticion, Paciente, Aplicacion, Reporte, Resultado } from "./general__tarjeta/TarjetaGeneral";
-import { PacienteIndividual } from "../../api/usuario.api";
+import { PacienteIndividual, FechaInscripcionCurso } from "../../api/usuario.api";
 import { ReporteIndividual } from "../../api/reporte.api";
 import { ResultadoIndividual } from "../../api/resultado.api";
 
@@ -287,6 +287,7 @@ export function TarjetaPaciente() {
     let { id } = useParams();
     /* *** Form **** */
     const [datosPaciente, setDatosP] = useState([]);
+    const [fechaIns, setFechaIns] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
@@ -301,7 +302,31 @@ export function TarjetaPaciente() {
             if (error.message === "NOT_AUTHENTICATED") {
                 navigate('/login');
             } else {
-                mostrarError('Error al mostrar datos de petición');
+                mostrarError('Error al mostrar datos de estudiante');
+            }
+        }
+    }
+
+    // Obtener fecha de inscripcion
+    const obtenerFecha = async () => {
+        try {
+            let fecha = await FechaInscripcionCurso(id);
+            if (fecha.data.success) {
+                setFechaIns(fecha.data.fecha_inscripcion);
+            } else {
+                if (fecha.data.message === "NOT_AUTHENTICATED") {
+                    navigate('/login');
+                } else if (fecha.data.error) {
+                    Swal.fire(fecha.data.error, "", "warning");
+                    navigate('/login');
+                } else {
+                    navigate('/login');
+                }
+            }
+
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
             }
         }
     }
@@ -314,6 +339,15 @@ export function TarjetaPaciente() {
             obtenerDatosPaciente();
         }
     }, [id]);
+
+        // Use effect
+        useEffect(() => {
+            if (!token) {
+                navigate('/login');
+            } else {
+                obtenerFecha();
+            }
+        }, [id]);
 
     // Funcion para mostrar errores
     const mostrarError = (message) => {
@@ -333,7 +367,7 @@ export function TarjetaPaciente() {
                         <span className="mb-0">{error}</span>
                     </div>
                 }
-                <Paciente datosPaciente={datosPaciente} />
+                <Paciente datosPaciente={datosPaciente} fecha={fechaIns}/>
             </>
         </div>
     )

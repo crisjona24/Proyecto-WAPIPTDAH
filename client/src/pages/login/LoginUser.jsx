@@ -117,11 +117,19 @@ export function IniciarSesion() {
                                     </div>
                                     <button type="submit" className='my-success-button'>Iniciar sesión</button>
                                     <Link className="btn btn-primary mt-2 w-100" to='/verificar/cuenta'>Verificar cuenta</Link>
+                                    <li style={{ listStyle: 'none', marginTop: '5%', textAlign: 'right' }} >
+                                        <Link style={{ textDecoration: 'none', color: 'gray' }} to="/recuperar/cuenta">
+                                            <span className="text">
+                                                Recupera tu cuenta
+                                            </span>
+                                        </Link>
+                                    </li>
                                     <div className='login-footer'>
                                         <li style={{ listStyle: 'none', marginTop: '1%' }} >
                                             <Link style={{ textDecoration: 'none' }} to="/registro"><h6>¿No tienes una cuenta?. CLIC AQUÍ..</h6></Link>
                                         </li>
                                     </div>
+
                                     <div className="login-footer">
                                         <h6>Registrate con</h6>
                                         <ul className="social-icons">

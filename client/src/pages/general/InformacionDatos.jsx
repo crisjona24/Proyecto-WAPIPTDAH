@@ -100,7 +100,7 @@ export function InformacionDominio() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
@@ -203,7 +203,7 @@ export function InformacionContenido() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
@@ -305,7 +305,7 @@ export function InformacionIndividual() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
@@ -344,9 +344,6 @@ export function InformacionPaciente() {
 
     // Datos
     const verificacion = async () => {
-        if (!token) {
-            navigate('/');
-        }
         // Flujo normal
         try {
             const cont = await VerificarUsuario();
@@ -366,6 +363,9 @@ export function InformacionPaciente() {
 
     // Cargar datos
     useEffect(() => {
+        if (!token) {
+            navigate('/');
+        }
         verificacion();
     }, []);
 
@@ -407,7 +407,7 @@ export function InformacionPaciente() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
@@ -508,7 +508,7 @@ export function InformacionAPP() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
@@ -610,7 +610,7 @@ export function InformacionReporte() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
@@ -712,7 +712,7 @@ export function InformacionResultado() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}

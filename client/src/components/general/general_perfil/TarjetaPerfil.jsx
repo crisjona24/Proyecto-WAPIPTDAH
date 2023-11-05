@@ -16,7 +16,7 @@ import { UsuarioEliminar } from '../../../api/usuario.api'
 export function Tecnico({ datos }) {
     const navigate = useNavigate();
     return (
-        <div className="mt-5 align-items-center" style={{ height: '100vh', marginLeft: '20%' }}>
+        <div className="align-items-center" style={{ height: '100vh', marginLeft: '20%', marginTop: '10%' }}>
             <Card className="mb-3" style={{ maxWidth: '75%' }}>
                 <Row>
                     <Col md={4}>
@@ -26,21 +26,28 @@ export function Tecnico({ datos }) {
                             src="/img/tarjeta-perfil.png" alt="Sample"
                             fluid
                         />
+                        <hr />
+                        <Row className="mb-3">
+                            <Card.Title style={{ fontSize: '0.8rem' }}>Fecha de unión</Card.Title>
+                            <Card.Text style={{ color: '#333', fontFamily: 'Roboto', fontSize: '0.8rem' }}>
+                                {datos.fecha_union}
+                            </Card.Text>
+                        </Row>
                     </Col>
                     <Col md={8}>
                         <Card.Body>
                             <Card.Title className="titulo-peticion mb-3">Datos de usuario </Card.Title>
                             <Row className="mb-3">
                                 <Col md={6} >
-                                    <Card.Title style={{ fontSize: '1rem' }}>Nombre :</Card.Title>
+                                    <Card.Title style={{ fontSize: '1rem' }}>Nombre y Apellido</Card.Title>
                                     <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
                                         {datos.nombre} {datos.apellido}
                                     </Card.Text>
                                 </Col>
                                 <Col md={6} >
-                                    <Card.Title style={{ fontSize: '1rem' }}>Edad :</Card.Title>
-                                    <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
-                                        {datos.edad}
+                                    <Card.Title className="text-center" style={{ fontSize: '1rem' }}>Edad</Card.Title>
+                                    <Card.Text className="text-center" style={{ color: '#333', fontFamily: 'Roboto' }}>
+                                        {datos.edad} años
                                     </Card.Text>
                                 </Col>
                             </Row>
@@ -53,9 +60,24 @@ export function Tecnico({ datos }) {
                             </Row>
                             <hr />
                             <Row className="mb-3">
-                                <Card.Title style={{ fontSize: '1rem' }}>Username</Card.Title>
+                                <Col md={5} >
+                                    <Card.Title style={{ fontSize: '1rem' }}>Username</Card.Title>
+                                    <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
+                                        {datos.username}
+                                    </Card.Text>
+                                </Col>
+                                <Col md={7} >
+                                    <Card.Title style={{ fontSize: '1rem' }}>Fecha de nacimiento</Card.Title>
+                                    <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
+                                        {datos.fecha_nacimiento}
+                                    </Card.Text>
+                                </Col>
+                            </Row>
+                            <hr />
+                            <Row className="mb-3">
+                                <Card.Title style={{ fontSize: '1rem' }}>Número de contacto</Card.Title>
                                 <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
-                                    {datos.username}
+                                    {datos.celular}
                                 </Card.Text>
                             </Row>
                             <Card.Text>
@@ -102,7 +124,7 @@ export function Tecnico({ datos }) {
 export function Comun({ datos }) {
     const navigate = useNavigate();
     return (
-        <div className="mt-5 align-items-center" style={{ height: '100vh', marginLeft: '20%' }}>
+        <div className="align-items-center" style={{ height: '100vh', marginLeft: '20%', marginTop: '10%' }}>
             <Card className="mb-3" style={{ maxWidth: '75%' }}>
                 <Row >
                     <Col md={4}>
@@ -112,41 +134,48 @@ export function Comun({ datos }) {
                             src="/img/tarjeta-perfil.png" alt="Sample"
                             fluid
                         />
+                        <hr />
+                        <Row className="mb-3">
+                            <Card.Title style={{ fontSize: '0.8rem' }}>Fecha de unión</Card.Title>
+                            <Card.Text style={{ color: '#333', fontFamily: 'Roboto', fontSize: '0.8rem' }}>
+                                {datos.fecha_union}
+                            </Card.Text>
+                        </Row>
                     </Col>
                     <Col md={8}>
                         <Card.Body>
                             <Card.Title className="titulo-peticion mb-3">Datos de usuario </Card.Title>
                             <Row className="mb-3">
-                                <Col md={6} >
-                                    <Card.Title style={{ fontSize: '1rem' }}>Nombre : </Card.Title>
+                                <Col md={7} >
+                                    <Card.Title style={{ fontSize: '1rem' }}>Nombre y Apellido </Card.Title>
                                     <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
                                         {datos.nombre} {datos.apellido}
                                     </Card.Text>
                                 </Col>
-                                <Col md={6} >
-                                    <Card.Title style={{ fontSize: '1rem' }}>Edad :</Card.Title>
-                                    <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
+                                <Col md={5} >
+                                    <Card.Title className="text-center" style={{ fontSize: '1rem' }}>Edad</Card.Title>
+                                    <Card.Text className="text-center" style={{ color: '#333', fontFamily: 'Roboto' }}>
                                         {datos.edad}
                                     </Card.Text>
                                 </Col>
                             </Row>
                             <hr />
                             <Row className="mb-3">
-                                <Card.Title style={{ fontSize: '1rem' }}>Correo electrónico :</Card.Title>
+                                <Card.Title style={{ fontSize: '1rem' }}>Correo electrónico</Card.Title>
                                 <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
                                     {datos.email}
                                 </Card.Text>
                             </Row>
                             <hr />
                             <Row className="mb-3">
-                                <Col md={6} >
-                                    <Card.Title style={{ fontSize: '1rem' }}>Área :</Card.Title>
+                                <Col md={7} >
+                                    <Card.Title style={{ fontSize: '1rem' }}>Área de ocupación</Card.Title>
                                     <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
                                         {datos.area_estudio}
                                     </Card.Text>
                                 </Col>
-                                <Col md={6} >
-                                    <Card.Title style={{ fontSize: '1rem' }}>Género :</Card.Title>
+                                <Col md={5} >
+                                    <Card.Title style={{ fontSize: '1rem' }}>Género</Card.Title>
                                     <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
                                         {datos.genero}
                                     </Card.Text>
@@ -154,19 +183,20 @@ export function Comun({ datos }) {
                             </Row>
                             <hr />
                             <Row className="mb-3">
-                                <Col md={6} >
-                                    <Card.Title style={{ fontSize: '1rem' }}>Celular :</Card.Title>
+                                <Col md={5} >
+                                    <Card.Title style={{ fontSize: '1rem' }}>Celular</Card.Title>
                                     <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
                                         {datos.celular}
                                     </Card.Text>
                                 </Col>
-                                <Col md={6} >
-                                    <Card.Title style={{ fontSize: '1rem' }}>Fecha de nacimiento :</Card.Title>
+                                <Col md={7} >
+                                    <Card.Title style={{ fontSize: '1rem' }}>Fecha de nacimiento</Card.Title>
                                     <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
                                         {datos.fecha_nacimiento}
                                     </Card.Text>
                                 </Col>
                             </Row>
+
                             <Card.Text>
                                 <small className="text-muted" style={{ fontFamily: 'Roboto' }}>Acciones</small>
                                 <div className='d-flex justify-content-between align-items-center'>
@@ -213,8 +243,8 @@ export function Comun({ datos }) {
 export function Paciente({ datos }) {
     const navigate = useNavigate();
     return (
-        <div className="mt-5 align-items-center" style={{ height: '100vh', marginLeft: '20%' }}>
-            <Card className="mb-3" style={{ maxWidth: '75%' }}>
+        <div className="align-items-center" style={{ height: '100vh', marginLeft: '20%', marginTop: '10%' }}>
+            <Card className="mb-1" style={{ maxWidth: '75%' }}>
                 <Row >
                     <Col md={4}>
                         <Image
@@ -223,27 +253,34 @@ export function Paciente({ datos }) {
                             src="/img/tarjeta-perfil.png" alt="Sample"
                             fluid
                         />
+                        <hr />
+                        <Row className="mb-3">
+                            <Card.Title style={{ fontSize: '0.8rem' }}>Fecha de unión</Card.Title>
+                            <Card.Text style={{ color: '#333', fontFamily: 'Roboto', fontSize: '0.8rem' }}>
+                                {datos.fecha_union}
+                            </Card.Text>
+                        </Row>
                     </Col>
                     <Col md={8}>
                         <Card.Body>
                             <Card.Title className="titulo-peticion mb-3">Datos de usuario </Card.Title>
                             <Row className="mb-3">
                                 <Col md={6} >
-                                    <Card.Title style={{ fontSize: '1rem' }}>Nombre :</Card.Title>
+                                    <Card.Title style={{ fontSize: '1rem' }}>Nombre y Apellido</Card.Title>
                                     <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
                                         {datos.nombre} {datos.apellido}
                                     </Card.Text>
                                 </Col>
                                 <Col md={6} >
-                                    <Card.Title style={{ fontSize: '1rem' }}>Edad :</Card.Title>
-                                    <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
+                                    <Card.Title className="text-center" style={{ fontSize: '1rem' }}>Edad</Card.Title>
+                                    <Card.Text className="text-center" style={{ color: '#333', fontFamily: 'Roboto' }}>
                                         {datos.edad}
                                     </Card.Text>
                                 </Col>
                             </Row>
                             <hr />
                             <Row className="mb-3">
-                                <Card.Title style={{ fontSize: '1rem' }}>Correo electrónico :</Card.Title>
+                                <Card.Title style={{ fontSize: '1rem' }}>Correo electrónico</Card.Title>
                                 <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
                                     {datos.email}
                                 </Card.Text>
@@ -251,13 +288,13 @@ export function Paciente({ datos }) {
                             <hr />
                             <Row className="mb-3">
                                 <Col md={5} >
-                                    <Card.Title style={{ fontSize: '1rem' }}>Celular :</Card.Title>
+                                    <Card.Title style={{ fontSize: '1rem' }}>Celular</Card.Title>
                                     <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
                                         {datos.celular}
                                     </Card.Text>
                                 </Col>
                                 <Col md={7} >
-                                    <Card.Title style={{ fontSize: '1rem' }}>Cto. de Emergencia :</Card.Title>
+                                    <Card.Title style={{ fontSize: '1rem' }}>Número de Emergencia</Card.Title>
                                     <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
                                         {datos.contacto_emergencia}
                                     </Card.Text>
@@ -265,7 +302,7 @@ export function Paciente({ datos }) {
                             </Row>
                             <hr />
                             <Row className="mb-3">
-                                <Card.Title style={{ fontSize: '1rem' }}>Fecha de nacimiento :</Card.Title>
+                                <Card.Title style={{ fontSize: '1rem' }}>Fecha de nacimiento</Card.Title>
                                 <Card.Text style={{ color: '#333', fontFamily: 'Roboto' }}>
                                     {datos.fecha_nacimiento}
                                 </Card.Text>

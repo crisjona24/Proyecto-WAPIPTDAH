@@ -192,7 +192,7 @@ export function ListadodeSalaPaciente({ salas, page, setPage, numeroPag }) {
                             <div className="row">
                             </div>
                         </div>
-                        <div className="panel-body_3 table-responsive">
+                        <div className="panel-body_6 table-responsive">
                             <Table responsive="sm" className="table">
                                 <thead>
                                     <tr>
@@ -585,7 +585,7 @@ export function ListadodeReportes({ reportes, usuario, page, setPage, numeroPag 
     };
 
     return (
-        <div className="cuerpo-tabla">
+        <div className="cuerpo-tabla-2">
             <div className="row">
                 <div className="col-md-offset-1 col-md-11">
                     <div className="panel">
@@ -611,7 +611,7 @@ export function ListadodeReportes({ reportes, usuario, page, setPage, numeroPag 
                                             reportes.map((reporte) => (
                                                 <tr key={reporte.id}>
                                                     <td>{reporte.nombre_paciente} {reporte.apellido_paciente}</td>
-                                                    <td>{reporte.tiempo_m_} m con {reporte.tiempo_s_} s</td>
+                                                    <td>{reporte.tiempo_m_}m con {reporte.tiempo_s_}s</td>
                                                     <td>{reporte.correo_paciente}</td>
                                                     <td className="text-center">{reporte.fecha_registro_reporte}</td>
                                                     <td>

@@ -38,9 +38,6 @@ export function SalasALL() {
 
     // Funcion para verificar el tipo de usuario
     const verificacion = async () => {
-        if (!token) {
-            navigate('/');
-        }
         // Flujo normal
         try {
             const cont = await VerificarUsuario();
@@ -59,6 +56,9 @@ export function SalasALL() {
 
     // Verificar el tipo de usuario
     useEffect(() => {
+        if (!token) {
+            navigate('/login');
+        }
         verificacion();
     }, []);
 
@@ -100,7 +100,7 @@ export function SalasALL() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
@@ -139,9 +139,6 @@ export function SalasAtendidasALL() {
 
     // Funcion para verificar el tipo de usuario
     const verificacion = async () => {
-        if (!token) {
-            navigate('/login');
-        }
         // Flujo normal
         try {
             const cont = await VerificarUsuario();
@@ -160,6 +157,9 @@ export function SalasAtendidasALL() {
 
     // Verificar el tipo de usuario
     useEffect(() => {
+        if (!token) {
+            navigate('/login');
+        }
         verificacion();
     }, []);
 
@@ -201,7 +201,7 @@ export function SalasAtendidasALL() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
@@ -240,9 +240,7 @@ export function SalasPaciente() {
 
     // Funcion para verificar el tipo de usuario
     const verificacion = async () => {
-        if (!token) {
-            navigate('/login');
-        }
+
         // Flujo normal
         try {
             const cont = await VerificarUsuario();
@@ -261,6 +259,9 @@ export function SalasPaciente() {
 
     // Verificar el tipo de usuario
     useEffect(() => {
+        if (!token) {
+            navigate('/login');
+        }
         verificacion();
     }, []);
 
@@ -302,7 +303,7 @@ export function SalasPaciente() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid gray' }}>
+                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}

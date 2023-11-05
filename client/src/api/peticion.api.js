@@ -400,3 +400,21 @@ export const PeticionAtendidaporRango = async (rango, page = 1) => {
         throw new Error("No se puede acceder a las peticiones: " + error.message);
     }
 };
+
+// Nombre de revisor
+export const RevisorPeticion = (id) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return baseurl.get(`wapiptdah/obtener/revisor/${id}/`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a los datos de peticion: " + error.message);
+    }
+};

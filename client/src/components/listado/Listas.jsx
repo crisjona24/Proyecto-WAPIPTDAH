@@ -451,6 +451,10 @@ export function ResultadoLista({ usuario }) {
     const [limite, setLimite] = useState("");
     const [estadoBusqueda, setEstadoBusqueda] = useState(false);
     const [estadoBusquedaSel, setEstadoBusquedaSel] = useState(false);
+    // Escoger busqueda
+    const [busqueda, setBusqueda] = useState("0");
+    const [escogido, setEscogido] = useState(false);
+    const [escogido2, setEscogido2] = useState(false);
 
     // Obtener resultados
     const cargarResultados = async () => {
@@ -562,6 +566,9 @@ export function ResultadoLista({ usuario }) {
         setFecha("");
         setEstadoBusquedaSel(false);
         setLimite("");
+        setBusqueda("0");
+        setEscogido(false);
+        setEscogido2(false);
     }
 
     // Funcion para validar la entreada
@@ -704,6 +711,7 @@ export function ResultadoLista({ usuario }) {
     // Manejo del estado de los datos
     useEffect(() => {
         if (limite === "0") {
+            resetearBusqueda();
             cargarResultados();
         } else {
             buscarResultadosRango();
@@ -739,62 +747,88 @@ export function ResultadoLista({ usuario }) {
                     <p className="mb-0">{error}</p>
                 </div>
             }
+
             <div className="mt-5 container alineacion-3" style={{ height: '50px', borderRadius: '10px' }}>
                 <div className="alineacion-lista-busqueda">
-                    <div className="col-md-12">
-                        <form>
-                            <div className="row form-group">
-                                <div className="col-2 d-flex justify-content-center mt-2">
-                                    <label htmlFor="nombre" style={{ fontFamily: 'Pacifico' }}
-                                    >Nombre</label>
-                                </div>
-                                <div className="col-9 d-flex flex-row">
-                                    <input type="text" className="form-control" id="nombre"
-                                        value={nombrebuscar} onChange={cambioEntrada} placeholder="Ingrese el nombre.." />
-                                    <>
-                                        {
-                                            mostrarBusqueda
-                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
-                                                    X
-                                                </Button>
-                                                : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaResultado} disabled={isTamanio}>
-                                                    Buscar
-                                                </Button>
-                                        }
-                                    </>
-                                </div>
+                    <div className="col-md-12 d-flex flex-row">
+                        <select
+                            className={`form-select h-75 separacion-busqueda 
+                            ${escogido ? 'w-25' : escogido2 ? 'w-25' : 'w-50'
+                                }`}
+                            value={busqueda}
+                            onChange={(e) => {
+                                setBusqueda(e.target.value);
+                                // Mostrar el formulario si la opción seleccionada es "1" (Nombre de estudiante)
+                                if (e.target.value === "1") {
+                                    setEscogido(true);
+                                    setEscogido2(false);
+                                } else if (e.target.value === "2") {
+                                    setEscogido2(true);
+                                    setEscogido(false);
+                                } else {
+                                    setEscogido(false);
+                                    setEscogido2(false);
+                                }
+                            }}
 
-                            </div>
-                        </form>
+                        >
+                            <option value="0">Buscar ....</option>
+                            <option value="1">Nombre de estudiante</option>
+                            <option value="2">Fecha</option>
+                        </select>
+                        {escogido && (
+                            <form>
+                                <div className="row form-group">
+                                    <div className="col-2 d-flex justify-content-center mt-2">
+                                        <label htmlFor="nombre" style={{ fontFamily: 'Pacifico' }}
+                                        >Nombre</label>
+                                    </div>
+                                    <div className="col-9 d-flex flex-row">
+                                        <input type="text" className="form-control" id="nombre"
+                                            value={nombrebuscar} onChange={cambioEntrada} placeholder="Ingrese el nombre.." />
+                                        <>
+                                            {
+                                                mostrarBusqueda
+                                                    ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                        X
+                                                    </Button>
+                                                    : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaResultado} disabled={isTamanio}>
+                                                        Vamos
+                                                    </Button>
+                                            }
+                                        </>
+                                    </div>
+                                </div>
+                            </form>
+                        )}
+                        {
+                            escogido2 && (
+                                <form>
+                                    <div className="row form-group">
+                                        <div className="col-2 d-flex justify-content-center mt-2">
+                                            <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                        </div>
+                                        <div className="col-9 d-flex flex-row">
+                                            <input type="date" className="form-control" id="fecha"
+                                                value={fecha} onChange={(e) => setFecha(e.target.value)} />
+                                            <>
+                                                {
+                                                    estadoBusqueda
+                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                            X
+                                                        </Button>
+                                                        : <Button variant="success" className="my-2 my-sm-0" onClick={buscarResultadosFecha} disabled={isTamanio}>
+                                                            Buscar
+                                                        </Button>
+                                                }
+                                            </>
+                                        </div>
+                                    </div>
+                                </form>
+                            )}
                     </div>
                 </div>
-                <div className="alineacion-lista-busqueda">
-                    <div className="col-md-12">
-                        <form>
-                            <div className="row form-group">
-                                <div className="col-2 d-flex justify-content-center mt-2">
-                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
-                                </div>
-                                <div className="col-9 d-flex flex-row">
-                                    <input type="date" className="form-control" id="fecha"
-                                        value={fecha} onChange={(e) => setFecha(e.target.value)} />
-                                    <>
-                                        {
-                                            estadoBusqueda
-                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
-                                                    X
-                                                </Button>
-                                                : <Button variant="success" className="my-2 my-sm-0" onClick={buscarResultadosFecha} disabled={isTamanio}>
-                                                    Buscar
-                                                </Button>
-                                        }
-                                    </>
-                                </div>
 
-                            </div>
-                        </form>
-                    </div>
-                </div>
                 <div className="alineacion-lista-busqueda">
                     <div className="col-md-12">
                         <form>
@@ -1066,7 +1100,7 @@ export function CursoLista() {
                                         X
                                     </Button>
                                     : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaCurso} disabled={isTamanio}>
-                                        Ir
+                                        Buscar
                                     </Button>
                             }
                         </>
@@ -1336,7 +1370,7 @@ export function SalaLista({ usuario }) {
                                         X
                                     </Button>
                                     : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaClick} disabled={isTamanio}>
-                                        Buscar
+                                        Vamos
                                     </Button>
                             }
                         </>
@@ -1757,7 +1791,7 @@ export function SalaListaAtendidas({ usuario }) {
                                         X
                                     </Button>
                                     : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaDeSala} disabled={isTamanio}>
-                                        Buscar
+                                        Vamos
                                     </Button>
                             }
                         </>
@@ -1820,6 +1854,10 @@ export function ReporteLista({ usuario }) {
     const [limite, setLimite] = useState("");
     const [estadoBusqueda, setEstadoBusqueda] = useState(false);
     const [estadoBusquedaSel, setEstadoBusquedaSel] = useState(false);
+    // Escoger busqueda
+    const [busqueda, setBusqueda] = useState("0");
+    const [escogido, setEscogido] = useState(false);
+    const [escogido2, setEscogido2] = useState(false);
 
     // Obtener resultados
     const cargarReporte = async () => {
@@ -1924,6 +1962,9 @@ export function ReporteLista({ usuario }) {
         setFecha("");
         setEstadoBusquedaSel(false);
         setLimite("");
+        setBusqueda("0");
+        setEscogido(false);
+        setEscogido2(false);
     }
 
     // Funcion para validar la entreada
@@ -2067,6 +2108,7 @@ export function ReporteLista({ usuario }) {
     // Manejo del estado de los datos
     useEffect(() => {
         if (limite === "0") {
+            resetearBusqueda();
             cargarReporte();
         } else {
             buscarReporteRango();
@@ -2104,58 +2146,83 @@ export function ReporteLista({ usuario }) {
             }
             <div className="mt-5 container alineacion-3" style={{ height: '50px', borderRadius: '10px' }}>
                 <div className="alineacion-lista-busqueda">
-                    <div className="col-md-12">
-                        <form>
-                            <div className="row form-group">
-                                <div className="col-2 d-flex justify-content-center mt-2">
-                                    <label htmlFor="nombre" style={{ fontFamily: 'Pacifico' }}
-                                    >Nombre</label>
-                                </div>
-                                <div className="col-9 d-flex flex-row">
-                                    <input type="text" className="form-control" id="nombre"
-                                        value={nombrebuscar} onChange={cambioEntrada} placeholder="Ingrese el nombre.." />
-                                    <>
-                                        {
-                                            mostrarBusqueda
-                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
-                                                    X
-                                                </Button>
-                                                : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaReporte} disabled={isTamanio}>
-                                                    Buscar
-                                                </Button>
-                                        }
-                                    </>
-                                </div>
+                    <div className="col-md-12 d-flex flex-row">
+                        <select
+                            className={`form-select h-75 separacion-busqueda 
+                            ${escogido ? 'w-25' : escogido2 ? 'w-25' : 'w-50'
+                                }`}
+                            value={busqueda}
+                            onChange={(e) => {
+                                setBusqueda(e.target.value);
+                                // Mostrar el formulario si la opción seleccionada es "1" (Nombre de estudiante)
+                                if (e.target.value === "1") {
+                                    setEscogido(true);
+                                    setEscogido2(false);
+                                } else if (e.target.value === "2") {
+                                    setEscogido2(true);
+                                    setEscogido(false);
+                                } else {
+                                    setEscogido(false);
+                                    setEscogido2(false);
+                                }
+                            }}
 
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <div className="alineacion-lista-busqueda">
-                    <div className="col-md-12">
-                        <form>
-                            <div className="row form-group">
-                                <div className="col-2 d-flex justify-content-center mt-2">
-                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                        >
+                            <option value="0">Buscar ....</option>
+                            <option value="1">Nombre de estudiante</option>
+                            <option value="2">Fecha</option>
+                        </select>
+                        {escogido && (
+                            <form>
+                                <div className="row form-group">
+                                    <div className="col-2 d-flex justify-content-center mt-2">
+                                        <label htmlFor="nombre" style={{ fontFamily: 'Pacifico' }}
+                                        >Nombre</label>
+                                    </div>
+                                    <div className="col-9 d-flex flex-row">
+                                        <input type="text" className="form-control" id="nombre"
+                                            value={nombrebuscar} onChange={cambioEntrada} placeholder="Ingrese el nombre.." />
+                                        <>
+                                            {
+                                                mostrarBusqueda
+                                                    ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                        X
+                                                    </Button>
+                                                    : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaReporte} disabled={isTamanio}>
+                                                        Vamos
+                                                    </Button>
+                                            }
+                                        </>
+                                    </div>
                                 </div>
-                                <div className="col-9 d-flex flex-row">
-                                    <input type="date" className="form-control" id="fecha"
-                                        value={fecha} onChange={(e) => setFecha(e.target.value)} />
-                                    <>
-                                        {
-                                            estadoBusqueda
-                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
-                                                    X
-                                                </Button>
-                                                : <Button variant="success" className="my-2 my-sm-0" onClick={buscarReportesFecha} disabled={isTamanio}>
-                                                    Buscar
-                                                </Button>
-                                        }
-                                    </>
-                                </div>
+                            </form>
+                        )}
+                        {
+                            escogido2 && (
+                                <form>
+                                    <div className="row form-group">
+                                        <div className="col-2 d-flex justify-content-center mt-2">
+                                            <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                        </div>
+                                        <div className="col-9 d-flex flex-row">
+                                            <input type="date" className="form-control" id="fecha"
+                                                value={fecha} onChange={(e) => setFecha(e.target.value)} />
+                                            <>
+                                                {
+                                                    estadoBusqueda
+                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                            X
+                                                        </Button>
+                                                        : <Button variant="success" className="my-2 my-sm-0" onClick={buscarReportesFecha} disabled={isTamanio}>
+                                                            Buscar
+                                                        </Button>
+                                                }
+                                            </>
+                                        </div>
 
-                            </div>
-                        </form>
+                                    </div>
+                                </form>
+                            )}
                     </div>
                 </div>
                 <div className="alineacion-lista-busqueda">

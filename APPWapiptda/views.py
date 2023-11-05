@@ -588,6 +588,9 @@ def datos_usuario(request):
                         'email': usuario__ob.email_usuario,
                         'username': usuario__ob.username_usuario,
                         'edad': usuario__ob.edad,
+                        'fecha_nacimiento': usuario__ob.fecha_nacimiento,
+                        'celular': usuario__ob.celular,
+                        'fecha_union': usuario__ob.fecha_registro_usuario,
                         'identificador': user.id,
                     }
                     return JsonResponse(context)
@@ -611,6 +614,7 @@ def datos_usuario(request):
                             'contacto_emergencia': paciente__ob.contacto_emergencia,
                             'fecha_nacimiento': paciente__ob.fecha_nacimiento,
                             'edad': paciente__ob.edad,
+                            'fecha_union': paciente__ob.fecha_registro_usuario,
                             'identificador': user.id,
                         }
                         return JsonResponse(context)
@@ -635,6 +639,7 @@ def datos_usuario(request):
                                 'genero': comun__ob.genero,
                                 'area_estudio': comun__ob.area_estudio,
                                 'edad': comun__ob.edad,
+                                'fecha_union': comun__ob.fecha_registro_usuario,
                                 'identificador': user.id,
                             }
                             return JsonResponse(context)
@@ -701,7 +706,7 @@ def username_exist(ob1):
         return False
     return False
 
-
+## Envio de correo para verifiacion de cuenta
 def validar_correo_link(_email):
     try:
         signer = Signer()
@@ -718,6 +723,144 @@ def validar_correo_link(_email):
         print(f"Error enviando el correo: {e}")
         return False
 
+
+## Envio de correo de recuperacion de cuenta de usuario
+## se envia un correo con un token firmado con un limite de tiempo
+## Envio de correo para verifiacion de cuenta
+def validar_correo_recuperacion(_email):
+    try:
+        signer = Signer()
+        token_firmado = signer.sign(_email)
+        # Email
+        subject = 'Recuperación de cuenta'
+        message = f'Reciba un cordial saludo de los administradores de WAPIPTDAH. ' \
+            f'\nRecibimos una solicitud de recuperación de cuenta para el correo: {_email}. ' \
+            f'\nEste es un mensaje para recuperar su cuenta por lo tanto debe seguir las instrucciones: ' \
+            f'\n\n1. Copia y pega el siguiente código especial para recuperar tu cuenta: {token_firmado}. ' \
+            f'\n\n2. Ingresa los datos solicitados en la ventana que aparecerá. ' \
+            f'\n' \
+            f'\nSi usted no hizo esta solicitud, ignore completamente este mensaje. ' \
+            f'\n' \
+            f'\nAtentamente: WAPIPTDAH.'
+        from_email = settings.EMAIL_HOST_USER
+        receiver_email = [_email]
+        send_mail(subject, message, from_email, receiver_email, fail_silently=False)
+        return True
+    except Exception as e:
+        print(f"Error enviando el correo: {e}")
+        return False
+
+
+## Verificacion de existencia de correo
+def existe__correo(ob1):
+    try:
+        if Paciente.objects.filter(email_usuario__iexact=ob1).exists():
+            return True
+        elif UsuarioComun.objects.filter(email_usuario__iexact=ob1).exists():
+            return True
+        elif Usuario.objects.filter(email_usuario__iexact=ob1).exists():
+            return True
+    except Paciente.DoesNotExist:
+        return False
+    except UsuarioComun.DoesNotExist:
+        return False
+    except Usuario.DoesNotExist:
+        return False
+    return False
+
+
+# METODO DE RECUPERACION DE CUENTA DE USUARIO
+@api_view(['POST'])
+def recuperar_cuenta(request):
+    try:
+        if request.method == 'POST':
+            data = json.loads(request.body)
+            email_ = data.get('correo')
+            if existe__correo(email_):
+                # Veriicar correo valido
+                if validar_correo_recuperacion(email_) == False:
+                    return JsonResponse({'error': 'No existe una cuenta con ese correo'})
+                else:
+                    return JsonResponse({'success': True})
+            else:
+                return JsonResponse({'error': 'No existe una cuenta con ese correo'})
+        else:
+            return JsonResponse({'error': 'Método no permitido'})
+    except Exception as e:
+        return JsonResponse({'error': 'Error al crear el usuario'})
+    
+
+
+# METODO DE VERIFICACION DE CORREO
+# Permite verificar el token para verificar la existencia de una cuenta de usuario
+# y dar paso a la modificación de la clave
+@api_view(['POST'])
+def verificar_email_recuperacion(request):
+    try:
+        if request.method == 'POST':
+            data = json.loads(request.body)
+            codigo_ = data.get('codigo')
+            # Llamamos al desfirmado
+            signer = Signer()
+            email_original = signer.unsign(codigo_)
+            user_ob = User.objects.get(email=email_original)
+            if is_tecnico(user_ob):
+                return JsonResponse({'success': True})
+            elif is_paciente(user_ob):
+                return JsonResponse({'success': True})
+            elif is_comun(user_ob):
+                return JsonResponse({'success': True})
+            else:
+                return JsonResponse({'error': 'Código de verificación inválido o ha expirado'})
+        else: 
+            return JsonResponse({'error': 'Código de verificación inválido o ha expirado'})
+    except BadSignature:
+       return JsonResponse({'error': 'Código de verificación inválido o ha expirado'})
+
+
+
+# METODO DE RESTABLECIMIENTO DE CLAVE
+# Permite restablecer la nueva clave enviada por parte del usuario
+# esto se realiza previo a una verificacion de correo mediante token
+@api_view(['POST'])
+def restablecer_clave(request):
+    try:
+        if request.method == 'POST':
+            data = json.loads(request.body)
+            email_ = data.get('correo')
+            clave2_ = data.get('clave2')
+            # Verificar correo
+            if existe__correo(email_) == False:
+                return JsonResponse({'error': 'No existe una cuenta con ese correo'})
+            # Verificar clave
+            if validar_clave(clave2_) == False:
+                return JsonResponse({'clave': 'Clave sin requisitos mínimos'})
+            # Guardamos la clave
+            if guardar_clave_(email_, clave2_):
+                return JsonResponse({'success': True})
+            else:
+                return JsonResponse({'error': 'Error al restablecer la clave'})
+        else:
+            return JsonResponse({'error': 'Método no permitido'})
+    except Exception as e:
+        return JsonResponse({'error': 'Error al restablecer la clave'})
+
+def guardar_clave_(ob1, ob2):
+    try:
+        # Encontrar el usuario relacionado al correo
+        user_ob = User.objects.get(email=ob1)
+        # Cambiar la clave
+        user_ob.password = make_password(ob2)
+        # Guardar cambios
+        user_ob.save()
+        return True
+    except User.DoesNotExist:
+        return False
+
+
+# METODO DE VERIFICACION DE CORREO
+# Permite verificar el token para verificar la activación de una cuenta de usuario
+# si el tokken no es adecuado al desfirmarlo esta no se lee ni se activa
 @api_view(['POST'])
 def verificar_email_firmado(request):
     try:
@@ -2099,6 +2242,7 @@ def api_sala_register(request):
                 # Enviamos una respuesta al front
                 return JsonResponse({'success': True})
             else:
+                print("Estoy aqui en el error")
                 error_message = "Error al agregar sala."
                 context = {'error': error_message}
                 return JsonResponse(context)
@@ -2111,16 +2255,20 @@ def api_sala_register(request):
 
 def guardar_sala (ob1, ob2, ob3, ob4, ob5):
     try:
+        print("Entre al guardar")
         # Capturamos la fecha actual de registro
-        fecha_registro_sala_ = datetime.now().date
+        fecha_registro_sala_ = datetime.now().date()
+        print("Obtuve fecha")
+        print(fecha_registro_sala_)
         # Guardamos el objeto de sala
         sala_obj = Sala.objects.create(
             nombre_sala=ob1,
             anotaciones=ob2,
             codigo_identificador=ob3,
             paciente=ob5,
-            fecha_registro_sala=fecha_registro_sala_,
+            fecha_registro_sala=fecha_registro_sala_
         )
+        print("Pase el guadar datos")
         sala_obj.save()
         # Creamos el detalle de sala
         detalle_obj = DetalleSala.objects.create(
@@ -2413,6 +2561,7 @@ def send_email_sala(ob1, ob2):
     send_mail(subject, message, from_email, receiver_email, fail_silently=False)
     return True
 
+
 ## CONTADOR DE SALAS ATENDIDAS
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
@@ -2688,7 +2837,6 @@ def api_enviar_contacto(request):
 def encontrar_usuario(ob1):
     # Orden de los modelos a verificar
     modelos = [UsuarioComun, Paciente, Usuario]
-
     for modelo in modelos:
         try:
             # Intenta obtener el usuario de cada modelo
@@ -2697,7 +2845,6 @@ def encontrar_usuario(ob1):
         except modelo.DoesNotExist:
             # Si el usuario no existe en ese modelo, sigue con el siguiente
             continue
-
     # Si ninguno de los modelos contiene el usuario, retorna False
     return False
 
@@ -2708,7 +2855,6 @@ def enviar_correo(ob1, ob2, ob3):
     from_email = ob1.email_usuario
     print(ob1.email_usuario)
     receiver_email = [settings.EMAIL_HOST_USER]
-
     send_mail(subject, message, from_email, receiver_email, fail_silently=False)
     return True
 
@@ -2876,4 +3022,100 @@ def verificar_paciente_curso(ob1, ob2, ob3):
     except Curso.DoesNotExist:
         return False
     except DetalleInscripcionCurso.DoesNotExist:
+        return False
+
+
+# GENERAR REPORTE ##
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def obtener_fecha_inscripcion(request, id):
+    try: 
+        # Decodifica el token
+        token = request.headers.get('Authorization').split(" ")[1]
+        user = get_user_from_token_jwt(token)
+        # Verificar existencia del usuario
+        if user and token:
+            if request.method == 'GET':
+                id_paciente = id
+                # buscamos la fecha de inscripcion del paciente
+                # Obtenemos el objeto paciente
+                paciente_ob = Paciente.objects.get(id=id_paciente)
+                # Obtenemos la fecha de inscripcion del paciente de DetalleInscripcionCurso
+                inscripcion_ = DetalleInscripcionCurso.objects.get(paciente=paciente_ob)
+                # Obtenemos la fecha de inscripcion
+                fecha_inscripcion = inscripcion_.fecha_inscripcion
+                # Verificamos y devolvemos al frontend
+                return JsonResponse({'success': True, 'fecha_inscripcion': fecha_inscripcion})
+            else:
+                return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
+        else:
+            return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
+    except Exception as e:
+        return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+    
+def obtener_fecha(ob1, ob2):
+    try:
+        # Verificamos que el usuario sea paciente
+        if is_paciente(ob1):
+            # Obtenemos el objeto paciente
+            paciente_ob = Paciente.objects.get(id=ob2)
+            # Obtenemos la fecha de inscripcion del paciente de DetalleInscripcionCurso
+            inscripcion_ = DetalleInscripcionCurso.objects.get(paciente=paciente_ob)
+            # Obtenemos la fecha de inscripcion
+            fecha_inscripcion = inscripcion_.fecha_inscripcion
+            return fecha_inscripcion
+        else:
+            return False
+    except Paciente.DoesNotExist:
+        return False
+    except DetalleInscripcionCurso.DoesNotExist:
+        return False
+
+
+# GENERAR REPORTE ##
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def obtener_nombre_revision(request, id):
+    try: 
+        # Decodifica el token
+        token = request.headers.get('Authorization').split(" ")[1]
+        user = get_user_from_token_jwt(token)
+        # Verificar existencia del usuario
+        if user and token:
+            if request.method == 'GET':
+                peticion_id = id
+                # Verificamos y obtenemos los valores
+                nombre_usuario, apellido_usuario = nombre_revision(peticion_id)
+                if nombre_usuario and apellido_usuario:
+                    # Verificamos y devolvemos al frontend
+                    return JsonResponse({'success': True, 
+                                         'nombre_u': nombre_usuario, 
+                                         'apellido_u': apellido_usuario})
+                else:
+                    error_message = "No se pudo obtener el nombre del revisor"
+                    context = {'error': error_message}
+                    return JsonResponse(context)
+            else:
+                return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
+        else:
+            return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
+    except Exception as e:
+        return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+
+def nombre_revision(ob1):
+    try:
+        # Obtenemos la peticion asociada al id
+        peticion_ob = Peticion.objects.get(id=ob1)
+        # Obtenemos el objeto de Detalle Peticion 
+        detalle_peticion_ob = DetallePeticion.objects.get(peticion=peticion_ob)
+        # Obtenemos el nombre y apellido del usuario tecnico
+        nombre_usuario = detalle_peticion_ob.usuario_tecnico.nombre_usuario
+        apellido_usuario = detalle_peticion_ob.usuario_tecnico.apellido_usuario
+        # Retornamos los valores
+        return nombre_usuario, apellido_usuario
+    except Peticion.DoesNotExist:
+        return False
+    except DetallePeticion.DoesNotExist:
         return False

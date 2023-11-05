@@ -31,7 +31,10 @@ urlpatterns = [
     path('aplicacion/', include(router.urls)),
     # Token
     path('verificar/cuenta/', verificar_email_firmado, name='verificar-cuenta'),
-    
+    path('cambiar/clave/', recuperar_cuenta, name='cambiar-clave'),
+    path('verificar/codigo/cuenta/', verificar_email_recuperacion, name='nueva-clave'),
+    path('registro/nueva/clave/', restablecer_clave, name='verificar-email-recuperacion'),
+
     ### LISTADOS PERSONALIZADOS ###
     path('contenidos/<str:slug>/', ContenidoListView.as_view(), name='contenidos-list'),
     path('contenidos/individuales/<str:slug>/', ContenidoIndividualListView.as_view(), name='contenidos-individuales-list'),
@@ -134,11 +137,13 @@ urlpatterns = [
     path('obtener/curso/<int:id>/', obtener_slug_curso, name='obtener-slug-curso'),
     path('obtener/dominio/<str:slug>/', obtener_slug_dominio, name='obtener-slug-dominio'),
     path('obtener/contenido/<str:slug>/', obtener_slug_contenido, name='obtener-slug-contenido'),
+    path('obtener/fecha/inscripcion/<int:id>/', obtener_fecha_inscripcion, name='obtener-fecha-inscripcion'),
 
     ### VERIFICACIONES ###
     path('verificar/inscripcion/', verificacion_inscripcion, name='verificar-inscripcion'),
     path('atender/peticion/', atender_peticion, name='atender-peticion'),
     path('atender/sala/<str:slug>/', atender_sala, name='atender-sala'),
+    path('obtener/revisor/<int:id>/', obtener_nombre_revision, name='obtener-revisor'),
 
     ## NOTIFICACIONES ###
     path('contador/peticion/', get_contador_peticiones, name='contador-peticion'),

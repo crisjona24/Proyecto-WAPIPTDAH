@@ -153,6 +153,7 @@ export function PeticionLista() {
     // Estado de los datos
     useEffect(() => {
         if (limite === "0") {
+            resetearBusqueda();
             cargarPeticiones();
         } else {
             buscarPeticionesRango();
@@ -398,6 +399,7 @@ export function PeticionListaAtendi() {
     // Estado de los datos
     useEffect(() => {
         if (limite === "0") {
+            resetearBusqueda();
             cargarPeticiones();
         } else {
             buscarPeticionesRangoA();
@@ -661,6 +663,7 @@ export function PeticionListaUsuario() {
     // Estado de los datos
     useEffect(() => {
         if (limite === "0") {
+            resetearBusqueda();
             cargarPeticiones();
         } else {
             buscarPeticionesRango();

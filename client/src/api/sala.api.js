@@ -245,7 +245,7 @@ export const ContadorSalas = async () => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a las salas: " + error.message);
+        throw new Error("No se puede controlar el contador de salas: " + error.message);
     }
 };
 

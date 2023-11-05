@@ -5,10 +5,12 @@ import { Button } from "react-bootstrap";
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Swal from "sweetalert2";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye } from "@fortawesome/free-solid-svg-icons";
 // Metodos
 import { info__nivel, info__dominio } from '../../controles/controlador_registro';
 import { CrearCurso } from '../../api/curso.api';
-import { VerificarCuenta } from '../../api/usuario.api';
+import { VerificarCuenta, CambiarClaveCuenta, EnvioNuevaClave, EnviarCodigoRecuperacion } from '../../api/usuario.api';
 import { CrearNivelNew, EnviarCorreo } from '../../api/grado.api';
 import { CrearPeticion, AtenderPeticion } from '../../api/peticion.api';
 import { validarTamanoImagen } from '../../controles/alert_user';
@@ -672,9 +674,9 @@ export function FormularioPeticion() {
                 <label className='label' htmlFor="peticion_cuerpo">Descripción de petición:</label>
                 <textarea className='form-control w-100 tamanio-text-area' type="text" id="peticion_cuerpo"
                     value={peticion_cuerpo} onChange={e => setPeticionCuerpo(e.target.value)}
-                    name='peticion_cuerpo' 
+                    name='peticion_cuerpo'
                     placeholder="Mira detalles en el boton Detalle**"
-                    />
+                />
             </div>
             <Button type="submit" variant="success" disabled={habilitado}>
                 {habilitado ? 'Guardando...' : 'Guardar'}
@@ -1187,4 +1189,377 @@ export function FormularioContacto() {
             </Button>
         </form>
     );
+}
+
+
+// Formulario de recuperacoón de cuenta
+export function FormularioRecuperacion() {
+    /* *** Form **** */
+    const [correo, setCorreo] = useState("");
+    const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
+    const [recuperar, setRecuperar] = useState(false);
+    // Recuperar clave
+    const [codigo, setCodigo] = useState("");
+    const navigate = useNavigate();
+
+    // Operacion de guardado
+    const enviarFRecuperacion = async (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (!valoresValidos()) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Flujo normal
+        setHabilitado(true);
+        try {
+            // Obtenemos los datos
+            const datos__post = {
+                correo
+            };
+            // Funcion de registro
+            await confirmGuardado(datos__post);
+        } catch (err) {
+            mostrarError('Error al enviar correo de recuperación');
+        }
+        setHabilitado(false);
+    };
+
+    // Operacion de cambio de clave
+    const enviarCodigo = async (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (!valoresValidos2()) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Flujo normal
+        setHabilitado(true);
+        try {
+            // Obtenemos los datos
+            const datos__post = {
+                codigo
+            };
+            // Funcion de registro
+            await confirmGuardadoRecuperacion(datos__post);
+        } catch (err) {
+            mostrarError('Error al enviar código de recuperación');
+        }
+        setHabilitado(false);
+    };
+
+    // Campos vacios
+    const valoresValidos = () => {
+        if (
+            correo.trim() === ""
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    // Campos vacios
+    const valoresValidos2 = () => {
+        if (
+            codigo.trim() === ""
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    // Mostrar error
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 9000);
+    };
+
+    // Envio de correo de confirmacion
+    const confirmGuardado = async (datos__post) => {
+        return Swal.fire({
+            title: '¿Desea enviar el correo de recuperación?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Enviar',
+            denyButtonText: 'No enviar',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    // Realizar la petición POST al servidor
+                    const responseRecup = await CambiarClaveCuenta(datos__post);
+                    if (responseRecup.data.success) {
+                        // Redirigir a la pagina de recuperacion
+                        Swal.fire("Correo de recuperación enviado correctamente", "", "success");
+                        setRecuperar(true);
+                    } else {
+                        if (responseRecup.data.error) {
+                            Swal.fire(responseRecup.data.error, '', 'error');
+                        } else {
+                            Swal.fire('Error al enviar correo de recuperación', '', 'error');
+                        }
+                    }
+                } catch (err) {
+                    Swal.fire('Error al enviar correo de recuperación', '', 'error');
+                }
+            } else if (result.isDenied) {
+                Swal.fire('La verificación no se ha enviado', '', 'info');
+            }
+        });
+    };
+
+    // Registro de nueva clave
+    const confirmGuardadoRecuperacion = async (datos__post) => {
+        return Swal.fire({
+            title: '¿Desea enviar el código de recuperación?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Enviar',
+            denyButtonText: 'No enviar',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    // Realizar la petición POST al servidor
+                    const responseR = await EnviarCodigoRecuperacion(datos__post);
+                    if (responseR.data.success) {
+                        // Redirigir al login
+                        Swal.fire("Código correcto", "", "success");
+                        navigate('/cambio/clave/cuenta');
+                    } else {
+                        if (responseR.data.error) {
+                            Swal.fire(responseR.data.error, '', 'error');
+                        } else {
+                            Swal.fire('Error al enviar el código de recuperación o es inválido', '', 'error');
+                        }
+                    }
+                } catch (err) {
+                    Swal.fire('Error al enviar el código de recuperación o es inválido', '', 'error');
+                }
+            } else if (result.isDenied) {
+                Swal.fire('Error al enviar el código de recuperación o es inválido', '', 'info');
+            }
+        });
+    };
+
+    return (
+        <form onSubmit={
+            recuperar === true ? enviarCodigo : enviarFRecuperacion
+        }>
+            {error && <span>{error}</span>}
+            {
+                recuperar === false ? (
+                    <>
+                        <div className="form-group">
+                            <label className='label' htmlFor="correo">Ingrese su dirección de correo electrónico :</label>
+                            <input className='form-control w-100' type="email"
+                                placeholder="Ingrese su correo electrónico**"
+                                id="correo" required
+                                name="correo"
+                                value={correo}
+                                onChange={e => setCorreo(e.target.value)}
+                            />
+                        </div>
+                        <Button type="submit" variant="success" disabled={habilitado}>
+                            {habilitado ? 'Enviando...' : 'Enviar'}
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <div className="form-group">
+                            <label className='label' htmlFor="codigo">Ingrese el código proporcionado :</label>
+                            <textarea class="form-control w-100 tamanio-text-area" placeholder="Ingrese el código**"
+                                id="codigo" required
+                                name="codigo"
+                                value={codigo}
+                                onChange={e => setCodigo(e.target.value)}>
+                            </textarea>
+                        </div>
+
+                        <Button type="submit" variant="success" disabled={habilitado}>
+                            {habilitado ? 'Verificando...' : 'Verificar'}
+                        </Button>
+                    </>
+                )
+            }
+
+        </form>
+    )
+
+}
+
+
+// Formulario de cambio de clave
+export function FormularioCambio() {
+    /* *** Form **** */
+    const [correo, setCorreo] = useState("");
+    const [error, setError] = useState("");
+    const [habilitado, setHabilitado] = useState(false);
+    // Recuperar clave
+    const [clave2, setClave2] = useState("");
+    const [clave3, setClave3] = useState("");
+    // Mostrar clave
+    const [mostrarC2, setVerClave2] = useState(false);
+    const [mostrarC3, setVerClave3] = useState(false);
+    const navigate = useNavigate();
+
+    // Operacion de cambio de clave
+    const enviarNuevaClave = async (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (!valoresValidos2()) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Verificar que las claves sean similares
+        if (!compararclavesIngresada(clave2, clave3)) {
+            Swal.fire("Las claves de recuperación no coinciden", "", "warning");
+            return;
+        }
+        // Flujo normal
+        setHabilitado(true);
+        try {
+            // Obtenemos los datos
+            const datos__post = {
+                clave2,
+                correo
+            };
+            // Funcion de registro
+            await confirmGuardadoRecuperacion(datos__post);
+        } catch (err) {
+            mostrarError('Error al enviar correo de recuperación');
+        }
+        setHabilitado(false);
+    };
+
+
+    // Campos vacios
+    const valoresValidos2 = () => {
+        if (
+            clave2.trim() === "" ||
+            clave3.trim() === "" ||
+            correo.trim() === ""
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    // Mostrar error
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 9000);
+    };
+
+
+    // Registro de nueva clave
+    const confirmGuardadoRecuperacion = async (datos__post) => {
+        return Swal.fire({
+            title: '¿Desea enviar la nueva clave?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Enviar',
+            denyButtonText: 'No enviar',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    // Realizar la petición POST al servidor
+                    const responseCambio = await EnvioNuevaClave(datos__post);
+                    if (responseCambio.data.success) {
+                        // Redirigir al login
+                        Swal.fire("Cambio de clave correcto", "", "success");
+                        navigate('/login');
+                    } else {
+                        if (responseCambio.data.error) {
+                            Swal.fire(responseCambio.data.error, '', 'error');
+                        } else if (responseCambio.data.clave) {
+                            Swal.fire(responseCambio.data.clave, '', 'error');
+                            mostrarError('La clave debe tener mínimo 8 caracteres que incluye una letra mayúscula, un número y un símbolo');
+                        } else {
+                            Swal.fire('Error al cambiar la clave', '', 'error');
+                        }
+                    }
+                } catch (err) {
+                    Swal.fire('Error al cambiar la clave', '', 'error');
+                }
+            } else if (result.isDenied) {
+                Swal.fire('Error al cambiar la clave', '', 'info');
+            }
+        });
+    };
+
+    // Comprobar que clave 2 y 3 sean similares
+    const compararclavesIngresada = (ob1, ob2) => {
+        if (ob1 === ob2) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    // Visibilidad de la clave
+    const observarC2 = () => {
+        setVerClave2(!mostrarC2);
+    }
+    const observarC3 = () => {
+        setVerClave3(!mostrarC3);
+    }
+
+    return (
+        <form onSubmit={enviarNuevaClave}>
+            {error && <span>{error}</span>}
+            <div className="form-group">
+                <label className='label' htmlFor="correo">Ingrese su dirección de correo electrónico :</label>
+                <input className='form-control w-100' type="email"
+                    placeholder="Ingrese su correo electrónico**"
+                    id="correo" required
+                    name="correo"
+                    value={correo}
+                    onChange={e => setCorreo(e.target.value)}
+                />
+            </div>
+            <div className='form-row row'>
+                <div className="form-group col-md-11">
+                    <label className='label' htmlFor="clave2">Ingrese su nueva clave :</label>
+                    <input className='form-control w-100' type={mostrarC2 ? "text" : "password"}
+                        placeholder="Ingrese su nueva clave**"
+                        id="clave2" required
+                        name="clave2"
+                        value={clave2}
+                        onChange={e => setClave2(e.target.value)}
+                    />
+                </div>
+                <div className="form-group col-md-1 mt-4 d-flex justify-content-center">
+                    <Button variant="success" onClick={observarC2}>
+                        <FontAwesomeIcon icon={faEye} />
+                    </Button>
+                </div>
+            </div>
+            <div className='form-row row'>
+                <div className="form-group col-md-11">
+                    <label className='label' htmlFor="clave3">Confirme su nueva clave :</label>
+                    <input className='form-control w-100' type={mostrarC3 ? "text" : "password"}
+                        placeholder="Confirme su nueva clave**"
+                        id="clave3" required
+                        name="clave3"
+                        value={clave3}
+                        onChange={e => setClave3(e.target.value)}
+                    />
+                </div>
+                <div className="form-group col-md-1 mt-4 d-flex justify-content-center">
+                    <Button variant="success" onClick={observarC3}>
+                        <FontAwesomeIcon icon={faEye} />
+                    </Button>
+                </div>
+            </div>
+
+            <Button type="submit" variant="success" disabled={habilitado}>
+                {habilitado ? 'Enviando...' : 'Enviar'}
+            </Button>
+        </form>
+    )
+
 }

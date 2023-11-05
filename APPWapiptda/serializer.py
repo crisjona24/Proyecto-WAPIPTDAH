@@ -20,7 +20,8 @@ class PacienteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Paciente
         fields = ( 'id', 'nombre_usuario', 'apellido_usuario', 'email_usuario', 'username_usuario',
-                  'celular', 'contacto_emergencia', 'fecha_nacimiento', 'direccion', 'edad', 'is_activo', 'user')
+                  'celular', 'contacto_emergencia', 'fecha_nacimiento', 'direccion', 'edad', 'is_activo', 'user',
+                  )
 
 # Clase de serialización para el usuario comun
 class ComunSerializer(serializers.ModelSerializer):
@@ -41,14 +42,15 @@ class DominioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dominio
         fields = ('id', 'nombre', 'descripcion', 'slug_dominio',
-                  'identificador_dominio', 'portada_dominio')
+                  'identificador_dominio', 'portada_dominio',
+                  'fecha_registro_dominio')
 
 # Clase de serialización para los tipos de contenido registrados en el sistema
 class ContenidoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contenido
         fields = ('id', 'nombre', 'identificador_contenido', 'slug_contenido',
-                  'dominio_tipo', 'portada', 'dominio')
+                  'dominio_tipo', 'portada', 'dominio', 'fecha_registro_contenido')
 
 # Clase de serialización para las actividades registrados en el sistema
 class ContenidIndividualSerializer(serializers.ModelSerializer):
@@ -121,10 +123,18 @@ class DetalleInscripcionCursoSerializer(serializers.ModelSerializer):
 # Clase de serialización para los registros de ipeticiones generados
 # # por el usuario comun 
 class PeticionSerializer(serializers.ModelSerializer):
+    # Datos de usuario comun
+    nombre_usuario = serializers.SerializerMethodField()
+    apellido_usuario = serializers.SerializerMethodField()
     class Meta:
         model = Peticion
         fields = ('id', 'motivo_peticion', 'tipo_peticion', 'slug_peticion', 'fecha_edicion_peticion',
-                  'estado_revision', 'peticion_cuerpo', 'fecha_registro_peticion', 'usuario_comun')
+                  'estado_revision', 'peticion_cuerpo', 'fecha_registro_peticion', 'usuario_comun',
+                  'nombre_usuario', 'apellido_usuario')
+    def get_nombre_usuario(self, obj):
+        return obj.usuario_comun.nombre_usuario
+    def get_apellido_usuario(self, obj):
+        return obj.usuario_comun.apellido_usuario
 
 # Clase de serialización para los registros de detalle de peticiones
 # añadiendo los datos del usuario tecnico
@@ -171,12 +181,13 @@ class ReporteSerializer(serializers.ModelSerializer):
     tiempo_s_ = serializers.SerializerMethodField()
     observacion_ = serializers.SerializerMethodField()
     fecha_registro_resultado_ = serializers.SerializerMethodField()
+    respuesta_r = serializers.SerializerMethodField()
 
     class Meta:
         model = Reporte
         fields = ('id', 'titulo_reporte', 'descripcion_reporte', 'slug_reporte', 'estado_reporte', 
                   'usuario_comun', 'contenido_individual', 'paciente', 'resultado', 'fecha_registro_reporte',
-                  'fecha_edicion_reporte',
+                  'fecha_edicion_reporte', 'respuesta_r',
                   'nombre_paciente', 'apellido_paciente', 'correo_paciente', 'descripcion_individual',
                   'respuesta', 'tipo_contenido', 'tiempo_m_', 'tiempo_s_', 'observacion_', 'celular_paciente',
                   'fecha_registro_resultado_', 'edad_paciente', 'direccion_paciente', 'identificador_contenido')
@@ -209,4 +220,6 @@ class ReporteSerializer(serializers.ModelSerializer):
         return obj.resultado.observacion
     def get_fecha_registro_resultado_(self, obj):
         return obj.resultado.fecha_registro_resultado
+    def get_respuesta_r(self, obj):
+        return obj.resultado.respuesta
     
