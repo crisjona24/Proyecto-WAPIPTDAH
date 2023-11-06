@@ -88,8 +88,8 @@ export function ContenidoLista({ usuario }) {
         try {
             const busqueda_contenido = await BusquedaContenidos(nombrebuscar, slug, page);
             if (busqueda_contenido.data.results.length === 0) {
-                setNumeropag(1);
                 Swal.fire("No existen contenidos con ese nombre. Ingresa un nombre válido", "", "warning");
+                resetearBusqueda();
                 return;
             } else {
                 setContenidos(busqueda_contenido.data.results);

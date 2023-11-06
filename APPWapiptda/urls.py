@@ -24,8 +24,6 @@ router.register('detalle_sala', DetalleSalaView)
 router.register('reporte', ReporteView)
 router.register('dominios', ListaSoloDominiosView)
 router.register('contenidos', ListaSoloContenidosView)
-#router.register('peticion/pendiente/', PeticionListViewNo)
-#router.register('peticion/atendida/', PeticionListViewSi)
 
 urlpatterns = [
     path('aplicacion/', include(router.urls)),

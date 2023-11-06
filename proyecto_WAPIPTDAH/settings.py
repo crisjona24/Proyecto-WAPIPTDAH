@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     #'gdstorage',
     'APPWapiptda',
+    'Juegos',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt', # JWT
