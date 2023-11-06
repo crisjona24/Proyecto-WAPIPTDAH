@@ -1511,7 +1511,7 @@ export function FormularioCambio() {
     return (
         <form onSubmit={enviarNuevaClave}>
             {error && <span>{error}</span>}
-            <div className="form-group">
+            <div className="form-group mt-1">
                 <label className='label' htmlFor="correo">Ingrese su dirección de correo electrónico :</label>
                 <input className='form-control w-100' type="email"
                     placeholder="Ingrese su correo electrónico**"
@@ -1522,7 +1522,7 @@ export function FormularioCambio() {
                 />
             </div>
             <div className='form-row row'>
-                <div className="form-group col-md-11">
+                <div className="form-group col-md-10">
                     <label className='label' htmlFor="clave2">Ingrese su nueva clave :</label>
                     <input className='form-control w-100' type={mostrarC2 ? "text" : "password"}
                         placeholder="Ingrese su nueva clave**"
@@ -1532,14 +1532,15 @@ export function FormularioCambio() {
                         onChange={e => setClave2(e.target.value)}
                     />
                 </div>
-                <div className="form-group col-md-1 mt-4 d-flex justify-content-center">
-                    <Button variant="success" onClick={observarC2}>
+                <div className="form-group col-md-2 mt-4 d-flex justify-content-center">
+                    <Button variant="success" onClick={observarC2} className={mostrarC2 ? "opaco" : "no-opaco"}
+                        >
                         <FontAwesomeIcon icon={faEye} />
                     </Button>
                 </div>
             </div>
             <div className='form-row row'>
-                <div className="form-group col-md-11">
+                <div className="form-group col-md-10">
                     <label className='label' htmlFor="clave3">Confirme su nueva clave :</label>
                     <input className='form-control w-100' type={mostrarC3 ? "text" : "password"}
                         placeholder="Confirme su nueva clave**"
@@ -1549,8 +1550,8 @@ export function FormularioCambio() {
                         onChange={e => setClave3(e.target.value)}
                     />
                 </div>
-                <div className="form-group col-md-1 mt-4 d-flex justify-content-center">
-                    <Button variant="success" onClick={observarC3}>
+                <div className="form-group col-md-2 mt-4 d-flex justify-content-center">
+                    <Button variant="success" onClick={observarC3} className={mostrarC3 ? "opaco" : "no-opaco"}>
                         <FontAwesomeIcon icon={faEye} />
                     </Button>
                 </div>

@@ -8,7 +8,12 @@ from django.contrib.auth import authenticate, login, logout
 import re
 from django.http import JsonResponse
 from django.urls import reverse
-from datetime import datetime
+from datetime import datetime, timedelta
+import jwt
+import secrets
+import string
+from django.contrib.auth.models import User
+import pytz
 
 # from django.views.decorators.csrf import csrf_exempt
 import json
@@ -723,6 +728,89 @@ def validar_correo_link(_email):
         print(f"Error enviando el correo: {e}")
         return False
 
+## Generador de token 
+def generar_token_unico(longitud=50):
+    # Define los caracteres que se implementarán en la generación de token
+    caracteres = string.ascii_letters + string.digits
+    # Genera un token único aleatorio en base a las especificaciones
+    token = ''.join(secrets.choice(caracteres) for _ in range(longitud))
+    return token
+
+## Metodo de generacion de token con tiempo de expiracion
+## El tiempo y el token son controlados por medio de una entidad de 
+#3 recuperacion que avala la validez
+def generar_token_tiempo(ob1, tiempo_Exp=60):
+    # Calcula la fecha y hora de expiración para ser registrada en el objeto de Recuperación
+    expiracion_tiempo = datetime.utcnow() + timedelta(minutes=tiempo_Exp)
+    # Crea una instancia de la entidad Recuperacion
+    recuperacion = Recuperacion(usuario=ob1, fecha_creacion=datetime.utcnow(), fecha_limite=expiracion_tiempo)
+    recuperacion.save()
+    # Crea un token único
+    token = generar_token_unico()  
+    # Asocia el token único con la instancia de RecuperacionContrasena
+    recuperacion.token = token
+    recuperacion.save()  # Actualiza el registro con el token
+    # Crea los datos que se incluirán en el token y seran enviado por medio del correo
+    datos = {
+        'usuario_id': ob1.id,
+        'token': token,
+        'exp': expiracion_tiempo
+    }
+    # Genera el token firmado por medio del tipo de algoritmo HS256
+    token = jwt.encode(datos, settings.SECRET_KEY, algorithm='HS256')
+    # Devolvemos el token
+    return token
+
+## Metodo que permite la verificación de la validez del token enviado al usuario cuando
+## requiere cambiar o en su defecto recuperar su cuenta. El token es validado por medio de 
+## un tiempo de duracion equivalente a 1 hora
+def verificar_token_tiempo(token):
+    try:
+        # Formateo de tipo de servidor para comparar fechas de limite y registro
+        utc = pytz.timezone('UTC')
+        # Decodifica el token y verifica la firma
+        datos_obtenidos = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+        # Recupera el usuario y la instancia de Recuperacion
+        usuario_id = datos_obtenidos['usuario_id']
+        token = datos_obtenidos['token']
+        usuario = User.objects.get(id=usuario_id)
+        # Verificar si existe el objeto de Recuperacion
+        if not entidad_R_existe(usuario, token):
+            return None
+        # Obtenemos los datos del objeto Recuperacion asociado
+        ob_recuperacion = Recuperacion.objects.filter(usuario=usuario, token=token).first()
+        fecha_obtenida = ob_recuperacion.fecha_limite
+        # Parseamos
+        fecha_obtenida = fecha_obtenida.replace(microsecond=0, tzinfo=utc)
+        # Comprueba si el token ha expirado
+        fecha_actual = datetime.utcnow()
+        fecha_actual = datetime.utcnow().replace(tzinfo=utc, microsecond=0)
+        # Comparamos
+        if fecha_actual > fecha_obtenida:
+            return None
+        if ob_recuperacion.esta_vencido():
+            return None
+        
+        # Devuelve el usuario y la instancia de Recuperacion
+        if ob_recuperacion:
+            return usuario, ob_recuperacion
+        else:
+            return None
+    except jwt.ExpiredSignatureError:
+        # Token expirado
+        return None
+    except jwt.DecodeError:
+        # Token inválido
+        return None
+
+## Método para verificar que el objeto de Recuperacion exista o no
+## caso contrario se evitara cualquier acción
+def entidad_R_existe(ob1, ob2):
+    try:
+        if Recuperacion.objects.filter(usuario=ob1, token=ob2).exists():
+            return True
+    except Recuperacion.DoesNotExist:
+        return False
 
 ## Envio de correo de recuperacion de cuenta de usuario
 ## se envia un correo con un token firmado con un limite de tiempo
@@ -736,7 +824,8 @@ def validar_correo_recuperacion(_email):
         message = f'Reciba un cordial saludo de los administradores de WAPIPTDAH. ' \
             f'\nRecibimos una solicitud de recuperación de cuenta para el correo: {_email}. ' \
             f'\nEste es un mensaje para recuperar su cuenta por lo tanto debe seguir las instrucciones: ' \
-            f'\n\n1. Copia y pega el siguiente código especial para recuperar tu cuenta: {token_firmado}. ' \
+            f'\n\n1. Copia y pega el siguiente código especial para recuperar tu cuenta: ' \
+            f'\n{token_firmado}'\
             f'\n\n2. Ingresa los datos solicitados en la ventana que aparecerá. ' \
             f'\n' \
             f'\nSi usted no hizo esta solicitud, ignore completamente este mensaje. ' \
@@ -744,13 +833,38 @@ def validar_correo_recuperacion(_email):
             f'\nAtentamente: WAPIPTDAH.'
         from_email = settings.EMAIL_HOST_USER
         receiver_email = [_email]
+        # Envio del correo
         send_mail(subject, message, from_email, receiver_email, fail_silently=False)
         return True
     except Exception as e:
         print(f"Error enviando el correo: {e}")
         return False
 
-
+def validar_correo_recuperacion_2(ob1, _email):
+    try:
+        # Llamamos al metodo generador de token
+        token_firmado = generar_token_tiempo(ob1)
+        # Email
+        subject = 'Recuperación de cuenta'
+        message = f'Reciba un cordial saludo de los administradores de WAPIPTDAH. ' \
+            f'\nRecibimos una solicitud de recuperación de cuenta para el correo: {_email}. ' \
+            f'\nEste es un mensaje para recuperar su cuenta por lo tanto debe seguir las instrucciones: ' \
+            f'\n\n1. Copia y pega el siguiente código especial para recuperar tu cuenta: ' \
+            f'\n{token_firmado}'\
+            f'\n\n2. Ingresa los datos solicitados en la ventana que aparecerá. ' \
+            f'\n' \
+            f'\nSi usted no hizo esta solicitud, ignore completamente este mensaje. ' \
+            f'\n' \
+            f'\nAtentamente: WAPIPTDAH.'
+        from_email = settings.EMAIL_HOST_USER
+        receiver_email = [_email]
+        # Envio del correo
+        send_mail(subject, message, from_email, receiver_email, fail_silently=False)
+        return True
+    except Exception as e:
+        print(f"Error enviando el correo: {e}")
+        return False
+    
 ## Verificacion de existencia de correo
 def existe__correo(ob1):
     try:
@@ -777,8 +891,10 @@ def recuperar_cuenta(request):
             data = json.loads(request.body)
             email_ = data.get('correo')
             if existe__correo(email_):
+                # Obtenemos el user asociado al email
+                user_ = User.objects.get(email=email_)
                 # Veriicar correo valido
-                if validar_correo_recuperacion(email_) == False:
+                if validar_correo_recuperacion_2(user_, email_) == False:
                     return JsonResponse({'error': 'No existe una cuenta con ese correo'})
                 else:
                     return JsonResponse({'success': True})
@@ -801,15 +917,23 @@ def verificar_email_recuperacion(request):
             data = json.loads(request.body)
             codigo_ = data.get('codigo')
             # Llamamos al desfirmado
-            signer = Signer()
-            email_original = signer.unsign(codigo_)
-            user_ob = User.objects.get(email=email_original)
-            if is_tecnico(user_ob):
-                return JsonResponse({'success': True})
-            elif is_paciente(user_ob):
-                return JsonResponse({'success': True})
-            elif is_comun(user_ob):
-                return JsonResponse({'success': True})
+            #signer = Signer()
+            #email_original = signer.unsign(codigo_)
+            # Obtener el usuario e instancia de Recuperacion
+            usuario_ = verificar_token_tiempo(codigo_)
+            if usuario_ is not None:
+                # Obtener el usuario e instancia de Recuperacion
+                usuario, recuperacion = usuario_
+                # Eliminamos el registro de la entidd Recuperacion
+                recuperacion.delete()
+                if is_tecnico(usuario):
+                    return JsonResponse({'success': True})
+                elif is_paciente(usuario):
+                    return JsonResponse({'success': True})
+                elif is_comun(usuario):
+                    return JsonResponse({'success': True})
+                else:
+                    return JsonResponse({'error': 'Código de verificación inválido o ha expirado'})
             else:
                 return JsonResponse({'error': 'Código de verificación inválido o ha expirado'})
         else: 

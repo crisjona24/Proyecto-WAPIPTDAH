@@ -2,7 +2,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.text import slugify
 from cloudinary_storage.storage import MediaCloudinaryStorage, RawMediaCloudinaryStorage
-from datetime import date
+from datetime import date, datetime, timedelta
+import pytz
 
 """from gdstorage.storage import GoogleDriveStorage
 
@@ -19,6 +20,24 @@ y en vias del desarrollo del presente PIC. Cristobal Rios
 
 # Correo
 from django.utils.crypto import get_random_string
+
+# MODELO DE RECUPERACION DE CLAVE
+class Recuperacion(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_limite = models.DateTimeField(auto_now_add=False, blank=True, null=True)
+
+    def esta_vencido(self):
+        utc = pytz.timezone('UTC')
+        # Controlamos la fecha limite de valides del token
+        fecha_creacion = self.fecha_creacion + timedelta(hours=1)
+        fecha_creacion = fecha_creacion.replace(tzinfo=utc, microsecond=0)
+        fecha_actual = datetime.utcnow()
+        fecha_actual = datetime.utcnow().replace(tzinfo=utc, microsecond=0)
+        return fecha_actual > fecha_creacion
+    def __str__(self):
+        return f"Usuario : {self.usuario}"
 
 # MODELO USUARIO
 class Usuario(models.Model):
