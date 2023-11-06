@@ -1,11 +1,13 @@
 /* **** RESULTADOS **** */
 import axios from 'axios';
 
+// RUTA BASE DE REDIRECCIONAMIENTO
 const baseurl = axios.create({
     baseURL: 'http://localhost:8000/',
 })
 
 // Listado de resultados
+// Listado de resultados mediante un método de la REST API
 export const ResultadosListado = (page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -24,6 +26,7 @@ export const ResultadosListado = (page = 1) => {
     }
 };
 
+// Listado de resultados mediante un método de la REST API
 export const ResultadosListaUsuario = (id, page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -43,6 +46,7 @@ export const ResultadosListaUsuario = (id, page = 1) => {
 };
 
 // Crear resultados
+// Crear resultados mediante un método de la REST API
 export const ResultadosCrear = (resultado) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -62,6 +66,7 @@ export const ResultadosCrear = (resultado) => {
 };
 
 // Crear resultados
+// Crear resultados en la base de datos mediante método directo
 export const CrearResultadoNew = async (datos__post) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -80,7 +85,7 @@ export const CrearResultadoNew = async (datos__post) => {
 };
 
 
-// Eliminar Resultado
+// Eliminar Resultado mediante un método de la REST API
 export const ResultadoEliminar = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -95,11 +100,11 @@ export const ResultadoEliminar = (id) => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a los resultados: " + error.message);
+        throw new Error("No se puede eliminar el resultado: " + error.message);
     }
 };
 
-// Resultado edicion
+// Resultado edicion mediante un método de la REST API
 export const ResultadoEditar = (id, resultado) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -114,7 +119,7 @@ export const ResultadoEditar = (id, resultado) => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a los resultados: " + error.message);
+        throw new Error("No se puede editar el resultado: " + error.message);
     }
 };
 
@@ -137,6 +142,7 @@ export const ResultadoIndividual = (id) => {
     }
 };
 
+// Informacion individual de resultado
 export const ResultadoIndividualSolo = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -156,6 +162,7 @@ export const ResultadoIndividualSolo = (id) => {
 };
 
 /* *** METODOS COMUNES *** */
+// Método para la verificación de existencia de registro de un resultado
 export const VerificarResultado = async (slug) => {
     const tokenLocal = localStorage.getItem('token');
     if (!tokenLocal) {
@@ -174,7 +181,7 @@ export const VerificarResultado = async (slug) => {
     }
 };
 
-// Resultados por paciente
+// Listado de los resultados por paciente
 export const PacientesResultados = async (nombre, page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {

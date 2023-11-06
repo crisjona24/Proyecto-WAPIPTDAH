@@ -1,10 +1,12 @@
 // IMPORTACION DE LA LISTA DE CONTENIDO
 import axios from 'axios';
 
+// RUTA BASE DE REDIRECCIONAMIENTO
 const baseurl = axios.create({
     baseURL: 'http://localhost:8000/',
 })
 
+// Listado de contenido mediante un método de la REST API
 export const ContenidoListado = (page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -59,6 +61,7 @@ export const ContenidoListEspecifico = (slug, page = 1) => {
     }
 };
 
+// Metodo para crear contenido mediante un método de la REST API
 export const contenidoCrear = (contenido) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -95,6 +98,7 @@ export const CrearContenidoNew = async (datos__post) => {
     }
 }
 
+// Método para obtener los datos de un registro de contenido mediante un método de la REST API
 export const ContenidoIndividual = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -113,6 +117,7 @@ export const ContenidoIndividual = (id) => {
     }
 }
 
+// Método para editar un registro de contenido mediante un método de la REST API
 export const ContenidoEditar = (id, contenido) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -127,11 +132,13 @@ export const ContenidoEditar = (id, contenido) => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a los contenidos: " + error.message);
+        throw new Error("No se puede editar el registro de contenido: " + error.message);
     }
 }
 
 /* *** METODOS COMUNES *** */
+
+// Método para verificar la existencia de un registro de contenido mediante un método de la REST API
 export const VerificarContenido = async (slug) => {
     const tokenLocal = localStorage.getItem('token');
     if (!tokenLocal) {
@@ -150,6 +157,7 @@ export const VerificarContenido = async (slug) => {
     }
 }
 
+// Método para eliminar un registro de contenido mediante un método de la REST API
 export const ContenidoEliminar = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -183,6 +191,6 @@ export const BusquedaContenidos = (nombre, slug, page = 1) => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a las salas: " + error.message);
+        throw new Error("No se puede acceder a los registros de contenido: " + error.message);
     }
 };

@@ -54,6 +54,7 @@ export function IndividualLista({ usuario }) {
         }
     }
 
+    // Cargar slug del dominio
     const cargarSlugDominio = async () => {
         try {
             const slugDomi = await ObtenerSlugDominio(slug);
@@ -75,6 +76,7 @@ export function IndividualLista({ usuario }) {
         }
     }
 
+    // Cargar nombres de nivel para el selección
     const cargarNombresNivel = async () => {
         try {
             // Obtenemos los datos de los niveles
@@ -89,6 +91,7 @@ export function IndividualLista({ usuario }) {
         }
     }
 
+    // Cargar actividades dependiendo del nombre del nivel
     const cargarContenidosINombre = async () => {
         try {
             const contIN = await IndividualListNombre(slug, nombre_nivel, page);
@@ -115,17 +118,32 @@ export function IndividualLista({ usuario }) {
             } else if (nombre_nivel) {
                 cargarContenidosINombre();
             }
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (nombre_nivel === "none") {
+                cargarContenidosI();
+            } else if (nombre_nivel) {
+                cargarContenidosINombre();
+            }
+        }, 3600000); // 1 hora
+        return () => clearInterval(interval);
+    }, [slug, nombre_nivel, page])
+
+
+    // Manejo del cargado de slug y nombres de nivel
+    useEffect(() => {
+        if (token) {
             cargarSlugDominio();
             cargarNombresNivel();
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            cargarContenidosI();
             cargarSlugDominio();
             cargarNombresNivel();
-        }, 3600000);
+        }, 3600000); // 1 hora
         return () => clearInterval(interval);
-    }, [slug, nombre_nivel, page])
+    }, [slug])
 
     // Funcion para mostrar errores
     const mostrarError = (message) => {

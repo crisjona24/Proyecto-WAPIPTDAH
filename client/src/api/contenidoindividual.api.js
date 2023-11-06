@@ -1,10 +1,11 @@
 import axios from 'axios';
 
+// RUTA BASE DE REDIRECCIONAMIENTO
 const baseurl = axios.create({
     baseURL: 'http://localhost:8000/',
 })
 
-// Listas
+// Listas de contenidos individuales mediante un método de la REST API
 export const ContenidoIndividualTodo = (slug) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -78,13 +79,13 @@ export const IndividualListNombre = (slug, nombre, page = 1) => {
 };
 
 // Crear contenido individual
-export const ContenidoIndividualCrear = (contenido) => {
+export const ContenidoIndividualCrear = async (contenido) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.post('wapiptdah/aplicacion/contenido_individual/', contenido,
+        return await baseurl.post('wapiptdah/aplicacion/contenido_individual/', contenido,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -134,13 +135,13 @@ export const CargarContenido = async (slug) => {
     }
 }
 
-export const ContenidoDatosIndividual = (id) => {
+export const ContenidoDatosIndividual = async (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/aplicacion/contenido_individual/${id}/`,
+        return await baseurl.get(`wapiptdah/aplicacion/contenido_individual/${id}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -172,6 +173,7 @@ export const ContenidoIndividualEditar = (id, contenido) => {
 }
 
 /* *** METODOS COMUNES *** */
+// Método para verificar la existencia del registro de contenido
 export const VerificarContenidoIndividual = async (slug) => {
     const tokenLocal = localStorage.getItem('token');
     if (!tokenLocal) {
@@ -190,6 +192,7 @@ export const VerificarContenidoIndividual = async (slug) => {
     }
 }
 
+// Método para eliminar contenido individual
 export const IndividualEliminar = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {

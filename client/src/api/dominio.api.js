@@ -2,11 +2,12 @@
 import axios from 'axios';
 //import { useHistory } from 'react-router-dom';
 
+// RUTA BASE DE REDIRECCIONAMIENTO
 const baseurl = axios.create({
     baseURL: 'http://localhost:8000/',
 })
 
-// Lista de dominios
+// Lista de dominios obtenidos mediante un método de la REST API
 export const DominiosListado = (page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -25,6 +26,7 @@ export const DominiosListado = (page = 1) => {
     }
 }
 
+// Lista de dominios obtenidos mediante un método de la REST API
 export const DominiosListadoSolo = () => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -43,7 +45,7 @@ export const DominiosListadoSolo = () => {
     }
 }
 
-// Crear dominio
+// Crear dominio a través de un método de la REST API
 export const DominiosCrear = (dominio) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -62,6 +64,7 @@ export const DominiosCrear = (dominio) => {
     }
 }
 
+// Crear dominio a través de un método directo
 export const CrearDominioNew = async (datos__post) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -79,14 +82,14 @@ export const CrearDominioNew = async (datos__post) => {
     }
 }
 
-// Datos individuales de un dominio
-export const DominioIndividual = (id) => {
+// Datos individuales de un dominio a través de un método de la REST API
+export const DominioIndividual = async (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/aplicacion/dominio/${id}/`,
+        return await baseurl.get(`wapiptdah/aplicacion/dominio/${id}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -98,14 +101,14 @@ export const DominioIndividual = (id) => {
     }
 }
 
-// Editar dominio
-export const DominioEditar = (id, dominio) => {
+// Editar dominio a través de un método de la REST API
+export const DominioEditar = async (id, dominio) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.put(`wapiptdah/aplicacion/dominio/${id}/`, dominio,
+        return await baseurl.put(`wapiptdah/aplicacion/dominio/${id}/`, dominio,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -118,6 +121,8 @@ export const DominioEditar = (id, dominio) => {
 }
 
 /* *** METODOS COMUNES *** */
+
+// Método para verificar si el dominio existe
 export const VerificarDominio = async (slug) => {
     const tokenLocal = localStorage.getItem('token');
     if (!tokenLocal) {
@@ -135,6 +140,7 @@ export const VerificarDominio = async (slug) => {
     }
 }
 
+// Método para eliminar un registro de Dominio
 export const DominioEliminar = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {

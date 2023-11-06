@@ -1,11 +1,13 @@
 // Objective: API for the course module
 import axios from 'axios';
 
+// RUTA BASE DE REDIRECCIONAMIENTO
 const baseurl = axios.create({
     baseURL: 'http://localhost:8000/',
 })
 
 /* Listado de cursos */
+// Listado de cursos mediante un método de la REST API
 export const CursoListado = (page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -25,6 +27,7 @@ export const CursoListado = (page = 1) => {
 };
 
 // LISTA DE CURSOS DE UN USUARIO
+// Listado de cursos para el usuario comun mediante un método de la REST API
 export const CursosUsuarioComun = (page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -42,7 +45,7 @@ export const CursosUsuarioComun = (page = 1) => {
     }
 };
 
-/* Crear un nuevo curso */
+// Listado de cursos para el usuario comun mediante un método de la REST API
 export const CursoCrear = (curso) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -61,7 +64,7 @@ export const CursoCrear = (curso) => {
     }
 };
 
-/* Crear curso manualmente */
+// Listado de cursos para el usuario comun  mediante un método directo
 export const CrearCurso = async (datos__post) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -79,7 +82,7 @@ export const CrearCurso = async (datos__post) => {
     }
 };
 
-/* Datos individuales */
+// Obtener los datos individuales del registro de un curso
 export const CursoIndividual = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -98,7 +101,7 @@ export const CursoIndividual = (id) => {
     }
 };
 
-/* Actualizar curso */
+// Edición del registro de curso mediante un método de la REST API
 export const CursoEditar = (id, curso) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -117,7 +120,7 @@ export const CursoEditar = (id, curso) => {
     }
 };
 
-/* Eliminar curso */
+// Eliminación del registro de curso mediante un método de la REST API
 export const CursoEliminar = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -136,7 +139,7 @@ export const CursoEliminar = (id) => {
     }
 };
 
-/* *** METODOS COMUNES *** */
+// Método para verificar la existencia del registro de un curso mediante un slug
 export const VerificarCurso = async (slug) => {
     const tokenLocal = localStorage.getItem('token');
     if (!tokenLocal) {
@@ -154,6 +157,7 @@ export const VerificarCurso = async (slug) => {
     }
 }
 
+// Método para verificar la inscripción de un estudiante en un curso
 export const VerificarInscripcion = () => {
     const tokenLocal = localStorage.getItem('token');
     if (!tokenLocal) {
@@ -171,6 +175,7 @@ export const VerificarInscripcion = () => {
     }
 }
 
+// Listado de los estudiantes que se están inscritos en un curso
 export const PacientesInscritos = (id, page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -190,13 +195,13 @@ export const PacientesInscritos = (id, page = 1) => {
 };
 
 // Obtener slug de curso
-export const ObtenerSlugCurso = (id) => {
+export const ObtenerSlugCurso = async (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/obtener/curso/${id}/`,
+        return await baseurl.get(`wapiptdah/obtener/curso/${id}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`

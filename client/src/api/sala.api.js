@@ -6,6 +6,7 @@ const baseurl = axios.create({
 })
 
 // LISTADO DE SALAS
+// Obtener la lista de salas registradas mediante un método REST API
 export const SalaListado = (page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -24,7 +25,7 @@ export const SalaListado = (page = 1) => {
     }
 };
 
-// CREAR SALA
+// Creación de un registro de sala mediante un método de la REST API
 export const SalaCrear = (sala) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -43,6 +44,7 @@ export const SalaCrear = (sala) => {
     }
 };
 
+// Creación de un registro de sala en la base de datos
 export const CrearSalaNueva = async (datos__post) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -62,7 +64,8 @@ export const CrearSalaNueva = async (datos__post) => {
 };
 
 
-// SALA INDIVIDUAL
+// DETALLE DE SALA
+// Obtener el detalle de una sala mediante un método REST API
 export const SalaIndividual = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -83,6 +86,7 @@ export const SalaIndividual = (id) => {
 
 
 // ACTUALIZAR SALA
+// Actualizar un registro de sala mediante un método de la REST API
 export const SalaActualizar = (id, sala) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -101,6 +105,7 @@ export const SalaActualizar = (id, sala) => {
     }
 };
 
+// Actualizar un registro de sala en la base de datos
 export const EditarSala = async (datos__post) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -120,6 +125,7 @@ export const EditarSala = async (datos__post) => {
 };
 
 /* *** METODOS COMUNES *** */
+// Verificar si existe una sala
 export const VerificarSala = async (slug) => {
     const tokenLocal = localStorage.getItem('token');
     if (!tokenLocal) {
@@ -140,6 +146,7 @@ export const VerificarSala = async (slug) => {
 
 
 // ELIMINAR SALA
+// Método para eliminar un registro de sala mediante un método de la REST API
 export const SalaEliminar = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -159,6 +166,7 @@ export const SalaEliminar = (id) => {
 };
 
 // LISTA DE SALAS DE UN USUARIO COMUN
+// Obtener la lista de salas de un usuario comun mediante un método REST API
 export const SalasUsuarioComun = (id, page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -177,6 +185,7 @@ export const SalasUsuarioComun = (id, page = 1) => {
 };
 
 // LISTA DE SALAS DE UN USUARIO COMUN ATENDIDAS
+// Obtener la lista de salas atendidas de un usuario comun mediante un método REST API
 export const SalasUsuarioComunAtendidas = (id, page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -195,6 +204,7 @@ export const SalasUsuarioComunAtendidas = (id, page = 1) => {
 };
 
 // LISTA DE SALAS DE UN PACIENTE
+// Obtener la lista de salas de un estudiante mediante un método REST API
 export const SalasPaciente = (id, page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -213,6 +223,7 @@ export const SalasPaciente = (id, page = 1) => {
 };
 
 // Busqueda de salas
+// Método de busqueda de un registro de sala mediante el nombre de estudiante
 export const BusquedaSalas = (nombre, page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -264,11 +275,12 @@ export const ReinicioContadorSalas = async () => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a la peticion: " + error.message);
+        throw new Error("No se puede reiniciar el contador: " + error.message);
     }
 };
 
 // Atender sala
+// Método para registrar la atención de una sala
 export const AtenderSala = (slug) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -283,7 +295,7 @@ export const AtenderSala = (slug) => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a la sala: " + error.message);
+        throw new Error("No se puede atender a la sala: " + error.message);
     }
 };
 
@@ -322,7 +334,7 @@ export const ContadorSalasAtendida = async () => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a las salas: " + error.message);
+        throw new Error("No se puede obtener el contador de salas atendidas: " + error.message);
     }
 };
 
@@ -341,7 +353,7 @@ export const ReinicioContadorSalasAtendidas = async () => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a la peticion: " + error.message);
+        throw new Error("No se puede reinicar el contador de salas atendidas: " + error.message);
     }
 };
 
@@ -360,7 +372,7 @@ export const SalaporFecha = async (fecha, id, page = 1) => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a las peticiones: " + error.message);
+        throw new Error("No se puede acceder a los registros de sala: " + error.message);
     }
 };
 
@@ -378,7 +390,7 @@ export const SalaFecha = async (fecha, page = 1) => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a las peticiones: " + error.message);
+        throw new Error("No se puede acceder a los registros de sala: " + error.message);
     }
 };
 
@@ -396,6 +408,6 @@ export const SalaporFechaAtendida = async (fecha, id, page = 1) => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a las peticiones: " + error.message);
+        throw new Error("No se puede acceder a los registros de sala: " + error.message);
     }
 };

@@ -2,11 +2,12 @@
 import axios from 'axios';
 //import { useHistory } from 'react-router-dom';
 
+// RUTA BASE DE REDIRECCIONAMIENTO
 const baseurl = axios.create({
     baseURL: 'http://localhost:8000/',
 })
 
-// Listado de niveles
+// Listado de niveles a través de un mpéodo de la REST API
 export const NivelListado = () => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -25,7 +26,7 @@ export const NivelListado = () => {
     }
 }
 
-// Crear nivel
+// Crear nivel a través de un método de la REST API
 export const NivelCrear = (grado) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -44,7 +45,7 @@ export const NivelCrear = (grado) => {
     }
 }
 
-
+// Crear nivel a través de un método directo
 export const CrearNivelNew = async (datos__post) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -63,6 +64,7 @@ export const CrearNivelNew = async (datos__post) => {
 }
 
 // Nivel individual
+// Obtener los datos del registro de nivel
 export const NivelIndividual = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -82,6 +84,7 @@ export const NivelIndividual = (id) => {
 }
 
 // Editar nivel
+// Edicion de niveles mediante un método de la REST API
 export const NivelEditar = (id, grado) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -101,6 +104,7 @@ export const NivelEditar = (id, grado) => {
 }
 
 /* *** METODOS COMUNES *** */
+// Verificación de la existencia de un registro de nivel
 export const VerificarNivel = async (slug) => {
     const tokenLocal = localStorage.getItem('token');
     if (!tokenLocal) {
@@ -138,6 +142,7 @@ export const NivelEliminar = (id) => {
 }
 
 // Contacto
+// Envío de correo de contacto
 export const EnviarCorreo = async (datos__post) => {
     const token = localStorage.getItem('token');
     if (!token) {

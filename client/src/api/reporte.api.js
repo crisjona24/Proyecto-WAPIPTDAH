@@ -1,11 +1,13 @@
 // IMPORTACION DE LA LISTA DE CONTENIDO
 import axios from 'axios';
 
+// RUTA BASE DE REDIRECCIONAMIENTO
 const baseurl = axios.create({
     baseURL: 'http://localhost:8000/',
 })
 
 // Listados
+// Listado de reportes mediante un método de la REST API
 export const ReporteListado = (page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -24,6 +26,7 @@ export const ReporteListado = (page = 1) => {
     }
 };
 
+// Listado de reportes pertenecientes a un usuario comun
 export const ReporteListadoUsuarioComun = (id, page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -43,6 +46,7 @@ export const ReporteListadoUsuarioComun = (id, page = 1) => {
 };
 
 // Creacion 
+// Crear reportes mediante un método de la REST API
 export const ReporteCrear = (reporte) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -61,13 +65,14 @@ export const ReporteCrear = (reporte) => {
     }
 };
 
-export const CrearReporteNuevo = (id) => {
+// Crear reportes mediante un método directo en la base de datos
+export const CrearReporteNuevo = async (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/registro/reporte/${id}/`,
+        return await baseurl.get(`wapiptdah/registro/reporte/${id}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -79,14 +84,14 @@ export const CrearReporteNuevo = (id) => {
     }
 };
 
-
-export const GenerarReporteAll = (datos__post) => {
+// Generación de reportes de forma general es decir de todos los resultados disponibles 
+export const GenerarReporteAll = async (datos__post) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.post('wapiptdah/generar/reporte/all/', datos__post,
+        return await baseurl.post('wapiptdah/generar/reporte/all/', datos__post,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -98,6 +103,8 @@ export const GenerarReporteAll = (datos__post) => {
 };
 
 // Acceso a datos individuales
+
+// Acceso a datos individuales de un reporte
 export const ReporteIndividual = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -118,6 +125,8 @@ export const ReporteIndividual = (id) => {
 
 
 // Edicion
+
+// Edicion de reportes mediante un método de la REST API
 export const ReporteEditar = (id, reporte) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -132,11 +141,13 @@ export const ReporteEditar = (id, reporte) => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder al reporte: " + error.message);
+        throw new Error("No se puede editar el registro de reporte: " + error.message);
     }
 };
 
 /* *** METODOS COMUNES *** */
+
+// Método para la verificación de la existencia de registro de un reporte
 export const VerificarReporte = async (slug) => {
     const tokenLocal = localStorage.getItem('token');
     if (!tokenLocal) {
@@ -155,6 +166,7 @@ export const VerificarReporte = async (slug) => {
     }
 };
 
+// Método para la eliminación de un registro de un reporte
 export const ReporteEliminar = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -174,6 +186,8 @@ export const ReporteEliminar = (id) => {
 };
 
 // METODOS VARIOS
+
+// Método para la modificación del estado de un reporte
 export const ModificarEstadoResultado = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {

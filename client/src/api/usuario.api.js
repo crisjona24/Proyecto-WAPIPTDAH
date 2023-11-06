@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const baseurl = axios.create({
-    baseURL: 'http://localhost:8000/wapiptdah/',
+    baseURL: 'http://localhost:8000/',
 })
 
 /* ****  TECNICO **** */
@@ -11,7 +11,7 @@ export const UsuarioListado = () => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get('aplicacion/usuario/',
+        return baseurl.get('wapiptdah/aplicacion/usuario/',
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -23,20 +23,22 @@ export const UsuarioListado = () => {
     }
 };
 
-export const UsuarioCrear = (usuario) => baseurl.post('aplicacion/usuario/', usuario)
+// Creacion de usuario mediante método de API REST
+export const UsuarioCrear = (usuario) => baseurl.post('wapiptdah/aplicacion/usuario/', usuario)
 
+// Creacion de usuario con rol tecnico en la base de datos
 export const UsuarioCrearNuevo = async (datos__post) => {
-    return await baseurl.post('registro_usuario/', datos__post);
+    return await baseurl.post('wapiptdah/registro_usuario/', datos__post);
 };
 
-// Editar usuario
+// Editar usuario mediante método de API REST
 export const UsuarioEditar = (id, usuario) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.put(`aplicacion/usuario/${id}/`, usuario,
+        return baseurl.put(`wapiptdah/aplicacion/usuario/${id}/`, usuario,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -48,14 +50,14 @@ export const UsuarioEditar = (id, usuario) => {
     }
 };
 
-// Usuario individual
+// Obtención de datos de usuario mediante método de API REST
 export const UsuarioIndividual = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`aplicacion/usuario/${id}/`,
+        return baseurl.get(`wapiptdah/aplicacion/usuario/${id}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -70,13 +72,14 @@ export const UsuarioIndividual = (id) => {
 
 /* ****  PACIENTE **** */
 
+// Obtención de todos los registros de usuario con rol paciente mediante método de API REST
 export const PacienteListado = () => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get('aplicacion/paciente/',
+        return baseurl.get('wapiptdah/aplicacion/paciente/',
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -88,21 +91,22 @@ export const PacienteListado = () => {
     }
 };
 
-export const PacienteCrear = (paciente) => baseurl.post('aplicacion/paciente/', paciente)
+// Creacion de usuario mediante método de API REST
+export const PacienteCrear = (paciente) => baseurl.post('wapiptdah/aplicacion/paciente/', paciente)
 
-// Crear paciente
+// Crear paciente en la base de datos
 export const CrearPaciente = async (datos__post) => {
-    return await baseurl.post('registro_paciente/', datos__post);
+    return await baseurl.post('wapiptdah/registro_paciente/', datos__post);
 };
 
-// Editar paciente
+// Editar paciente mediante método de API REST
 export const PacienteEditar = (id, usuario) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.put(`aplicacion/paciente/${id}/`, usuario,
+        return baseurl.put(`wapiptdah/aplicacion/paciente/${id}/`, usuario,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -114,14 +118,14 @@ export const PacienteEditar = (id, usuario) => {
     }
 };
 
-// Paciente individual
+// Obtención de datos de usuario mediante método de API REST
 export const PacienteIndividual = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`aplicacion/paciente/${id}/`,
+        return baseurl.get(`wapiptdah/aplicacion/paciente/${id}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -133,32 +137,35 @@ export const PacienteIndividual = (id) => {
     }
 };
 
-// Busqueda de salas
+// Busqueda de pacientes inscritos en un curso por nombre y apeliido para conocer
+// quienes se encuentran registrados en un mismo curso
 export const BusquedaPacientesCurso = (nombre, slug, page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`busqueda/paciente/curso/${encodeURIComponent(nombre)}/${slug}/?page=${page}`,
+        return baseurl.get(`wapiptdah/busqueda/paciente/curso/${encodeURIComponent(nombre)}/${slug}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a las salas: " + error.message);
+        throw new Error("No se puede acceder a los pacientes: " + error.message);
     }
 };
 
 /* ****  COMUN **** */
+
+// Obtención de todos los registros de usuario con rol comun mediante método de API REST
 export const ComunListado = () => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get('aplicacion/comun/',
+        return baseurl.get('wapiptdah/aplicacion/comun/',
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -170,21 +177,22 @@ export const ComunListado = () => {
     }
 };
 
-export const ComunCrear = (paciente) => baseurl.post('aplicacion/comun/', paciente)
+// Creacion de usuario mediante método de API REST
+export const ComunCrear = (paciente) => baseurl.post('wapiptdah/aplicacion/comun/', paciente)
 
-// Crear usuario comun
+// Crear usuario comun en la base de datos
 export const CrearComunNew = async (datos__post) => {
-    return await baseurl.post('registro_comun/', datos__post);
+    return await baseurl.post('wapiptdah/registro_comun/', datos__post);
 };
 
-// Editar usuario comun
+// Editar usuario comun mediante método de API REST
 export const ComunEditar = (id, usuario) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.put(`aplicacion/comun/${id}/`, usuario,
+        return baseurl.put(`wapiptdah/aplicacion/comun/${id}/`, usuario,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -196,14 +204,14 @@ export const ComunEditar = (id, usuario) => {
     }
 };
 
-// Datos individuales de usuario comun
+// Datos individuales de usuario comun mediante método de API REST
 export const ComunIndividual = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`aplicacion/comun/${id}/`,
+        return baseurl.get(`wapiptdah/aplicacion/comun/${id}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -216,13 +224,16 @@ export const ComunIndividual = (id) => {
 };
 
 /* *** METODOS COMUNES *** */
+
+// Método para la verificación de inicio de sesión de un usuario específico
+// a traves de su respuesta request al servidor Backend
 export const VerificarUsuario = async () => {
     const tokenLocal = localStorage.getItem('token');
     if (!tokenLocal) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get('verificar/usuario/', {
+        return await baseurl.get('wapiptdah/verificar/usuario/', {
             headers: {
                 'Authorization': `Bearer ${tokenLocal}`
             }
@@ -232,14 +243,14 @@ export const VerificarUsuario = async () => {
     }
 };
 
-// Datos de usuario
+// Datos de usuario logueado
 export const DatosUser = async () => {
     const tokenLocal = localStorage.getItem('token');
     if (!tokenLocal) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get('datos/usuario/', {
+        return await baseurl.get('wapiptdah/datos/usuario/', {
             headers: {
                 'Authorization': `Bearer ${tokenLocal}`
                 //'Authorization': `Token ${tokenLocal}`
@@ -250,14 +261,14 @@ export const DatosUser = async () => {
     }
 };
 
-// Eliminar usuario comun
+// Eliminar usuario comun mediante método de API REST
 export const UsuarioEliminar = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.delete(`aplicacion/user/${id}/`,
+        return baseurl.delete(`wapiptdah/aplicacion/user/${id}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -270,13 +281,15 @@ export const UsuarioEliminar = (id) => {
 };
 
 /* INSCRIPCIONES A CURSO*/
+
+// Método para el registro o inscripción de un estudiante en un curso específico
 export const InscripcionCurso = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`registro/curso/${id}/`,
+        return baseurl.get(`wapiptdah/registro/curso/${id}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -288,13 +301,14 @@ export const InscripcionCurso = (id) => {
     }
 };
 
+// Método para obtener la fecha de inscripción de un estudiante en un curso específico
 export const FechaInscripcionCurso = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`obtener/fecha/inscripcion/${id}/`,
+        return baseurl.get(`wapiptdah/obtener/fecha/inscripcion/${id}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -307,20 +321,20 @@ export const FechaInscripcionCurso = (id) => {
 
 // Verificacion de cuenta
 export const VerificarCuenta = async (datos__post) => {
-    return await baseurl.post('verificar/cuenta/', datos__post);
+    return await baseurl.post('wapiptdah/verificar/cuenta/', datos__post);
 };
 
 // Cambiar clave de cuenta
 export const CambiarClaveCuenta = async (datos__post) => {
-    return await baseurl.post('cambiar/clave/', datos__post);
+    return await baseurl.post('wapiptdah/cambiar/clave/', datos__post);
 };
 
 // Cambiar clave de cuenta
 export const EnviarCodigoRecuperacion = async (datos__post) => {
-    return await baseurl.post('verificar/codigo/cuenta/', datos__post);
+    return await baseurl.post('wapiptdah/verificar/codigo/cuenta/', datos__post);
 };
 
 // Envio de nuevas claves
 export const EnvioNuevaClave = async (datos__post) => {
-    return await baseurl.post('registro/nueva/clave/', datos__post);
+    return await baseurl.post('wapiptdah/registro/nueva/clave/', datos__post);
 };

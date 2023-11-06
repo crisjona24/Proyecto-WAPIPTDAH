@@ -1,12 +1,15 @@
 // Objective: API for the course module
 import axios from 'axios';
 
+// RUTA BASE DE REDIRECCIONAMIENTO
 const baseurl = axios.create({
     baseURL: 'http://localhost:8000/',
 })
 
 
 /* Listado de peticiones */
+
+// Listado de peticiones mediante un método de la REST API
 export const PeticionListado = () => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -25,6 +28,7 @@ export const PeticionListado = () => {
     }
 };
 
+// Listado de peticiones pendientes mediante un método de la REST API
 export const PeticionPendiente = (page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -43,6 +47,7 @@ export const PeticionPendiente = (page = 1) => {
     }
 };
 
+// Listado de peticiones atendidas mediante un método de la REST API
 export const PeticionAtendida = (page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -61,6 +66,7 @@ export const PeticionAtendida = (page = 1) => {
     }
 };
 
+// Listado de peticiones de un usuario comun mediante un método de la REST API
 export const PeticionesUC = (id, page = 1) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -99,6 +105,7 @@ export const PeticionCrear = (peticion) => {
 };
 
 /* Crear peticion manualmente */
+// Crear un nuevo peticion mediante metodo directo
 export const CrearPeticion = async (datos__post) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -117,6 +124,8 @@ export const CrearPeticion = async (datos__post) => {
 };
 
 /* Datos individuales */
+
+// Datos de una peticion mediante un método de la REST API
 export const PeticionIndividual = (id) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -137,6 +146,7 @@ export const PeticionIndividual = (id) => {
 
 
 /* Actualizar peticion */
+// Actualizar un peticion mediante un método de la REST API
 export const PeticionEditar = (id, peticion) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -170,11 +180,13 @@ export const PeticionEliminar = (id) => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a la petición: " + error.message);
+        throw new Error("No se puede eliminar el registro de petición: " + error.message);
     }
 };
 
 /* *** METODOS COMUNES *** */
+
+// Método para verificar la existencia de un registro de petición en base a un slug
 export const VerificarPeticion = async (slug) => {
     const tokenLocal = localStorage.getItem('token');
     if (!tokenLocal) {
@@ -226,7 +238,7 @@ export const ContadorPeticiones = async () => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a la petición: " + error.message);
+        throw new Error("No se puede acceder al contador de petición: " + error.message);
     }
 };
 
@@ -245,7 +257,7 @@ export const ReinicioContador = async () => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a la petición: " + error.message);
+        throw new Error("No se puede reiniciar el contador de petición: " + error.message);
     }
 };
 
@@ -264,7 +276,7 @@ export const ContadorPeticionesAtendidas = async () => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a la petición: " + error.message);
+        throw new Error("No se puede acceder al contador de petición: " + error.message);
     }
 };
 
@@ -283,7 +295,7 @@ export const ReinicioContadorAtendidas = async () => {
                 }
             })
     } catch (error) {
-        throw new Error("No se puede acceder a la petición: " + error.message);
+        throw new Error("No se puede reinicar el contador de petición: " + error.message);
     }
 };
 
