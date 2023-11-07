@@ -34,7 +34,7 @@ export const CursosUsuarioComun = (page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/lista/cursos/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/lista/cursos/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -71,7 +71,7 @@ export const CrearCurso = async (datos__post) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.post('wapiptdah/registro_curso/', datos__post, {
+        return await baseurl.post('wapiptdah/estudio/registro_curso/', datos__post, {
             headers: {
                 'Authorization': `Bearer ${token}`
                 //'Authorization': `Token ${token}`
@@ -146,7 +146,7 @@ export const VerificarCurso = async (slug) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/verificar/curso/${slug}/`, {
+        return await baseurl.get(`wapiptdah/estudio/verificar/curso/${slug}/`, {
             headers: {
                 'Authorization': `Bearer ${tokenLocal}`
                 //'Authorization': `Token ${tokenLocal}`
@@ -182,7 +182,7 @@ export const PacientesInscritos = (id, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/lista/pacientes/${id}/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/lista/pacientes/${id}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -220,7 +220,7 @@ export const BusquedaCurso = (nombre, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/busqueda/curso/${encodeURIComponent(nombre)}/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/busqueda/curso/${encodeURIComponent(nombre)}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -238,7 +238,7 @@ export const CursoporFecha = async (fecha, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/curso/fecha/${fecha}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/curso/fecha/${fecha}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -256,7 +256,7 @@ export const CursoporFechaTecnico = async (fecha, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/curso/fecha/tecnico/${fecha}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/curso/fecha/tecnico/${fecha}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`

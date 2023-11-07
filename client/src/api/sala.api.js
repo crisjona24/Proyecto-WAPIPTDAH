@@ -51,7 +51,7 @@ export const CrearSalaNueva = async (datos__post) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.post('wapiptdah/registro_sala/', datos__post,
+        return await baseurl.post('wapiptdah/estudio/registro_sala/', datos__post,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -112,7 +112,7 @@ export const EditarSala = async (datos__post) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.post('wapiptdah/edicion_sala/', datos__post,
+        return await baseurl.post('wapiptdah/estudio/edicion_sala/', datos__post,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -132,7 +132,7 @@ export const VerificarSala = async (slug) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/verificar/sala/${slug}/`,
+        return await baseurl.get(`wapiptdah/estudio/verificar/sala/${slug}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${tokenLocal}`
@@ -173,7 +173,7 @@ export const SalasUsuarioComun = (id, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/lista/salas/${id}/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/lista/salas/${id}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -192,7 +192,7 @@ export const SalasUsuarioComunAtendidas = (id, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/lista/salas/atendidas/${id}/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/lista/salas/atendidas/${id}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -211,7 +211,7 @@ export const SalasPaciente = (id, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/lista/salas/paciente/${id}/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/lista/salas/paciente/${id}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -230,7 +230,7 @@ export const BusquedaSalas = (nombre, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/busqueda/salas/${encodeURIComponent(nombre)}/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/busqueda/salas/${encodeURIComponent(nombre)}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -364,7 +364,7 @@ export const SalaporFecha = async (fecha, id, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/sala/fecha/${fecha}/${id}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/sala/fecha/${fecha}/${id}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -383,7 +383,7 @@ export const SalaFecha = async (fecha, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/sala/fecha/tecnico/${fecha}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/sala/fecha/tecnico/${fecha}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -401,7 +401,7 @@ export const SalaporFechaAtendida = async (fecha, id, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/sala/fecha/atendida/${fecha}/${id}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/sala/fecha/atendida/${fecha}/${id}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`

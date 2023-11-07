@@ -52,7 +52,7 @@ export const CrearNivelNew = async (datos__post) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.post('wapiptdah/registro_nivel/', datos__post, {
+        return await baseurl.post('wapiptdah/estudio/registro_nivel/', datos__post, {
             headers: {
                 'Authorization': `Bearer ${token}`
                 //'Authorization': `Token ${token}`
@@ -111,7 +111,7 @@ export const VerificarNivel = async (slug) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/verificar/nivel/${slug}/`, {
+        return await baseurl.get(`wapiptdah/estudio/verificar/nivel/${slug}/`, {
             headers: {
                 'Authorization': `Bearer ${tokenLocal}`
                 //'Authorization': `Token ${tokenLocal}`

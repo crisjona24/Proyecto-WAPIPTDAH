@@ -12,7 +12,7 @@ export const ContenidoIndividualTodo = (slug) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/contenidos/individuales/todo/${slug}/`,
+        return baseurl.get(`wapiptdah/estudio/contenidos/individuales/todo/${slug}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -48,7 +48,7 @@ export const IndividualListEspecifico = (slug, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/contenidos/individuales/${slug}/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/contenidos/individuales/${slug}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -66,7 +66,7 @@ export const IndividualListNombre = (slug, nombre, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/contenidos/individuales/nombre/${slug}/${nombre}/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/contenidos/individuales/nombre/${slug}/${nombre}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -103,7 +103,7 @@ export const CrearContenidoIndividual = async (datos__post) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.post('wapiptdah/registro_contenido_individual/', datos__post,
+        return await baseurl.post('wapiptdah/estudio/registro_contenido_individual/', datos__post,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -123,7 +123,7 @@ export const CargarContenido = async (slug) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/cargar_contenido_individual/${slug}/`,
+        return await baseurl.get(`wapiptdah/estudio/cargar_contenido_individual/${slug}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -180,7 +180,7 @@ export const VerificarContenidoIndividual = async (slug) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/verificar/contenido/individual/${slug}/`,
+        return await baseurl.get(`wapiptdah/estudio/verificar/contenido/individual/${slug}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${tokenLocal}`

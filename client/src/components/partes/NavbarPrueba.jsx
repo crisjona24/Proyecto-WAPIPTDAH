@@ -9,8 +9,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, useNavigate } from 'react-router-dom';
 import {
     faAdjust, faGear, faMessage, faUser, faHome, faBell, faCamera, faPenNib,
-    faPen, faBook, faPenToSquare, faBrush, faFile
+    faPen, faBook, faPenToSquare, faBrush, faFile, faSnowman
 } from '@fortawesome/free-solid-svg-icons';
+import Swal from 'sweetalert2';
 // Metodos
 import { LogoutNew } from './Logout'
 import { cambiarColorFondo } from "../../controles/alert_user";
@@ -20,7 +21,30 @@ import {
     ContadorPeticionesAtendidas, ReinicioContadorAtendidas
 } from "../../api/peticion.api";
 import { ContadorSalas, ReinicioContadorSalas, ContadorSalasAtendida, ReinicioContadorSalasAtendidas } from "../../api/sala.api"
-import Swal from 'sweetalert2';
+
+
+// Funciones
+const dirigir_link = (link) => {
+    // SweetAlert de confirmación
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Se dirigirá a la ventana con la actividad recreativa.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, abrir',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.open(link, '_blank');
+        }
+    });
+};
+
+// Links externos
+const link1 = 'https://www.google.com/search?q=jugar%20Snake&si=ALGXSlbfutuq-B7BDdtCoU16ZfJf1pvrrqddg7N879mALvyHU4dI3JFCCv11PMeNWuFSCwb9hhE40ud2ZNshBsTGyN6UxQiNmg==&biw=1366&bih=661&dpr=1';
+const link2 = 'https://www.google.com/search?q=jugar%20al%20Buscaminas&si=ALGXSla9Qn5W_3r_le6kQWJ-JKIvIkBIJyQpXpFzjsQiZftc8UWjTEIiaO9FpENHQQJdaQfaTasKJHxYP1U_XNUNqFlbmRihuA==&biw=1366&bih=661&dpr=1';
+const link3 = 'https://www.google.com/search?q=jugar%20al%20tres%20en%20l%C3%ADnea&si=ALGXSlYKHzbKbIXVuk-0ZWg8AxGUMl39jrKUFLgN1AOsbeyA-nrrVnFtExjWCstDTFyjnmC0Rcp9_nUul2hKCNjCLKIoeacRoA==&biw=1366&bih=661&dpr=1';
+const link4 = 'https://www.google.com/search?q=juego%20de%20memoria%20de%20google&si=ALGXSlbaetklG3NTT4FgTpz45gwrnLS9HPCZ-n_Z2oOQK2i7TSUsq_UZ3iFbVoKyJKkDUBwmTaPIHjTNH7lT4ezknn7IeHcq2g==&biw=1366&bih=661&dpr=1';
 
 // Navbar de Tecnico
 export function Navbar_T() {
@@ -635,6 +659,28 @@ export function Navbar_Paci() {
                         </li>
                     </ul>
                 </li>
+                {
+                    verificacion.inscrito === "1" &&
+                    <li>
+                        <a href="#juego" data-toggle="collapse" aria-expanded={expandedMenu === 'juego'}
+                            className="dropdown-toggle" onClick={() => toggleMenu('juego')}
+                        ><FontAwesomeIcon icon={faSnowman} style={{ marginRight: '4%' }} />Juegos</a>
+                        <ul className={`collapse list-unstyled ${expandedMenu === 'juego' ? 'show' : ''}`} id="pageSubmenu">
+                            <li>
+                                <a href="#" onClick={() => dirigir_link(link1)} className='text__'>La culebrita</a>
+                            </li>
+                            <li>
+                                <a href="#" onClick={() => dirigir_link(link2)} className='text__'>Buscaminas</a>
+                            </li>
+                            <li>
+                                <a href="#" onClick={() => dirigir_link(link3)} className='text__'>Tres en raya</a>
+                            </li>
+                            <li>
+                                <a href="#" onClick={() => dirigir_link(link4)} className='text__'>Juego de memoria</a>
+                            </li>
+                        </ul>
+                    </li>
+                }
                 <li>
                     <Link to={'/registro/contacto'} title='Contacto'> <FontAwesomeIcon icon={faMessage} style={{ marginRight: '4%' }} />Contacto</Link>
                 </li>

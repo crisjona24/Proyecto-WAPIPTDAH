@@ -33,7 +33,7 @@ export const ResultadosListaUsuario = (id, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/lista/resultado/usuario/${id}/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/lista/resultado/usuario/${id}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -73,7 +73,7 @@ export const CrearResultadoNew = async (datos__post) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.post('wapiptdah/registro_resultado/', datos__post, {
+        return await baseurl.post('wapiptdah/estudio/registro_resultado/', datos__post, {
             headers: {
                 'Authorization': `Bearer ${token}`
                 //'Authorization': `Token ${token}`
@@ -169,7 +169,7 @@ export const VerificarResultado = async (slug) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/verificar/resultado/${slug}/`,
+        return await baseurl.get(`wapiptdah/estudio/verificar/resultado/${slug}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${tokenLocal}`
@@ -188,7 +188,7 @@ export const PacientesResultados = async (nombre, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/resultados/${encodeURIComponent(nombre)}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/resultados/${encodeURIComponent(nombre)}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -208,7 +208,7 @@ export const ResultadoporFecha = async (fecha, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/resultado/fecha/${fecha}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/resultado/fecha/${fecha}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -226,7 +226,7 @@ export const ResultadoporFechaTecnico = async (fecha, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/resultado/fecha/tecnico/${fecha}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/resultado/fecha/tecnico/${fecha}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -244,7 +244,7 @@ export const ResultadoporRango = async (rango, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/resultado/rango/${rango}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/resultado/rango/${rango}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -262,7 +262,7 @@ export const ResultadoporRangoTecnico = async (rango, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/resultado/rango/tecnico/${rango}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/resultado/rango/tecnico/${rango}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`

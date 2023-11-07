@@ -44,7 +44,7 @@ import { SalasEdicion } from "./pages/edicion/SalaEdicion";
 import { ReporteEdicion } from "./pages/edicion/ReporteEdicion";
 import { Probando } from "./pages/general/Probando"
 {/* Informacion */ }
-import { Ver, VerPeticion } from "./pages/general/Verpdf"
+import { Ver, VerPeticion, Juego } from "./pages/general/Verpdf"
 import {
   InformacionDominio, InformacionContenido, InformacionIndividual,
   InformacionPaciente, InformacionAPP, InformacionReporte, InformacionResultado
@@ -113,6 +113,7 @@ function App() {
         <Route path="/sala/editar/:id" element={<SalasEdicion />} />
         <Route path="/editar/reporte/:id" element={<ReporteEdicion />} />
         {/*OTRA RUTA */}
+        <Route path="/juego/invasion" element={<Juego />} />
       </Routes>
     </BrowserRouter>
   );

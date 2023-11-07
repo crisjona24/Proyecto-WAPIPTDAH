@@ -145,7 +145,7 @@ export const BusquedaPacientesCurso = (nombre, slug, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/busqueda/paciente/curso/${encodeURIComponent(nombre)}/${slug}/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/busqueda/paciente/curso/${encodeURIComponent(nombre)}/${slug}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -289,7 +289,7 @@ export const InscripcionCurso = (id) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/registro/curso/${id}/`,
+        return baseurl.get(`wapiptdah/estudio/registro/curso/${id}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -337,4 +337,24 @@ export const EnviarCodigoRecuperacion = async (datos__post) => {
 // Envio de nuevas claves
 export const EnvioNuevaClave = async (datos__post) => {
     return await baseurl.post('wapiptdah/registro/nueva/clave/', datos__post);
+};
+
+
+// Llamar ejecucion de juegos
+export const EjecutarJuego_1 = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get('wapiptdah/juegos/juego/invasion/',
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                    //'Authorization': `Token ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a los usuarios: " + error.message);
+    }
 };

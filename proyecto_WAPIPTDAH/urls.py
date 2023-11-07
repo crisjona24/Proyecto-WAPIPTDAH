@@ -17,11 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from APPWapiptda.views import *
-from Juegos.views import *
+from EstudioyEntrenamiento.views import *
+# from Juegos.views import *
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('wapiptdah/', include('APPWapiptda.urls')),
-    path('wapiptdah/juegos/', include('Juegos.urls')),
+    path('wapiptdah/estudio/', include('EstudioyEntrenamiento.urls')),
+    # path('wapiptdah/juegos/', include('Juegos.urls')),
     path('api/login/', api_login, name='api_login'),
     path('api/logout/', api_logout, name='api_logout'),
 ]

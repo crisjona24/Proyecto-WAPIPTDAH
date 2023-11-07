@@ -1,7 +1,8 @@
 ### GENERALES ###
-from .models import *
-from .serializer import *
-from .views import *
+from APPWapiptda.models import *
+from APPWapiptda.serializer import *
+from APPWapiptda.views import *
+from EstudioyEntrenamiento.views import *
 from datetime import datetime, timedelta
 ### PAGINACION ###
 from rest_framework.pagination import PageNumberPagination
@@ -18,186 +19,9 @@ class Paginacion(PageNumberPagination):
 class Paginacion2(PageNumberPagination):
     page_size = 6
 
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class UserView(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class UsuarioView(viewsets.ModelViewSet):
-    queryset = Usuario.objects.all()
-    serializer_class = UsuarioSerializer
-
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class PacienteView(viewsets.ModelViewSet):
-    queryset = Paciente.objects.all()
-    serializer_class = PacienteSerializer
-
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class ComunView(viewsets.ModelViewSet):
-    queryset = UsuarioComun.objects.all()
-    serializer_class = ComunSerializer
-
-
-### VISTAS DE USUARIO ###
-
-########## Lista de niveles de TDAH registrados en el sistema
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class GradoTDAHView(viewsets.ModelViewSet):
-    queryset = GradoTDAH.objects.all()
-    serializer_class = GraditoTDAHSerializer
-
-########## Lista de dominios registrados en el sistema
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class DominioView(viewsets.ModelViewSet):
-    queryset = Dominio.objects.all().order_by('identificador_dominio')
-    serializer_class = DominioSerializer
-    pagination_class = Paginacion2
-
-########## Lista de contenido registrado en el sistema
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class ContenidoView(viewsets.ModelViewSet):
-    queryset = Contenido.objects.all().order_by('identificador_contenido')
-    serializer_class = ContenidoSerializer
-    pagination_class = Paginacion2
-
-########## Lista de contenido individual registrado en el sistema
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class ContenidoIndividualView(viewsets.ModelViewSet):
-    queryset = ContenidoIndividual.objects.all().order_by('-id')
-    serializer_class = ContenidIndividualSerializer
-    pagination_class = Paginacion2
-
-
-##### Lista de contenido individual registrado en el sistema
-##### sin paginacion
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class ContenidoIndividualTodoView(viewsets.ModelViewSet):
-    queryset = ContenidoIndividual.objects.all().order_by('-id')
-    serializer_class = ContenidIndividualSerializer
-
-##### Lista de contenido individual registrado en el sistema
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class ResultadoView(viewsets.ModelViewSet):
-    queryset = Resultado.objects.all()
-    serializer_class = ResultadoSerializer
-    pagination_class = Paginacion
-
-
-##### Lista de contenido individual registrado en el sistema
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class ResultadoViewOnly(viewsets.ModelViewSet):
-    queryset = Resultado.objects.all()
-    serializer_class = ResultadoSerializerOnly
-
-
-##### Lista de cursos registrados en el sistema
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class CursoView(viewsets.ModelViewSet):
-    queryset = Curso.objects.all().order_by('id')
-    pagination_class = Paginacion
-    serializer_class = CursoSerializer
-
-
-##### Lista del detalle de inscripcion del curso en sl sistema
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class DetalleInscripcionCursoView(viewsets.ModelViewSet):
-    queryset = DetalleInscripcionCurso.objects.all()
-    serializer_class = DetalleInscripcionCursoSerializer
-
-##### Lista de peticiones generadas por el usuario comun en el sistema
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class PeticionView(viewsets.ModelViewSet):
-    queryset = Peticion.objects.all()
-    serializer_class = PeticionSerializer
-
-
-##### Lista del detalle de peticiones registradas por el usuario comun
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class DetallePeticionView(viewsets.ModelViewSet):
-    queryset = DetallePeticion.objects.all()
-    serializer_class = DetallePeticionSerializer
-
-
-##### Lista de salas registradas en el sistema
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class SalaView(viewsets.ModelViewSet):
-    queryset = Sala.objects.all().order_by('nombre_sala')
-    pagination_class = Paginacion
-    serializer_class = SalaSerializer
-
-
-##### Lista de detalle de resolución de sala
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class DetalleSalaView(viewsets.ModelViewSet):
-    queryset = DetalleSala.objects.all()
-    serializer_class = DetalleSalaSerializer
-    pagination_class = Paginacion
-
-
-##### Lista de reportes registrados en el sistema por el usuario comum
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class ReporteView(viewsets.ModelViewSet):
-    queryset = Reporte.objects.all().order_by('titulo_reporte')
-    serializer_class = ReporteSerializer
-    pagination_class = Paginacion
-
-
-##### Lista de dominios sin paginacion 
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class ListaSoloDominiosView(viewsets.ModelViewSet):
-    queryset = Dominio.objects.all()
-    serializer_class = DominioSerializer
-    
-##### Lista de contenido sin paginacion
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class ListaSoloContenidosView(viewsets.ModelViewSet):
-    queryset = Contenido.objects.all()
-    serializer_class = ContenidoSerializer
 
 """ Listados personalizados """
 
-"""
 ##### Lista de contenido que pertenece a un dominio especifico
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
@@ -1228,4 +1052,3 @@ def reporte_por_rango(ob1, ob2):
     except Reporte.DoesNotExist:
         return []
 
-""" 

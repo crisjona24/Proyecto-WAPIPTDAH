@@ -71,7 +71,7 @@ export const CrearDominioNew = async (datos__post) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.post('wapiptdah/registro_dominio/', datos__post, {
+        return await baseurl.post('wapiptdah/estudio/registro_dominio/', datos__post, {
             headers: {
                 'Authorization': `Bearer ${token}`
                 //'Authorization': `Token ${token}`
@@ -129,7 +129,7 @@ export const VerificarDominio = async (slug) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/verificar/dominio/${slug}/`, {
+        return await baseurl.get(`wapiptdah/estudio/verificar/dominio/${slug}/`, {
             headers: {
                 'Authorization': `Bearer ${tokenLocal}`
                 //'Authorization': `Token ${tokenLocal}`

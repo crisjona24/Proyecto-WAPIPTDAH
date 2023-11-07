@@ -35,7 +35,7 @@ export const PeticionPendiente = (page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/peticion/pendiente/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/peticion/pendiente/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -54,7 +54,7 @@ export const PeticionAtendida = (page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/peticion/atendida/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/peticion/atendida/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -73,7 +73,7 @@ export const PeticionesUC = (id, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/peticion/usuario/${id}/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/peticion/usuario/${id}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -112,7 +112,7 @@ export const CrearPeticion = async (datos__post) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.post('wapiptdah/registro_peticion/', datos__post, {
+        return await baseurl.post('wapiptdah/estudio/registro_peticion/', datos__post, {
             headers: {
                 'Authorization': `Bearer ${token}`
                 //'Authorization': `Token ${token}`
@@ -193,7 +193,7 @@ export const VerificarPeticion = async (slug) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/verificar/peticion/${slug}/`, {
+        return await baseurl.get(`wapiptdah/estudio/verificar/peticion/${slug}/`, {
             headers: {
                 'Authorization': `Bearer ${tokenLocal}`
                 //'Authorization': `Token ${tokenLocal}`
@@ -306,7 +306,7 @@ export const PeticionporFecha = async (fecha, id, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/peticion/fecha/${fecha}/${id}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/peticion/fecha/${fecha}/${id}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -325,7 +325,7 @@ export const PeticionporRango = async (rango, id, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/peticion/rango/${rango}/${id}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/peticion/rango/${rango}/${id}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -344,7 +344,7 @@ export const PeticionPendienteporFecha = async (fecha, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/peticion/fecha/pendiente/${fecha}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/peticion/fecha/pendiente/${fecha}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -363,7 +363,7 @@ export const PeticionPendienteporRango = async (rango, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/peticion/rango/pendiente/${rango}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/peticion/rango/pendiente/${rango}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -382,7 +382,7 @@ export const PeticionAtendidaporFecha = async (fecha, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/peticion/fecha/atendida/${fecha}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/peticion/fecha/atendida/${fecha}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -401,7 +401,7 @@ export const PeticionAtendidaporRango = async (rango, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/lista/peticion/rango/atendida/${rango}/?page=${page}`,
+        return await baseurl.get(`wapiptdah/estudio/lista/peticion/rango/atendida/${rango}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`

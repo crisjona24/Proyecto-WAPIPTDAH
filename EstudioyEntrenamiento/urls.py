@@ -1,86 +1,12 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import *
-from .controlers import *
-
-# ROUTERS
-router = routers.DefaultRouter()
-router.register('user', UserView)
-router.register('usuario', UsuarioView)
-router.register('paciente', PacienteView)
-router.register('comun', ComunView)
-# Movimiento a la otra app
-router.register('grado', GradoTDAHView)
-router.register('dominio', DominioView)
-router.register('contenido', ContenidoView)
-router.register('contenido_individual', ContenidoIndividualView)
-router.register('resultado', ResultadoView)
-router.register('resultado/solo/', ResultadoViewOnly)
-router.register('curso', CursoView)
-router.register('detalle_inscripcion', DetalleInscripcionCursoView)
-router.register('peticion', PeticionView)
-router.register('detalle_peticion', DetallePeticionView)
-router.register('sala', SalaView)
-router.register('detalle_sala', DetalleSalaView)
-router.register('reporte', ReporteView)
-router.register('dominios', ListaSoloDominiosView)
-router.register('contenidos', ListaSoloContenidosView)
+from EstudioyEntrenamiento.views import *
+from EstudioyEntrenamiento.controlers import *
 
 urlpatterns = [
-    path('aplicacion/', include(router.urls)),
-    # Token
-    path('verificar/cuenta/', verificar_email_firmado, name='verificar-cuenta'),
-    path('cambiar/clave/', recuperar_cuenta, name='cambiar-clave'),
-    path('verificar/codigo/cuenta/', verificar_email_recuperacion, name='nueva-clave'),
-    path('registro/nueva/clave/', restablecer_clave, name='verificar-email-recuperacion'),
 
-    ### LISTADOS PERSONALIZADOS ###
+    ########### Listados personalizados
     
-    ### REGISTRO ###
-
-    path('registro_usuario/', api_user_register, name='api_user_register'),
-    ############ Registro de estudiantes
-    path('registro_paciente/', api_paciente_register, name='api_paciente_register'),
-    ############ Registro de usuario comun
-    path('registro_comun/', api_comun_register, name='api_comun_register'),
-    
-    ### CONTACTO ###
-
-    ############ Envio de correo de contacto
-    path('contacto/', api_enviar_contacto, name='enviar-contacto'),
-
-    ### OBTENER DATOS ###
-
-    ########### Obtención de datos de usuario
-    path('datos/usuario/', datos_usuario, name='datos_usuario'),
-    ########### Verificaciones
-    path('verificar/usuario/', verificar_usuario, name='verificar_usuario'),
-    ########### Obtención de slug
-    path('obtener/curso/<int:id>/', obtener_slug_curso, name='obtener-slug-curso'),
-    path('obtener/dominio/<str:slug>/', obtener_slug_dominio, name='obtener-slug-dominio'),
-    path('obtener/contenido/<str:slug>/', obtener_slug_contenido, name='obtener-slug-contenido'),
-    path('obtener/fecha/inscripcion/<int:id>/', obtener_fecha_inscripcion, name='obtener-fecha-inscripcion'),
-
-    ### VERIFICACIONES ###
-    path('verificar/inscripcion/', verificacion_inscripcion, name='verificar-inscripcion'),
-    path('atender/peticion/', atender_peticion, name='atender-peticion'),
-    path('atender/sala/<str:slug>/', atender_sala, name='atender-sala'),
-    path('obtener/revisor/<int:id>/', obtener_nombre_revision, name='obtener-revisor'),
-
-    ## NOTIFICACIONES ###
-    path('contador/peticion/', get_contador_peticiones, name='contador-peticion'),
-    path('contador/peticion/reinicio/', reset_contador_peticiones, name='reinicio-peticion'),
-    path('contador/peticion/atendida/', get_contador_peticiones_atendidas, name='contador-peticion-atendida'),
-    path('contador/atendido/reinicio/', reset_contador_peticiones_atendidas, name='reinicio-peticion-atendida'),
-    path('contador/sala/', get_contador_salas, name='contador-sala'),
-    path('contador/sala/reinicio/', reset_contador_salas, name='reinicio-sala'),
-    path('contador/sala/atendida/', get_contador_salas_atendidas, name='contador-sala-atendida'),
-    path('contador/sala/atendida/reinicio/', reset_contador_salas_atendidas, name='reinicio-sala-atendida'),
-    path('modificar/estado/resultado/<int:id>/', modificar_estado_reporte, name='modificar-estado-resultado'),
-]
-
-
-'''
     path('contenidos/<str:slug>/', ContenidoListView.as_view(), name='contenidos-list'),
     path('contenidos/individuales/<str:slug>/', ContenidoIndividualListView.as_view(), name='contenidos-individuales-list'),
     path('contenidos/individuales/todo/<str:slug>/', ContenidoIndividualTodoListView.as_view(), name='contenidos-individuales-todo-list'),
@@ -130,4 +56,44 @@ urlpatterns = [
     path('busqueda/contenido/<str:nombre>/<str:slug>/', BusquedaContenidoListView.as_view(), name='contenido-busqueda'),
     path('busqueda/curso/<str:nombre>/', BusquedaCursoListView.as_view(), name='curso-busqueda'),
     path('lista/reportes/<str:nombre>/', ReportedePacienteListView.as_view(), name='reporte-list-paciente'),
-    ''' 
+
+
+    ########### Verificaciones
+    path('verificar/nivel/<str:slug>/', verificar_nivel, name='verificar_nivel'),
+    path('verificar/dominio/<str:slug>/', verificar_dominio, name='verificar_dominio'),
+    path('verificar/contenido/<str:slug>/', verificar_contenido, name='verificar_contenido'),
+    path('verificar/curso/<str:slug>/', verificar_curso, name='verificar-curso'),
+    path('verificar/peticion/<str:slug>/', verificar_peticion, name='verificar-peticion'),
+    path('verificar/resultado/<str:slug>/', verificar_resultado, name='verificar-resultado'),
+    path('verificar/sala/<str:slug>/', verificar_sala, name='verificar-sala'),
+    path('verificar/reporte/<str:slug>/', verificar_reporte, name='verificar-reporte'),
+    path('verificar/contenido/individual/<str:slug>/', verificar_contenido_individual, name='verificar_contenido_individual'),
+
+    ########### Registros
+    ############ Registro de nivel
+    path('registro_nivel/', api_nivel_register, name='api_nivel_register'),
+    ############ Registro de dominio
+    path('registro_dominio/', api_dominio_register, name='api_dominio_register'),
+    ############ Registro de contenido
+    path('registro_contenido/', api_contenido_register, name='api_contenido_register'),
+    ############ Registro de actividades
+    path('registro_contenido_individual/', api_contenido_individual_register, name='registro_individual'),
+    ############ Registro de curso
+    path('registro_curso/', api_curso_register, name='curso-registro'),
+    path('registro/curso/<int:id>/', api_curso_inscripcion, name='inscripcion-registro'),
+    ############ Registro de petición
+    path('registro_peticion/', api_peticion_register, name='peticion-registro'),
+    ############ Registro de resultado
+    path('registro_resultado/', save_resultado, name='registro-resultado'),
+    ############ Registro & Edicion de sala
+    path('registro_sala/', api_sala_register, name='registro-sala'),
+    path('edicion_sala/', api_sala_edicion, name='edicion-sala'),
+    ############ Registro de reporte
+    path('registro/reporte/<int:id>/', generar_reporte_resultado, name='registro-reporte'),
+    path('generar/reporte/all/', generar_reporte_all, name='registro-reporte-all'),
+
+    ########### Cargado de contenido
+    path('cargar_contenido_individual/<str:slug>/', contenido_individual, name='cargar_individual'),
+    path('cargar_contenido_principal/<str:slug>/', contenido_principal, name='cargar_principal'),
+    path('codigo/contenido/<int:codigo>/', obtener_contenido_individual, name='obtener-contenido-individual'),
+]

@@ -50,8 +50,8 @@ a:focus {
 }
 
 .preloader{
-    min-width: 325px;
-    max-width: 325px;
+    min-width: 290px;
+    max-width: 290px;
     background: #fff;
     display: flex;
     justify-content: center;
@@ -59,8 +59,8 @@ a:focus {
 }
 
 #sidebar {
-    min-width: 300px;
-    max-width: 300px;
+    min-width: 290px;
+    max-width: 290px;
     background: #fff;
     color: #333;
     

@@ -49,7 +49,7 @@ export const ContenidoListEspecifico = (slug, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/contenidos/${slug}/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/contenidos/${slug}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -86,7 +86,7 @@ export const CrearContenidoNew = async (datos__post) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.post('wapiptdah/registro_contenido/', datos__post,
+        return await baseurl.post('wapiptdah/estudio/registro_contenido/', datos__post,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -145,7 +145,7 @@ export const VerificarContenido = async (slug) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.get(`wapiptdah/verificar/contenido/${slug}/`,
+        return await baseurl.get(`wapiptdah/estudio/verificar/contenido/${slug}/`,
             {
                 headers: {
                     'Authorization': `Bearer ${tokenLocal}`
@@ -184,7 +184,7 @@ export const BusquedaContenidos = (nombre, slug, page = 1) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.get(`wapiptdah/busqueda/contenido/${encodeURIComponent(nombre)}/${slug}/?page=${page}`,
+        return baseurl.get(`wapiptdah/estudio/busqueda/contenido/${encodeURIComponent(nombre)}/${slug}/?page=${page}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
