@@ -10,13 +10,14 @@ import Swal from "sweetalert2";
 import { VerificarUsuario, BusquedaPacientesCurso } from "../../api/usuario.api";
 import { NivelListado } from "../../api/grado.api";
 import { PacientesInscritos, VerificarCurso, CursoListado, CursosUsuarioComun } from "../../api/curso.api";
-import { BusquedaCurso, CursoporFecha, CursoporFechaTecnico } from "../../api/curso.api";
+import { BusquedaCurso, CursoporFecha, CursoporFechaTecnico, EstudianteporCedula } from "../../api/curso.api";
 import { ResultadosListado, PacientesResultados, ResultadosListaUsuario } from "../../api/resultado.api";
 import { ResultadoporFecha, ResultadoporFechaTecnico, ResultadoporRango, ResultadoporRangoTecnico } from "../../api/resultado.api";
 import { SalasUsuarioComun, SalaListado, SalasPaciente, BusquedaSalas, AccederSala, SalaporFecha } from "../../api/sala.api";
-import { ReporteListado, ReporteListadoUsuarioComun, ReportesPaciente } from "../../api/reporte.api";
+import { ReporteListado, ReporteListadoUsuarioComun, ReportesPaciente, ReporteporCedula } from "../../api/reporte.api";
 import { ReporteporFecha, ReporteporFechaTecnico, ReporteporRango, ReporteporRangoTecnico } from "../../api/reporte.api";
 import { SalasUsuarioComunAtendidas, SalaFecha, SalaporFechaAtendida } from "../../api/sala.api";
+import { ResultadoporCedula } from "../../api/resultado.api";
 
 import { ListadodePacientes } from "../general/ListaPaciente";
 import { OpcionesTecnico, OpcionesComun, OpcionesPaciente } from '../general/OpcionesNivel';
@@ -282,7 +283,14 @@ export function PacienteListado() {
     const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
     const [isTamanio, setIstamanio] = useState(false);
     const [entradaValida, setEntradavaldia] = useState(true);
+    // Escoger busqueda
+    const [busquedaPaci, setBusquedaPaci] = useState("0");
+    const [escogido, setEscogido] = useState(false);
+    const [escogido2, setEscogido2] = useState(false);
+    const [cedula, setCedula] = useState("");
+    const [estadoBusquedaCR, setEstadoBusquedaCR] = useState(false);
 
+    // Cargar lista de pacientes
     const cargarPacientes = async () => {
         try {
             // Verificar curso
@@ -290,11 +298,11 @@ export function PacienteListado() {
             if (curso.data.identificador) {
                 // Cargar datos de pacientes
                 let paciente = await PacientesInscritos(curso.data.identificador, page);
-                setPacientes(paciente.data.results);
                 if (paciente.data.results.length === 0) {
                     setIstamanio(true);
                     setNumeropag(1);
                 } else {
+                    setPacientes(paciente.data.results);
                     setNumeropag(Math.ceil(paciente.data.count / elementosPorPagina));
                 }
             } else {
@@ -342,6 +350,7 @@ export function PacienteListado() {
         try {
             const busqueda_paciente = await BusquedaPacientesCurso(nombrebuscarP, slug, page);
             if (busqueda_paciente.data.results.length === 0) {
+                resetearBusqueda();
                 Swal.fire("No existe un paciente con ese nombre. Ingresa un nombre válido", "", "warning");
                 return;
             } else {
@@ -358,6 +367,12 @@ export function PacienteListado() {
     const resetearBusqueda = () => {
         setMostrarBusqueda(false);
         setNombreBuscarP("");
+        setBusquedaPaci("0");
+        setEscogido(false);
+        // Paciente
+        setEstadoBusquedaCR(false);
+        setCedula("");
+        setEscogido2(false);
     }
 
     // Control de entrada de datos
@@ -382,6 +397,66 @@ export function PacienteListado() {
         return generar.test(value);
     };
 
+    // BUSCAR POR CEDULA
+    // Metodo de busqueda por cédula
+    const buscarEstudianteCedula = async () => {
+        // Verificar campos vacíos
+        if (isEmptyField(cedula)) {
+            Swal.fire("Por favor ingrese el campo de cédula", "", "warning");
+            return;
+        }
+        // Verificar cédula ingresada
+        try {
+            if (cedula !== "") {
+                // Validar tamaño de cédula
+                if (cedula.length < 10) {
+                    Swal.fire("La cédula debe tener al menos 10 dígitos", "", "warning");
+                    resetearBusqueda();
+                    return;
+                }
+                const resultadoPCedula = await EstudianteporCedula(cedula, slug, page);
+                if (resultadoPCedula.data.results.length === 0) {
+                    Swal.fire("No existe un estudiante con esa cédula en el curso. Ingrese una válida.", "", "warning");
+                    resetearBusqueda();
+                    return;
+                } else {
+                    setPacientes(resultadoPCedula.data.results);
+                    setNumeropag(Math.ceil(resultadoPCedula.data.count / elementosPorPagina));
+                    setEstadoBusquedaCR(true);
+                }
+            } else {
+                cargarPacientes();
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                Swal.fire("No existe un estudiante con esa cédula en el curso.. Ingresa una válida", "", "warning");
+            }
+        }
+    }
+
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (!estadoBusquedaCR) {
+            resetearBusqueda();
+            cargarPacientes();
+        } else {
+            buscarEstudianteCedula();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (!estadoBusquedaCR) {
+                resetearBusqueda();
+                cargarPacientes();
+            } else {
+                buscarEstudianteCedula();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+
+    }, [slug, estadoBusquedaCR, page]);
+
     return (
         <div>
             <div className="cabeza__Nivel">
@@ -401,25 +476,91 @@ export function PacienteListado() {
                     <p className="mb-0">{error}</p>
                 </div>
             }
-            <div className="mt-4 container" style={{ height: '50px', borderRadius: '10px' }}>
-                <div className="d-flex flex-row justify-content-left w-100" style={{ alignItems: 'center', marginLeft: '1px' }}>
-                    <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar</a>
-                    <form className="d-flex flex-row justify-content-between w-50">
-                        <input className="form-control mr-sm-2 w-100" type="search" name="nombre" id="nombre"
-                            placeholder="Nombre de paciente.." aria-label="Search" value={nombrebuscarP}
-                            onChange={cambioEntrada} disabled={isTamanio} />
-                        <>
-                            {
-                                mostrarBusqueda
-                                    ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
-                                        X
-                                    </Button>
-                                    : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaPaciente} disabled={isTamanio}>
-                                        Ir
-                                    </Button>
-                            }
-                        </>
-                    </form>
+            <div className="mt-3 container alineacion-3" style={{ height: '50px', borderRadius: '10px' }}>
+                <div className="alineacion-lista-busqueda">
+                    <div className="col-md-12 d-flex flex-row">
+                        <select
+                            className={`form-select h-75 separacion-busqueda 
+                            ${escogido ? 'w-25' : escogido2 ? 'w-25' : 'w-50'
+                                }`}
+                            value={busquedaPaci}
+                            onChange={(e) => {
+                                setBusquedaPaci(e.target.value);
+                                // Mostrar el formulario si la opción seleccionada es "1" (Nombre de estudiante)
+                                if (e.target.value === "1") {
+                                    setEscogido(true);
+                                    setEscogido2(false);
+                                } else if (e.target.value === "2") {
+                                    setEscogido2(true);
+                                    setEscogido(false);
+                                } else {
+                                    setEscogido(false);
+                                    setEscogido2(false);
+                                }
+                            }}
+                        >
+                            <option value="0">Buscar por ....</option>
+                            <option value="1">Nombre de estudiante</option>
+                            <option value="2">Cédula de identidad</option>
+                        </select>
+                        {escogido && (
+                            <form>
+                                <div className="row form-group">
+                                    <div className="col-2 d-flex justify-content-center mt-2">
+                                        <label htmlFor="nombre" style={{ fontFamily: 'Pacifico' }}
+                                        >Nombre</label>
+                                    </div>
+                                    <div className="col-9 d-flex flex-row">
+                                        <input type="text" className="form-control" id="nombre"
+                                            value={nombrebuscarP} onChange={cambioEntrada} placeholder="Ingrese el nombre.." />
+                                        <>
+                                            {
+                                                mostrarBusqueda
+                                                    ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                        X
+                                                    </Button>
+                                                    : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaPaciente} disabled={isTamanio}>
+                                                        Vamos
+                                                    </Button>
+                                            }
+                                        </>
+                                    </div>
+                                </div>
+                            </form>
+                        )}
+                        {
+                            escogido2 && (
+                                <form>
+                                    <div className="row form-group">
+                                        <div className="col-2 d-flex justify-content-center mt-2">
+                                            <label htmlFor="cedula" style={{ fontFamily: 'Pacifico' }}>Cédula</label>
+                                        </div>
+                                        <div className="col-10 d-flex flex-row">
+                                            <input type="text" className="form-control" id="cedula"
+                                                placeholder="Ingrese el número de cédula**" name='cedula'
+                                                maxLength={10}
+                                                value={cedula}
+                                                onChange={e => {
+                                                    if (e.target.value === "" || /^[0-9\b]+$/.test(e.target.value)) {
+                                                        setCedula(e.target.value);
+                                                    }
+                                                }} />
+                                            <>
+                                                {
+                                                    estadoBusquedaCR
+                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                            X
+                                                        </Button>
+                                                        : <Button variant="success" className="my-2 my-sm-0" onClick={buscarEstudianteCedula} disabled={isTamanio}>
+                                                            Buscar
+                                                        </Button>
+                                                }
+                                            </>
+                                        </div>
+                                    </div>
+                                </form>
+                            )}
+                    </div>
                 </div>
             </div>
             {/* Table */}
@@ -449,12 +590,15 @@ export function ResultadoLista({ usuario }) {
     // Filtro de fecha
     const [fecha, setFecha] = useState("");
     const [limite, setLimite] = useState("");
+    const [cedula, setCedula] = useState("");
     const [estadoBusqueda, setEstadoBusqueda] = useState(false);
     const [estadoBusquedaSel, setEstadoBusquedaSel] = useState(false);
+    const [estadoBusquedaCR, setEstadoBusquedaCR] = useState(false);
     // Escoger busqueda
     const [busqueda, setBusqueda] = useState("0");
     const [escogido, setEscogido] = useState(false);
     const [escogido2, setEscogido2] = useState(false);
+    const [escogido3, setEscogido3] = useState(false);
 
     // Obtener resultados
     const cargarResultados = async () => {
@@ -531,7 +675,7 @@ export function ResultadoLista({ usuario }) {
             Swal.fire("Por favor ingrese todos los campos", "", "warning");
             return;
         }
-        // Entrada
+        // Validar entradade nombre 
         if (!entradaValida) {
             Swal.fire("Por favor ingrese el formato: Nombre Apellido", "", "warning");
             return;
@@ -549,6 +693,7 @@ export function ResultadoLista({ usuario }) {
                 setMostrarBusqueda(true);
             }
         } catch (error) {
+            resetearBusqueda();
             Swal.fire("No existen resultados con ese nombre de paciente. Ingresa un nombre válido", "", "warning");
         }
     }
@@ -584,6 +729,8 @@ export function ResultadoLista({ usuario }) {
     };
 
     const validarEntrada = (value) => {
+        // Evaluar dos o tres valores
+
         const generar = /^[a-zA-Z]+ [a-zA-Z]+$/;
         return generar.test(value);
     };
@@ -728,6 +875,73 @@ export function ResultadoLista({ usuario }) {
 
     }, [limite, page]);
 
+    // Metodo de busqueda por cédula
+    const buscarResultadoCedula = async () => {
+        // Verificar campos vacíos
+        if (isEmptyField(cedula)) {
+            Swal.fire("Por favor ingrese el campo de cédula", "", "warning");
+            return;
+        }
+        // Verificar cédula ingresada
+        try {
+            if (cedula !== "") {
+                // Validar tamaño de cédula
+                if (cedula.length < 10) {
+                    Swal.fire("La cédula debe tener al menos 10 dígitos", "", "warning");
+                    resetearBusquedaCedula();
+                    return;
+                }
+                const resultadoCedula = await ResultadoporCedula(cedula, page);
+                if (resultadoCedula.data.results.length === 0) {
+                    Swal.fire("No existen resultados de estudiante con esa cédula. Ingrese una válida.", "", "warning");
+                    resetearBusquedaCedula();
+                    return;
+                } else {
+                    setResultados(resultadoCedula.data.results);
+                    setNumeropag(Math.ceil(resultadoCedula.data.count / elementosPorPagina));
+                    setEstadoBusquedaCR(true);
+                }
+            } else {
+                cargarResultados();
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                Swal.fire("No existen resultados con esa cédula.. Ingresa una válida", "", "warning");
+            }
+        }
+    }
+
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (!estadoBusquedaCR) {
+            resetearBusqueda();
+            cargarResultados();
+        } else {
+            buscarResultadoCedula();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (!estadoBusquedaCR) {
+                resetearBusqueda();
+                cargarResultados();
+            } else {
+                buscarResultadoCedula();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+
+    }, [estadoBusquedaCR, page]);
+
+    // Reseteo de cédula
+    const resetearBusquedaCedula = () => {
+        setEscogido3(false);
+        setEstadoBusquedaCR(false);
+        setCedula("");
+        setBusqueda("0");
+    }
+
     return (
         <div>
             <div className="cabeza__Nivel">
@@ -748,12 +962,12 @@ export function ResultadoLista({ usuario }) {
                 </div>
             }
 
-            <div className="mt-5 container alineacion-3" style={{ height: '50px', borderRadius: '10px' }}>
+            <div className="mt-3 container alineacion-3" style={{ height: '50px', borderRadius: '10px' }}>
                 <div className="alineacion-lista-busqueda">
                     <div className="col-md-12 d-flex flex-row">
                         <select
                             className={`form-select h-75 separacion-busqueda 
-                            ${escogido ? 'w-25' : escogido2 ? 'w-25' : 'w-50'
+                            ${escogido ? 'w-25' : escogido2 ? 'w-25' : escogido3 ? 'w-25' : 'w-50'
                                 }`}
                             value={busqueda}
                             onChange={(e) => {
@@ -762,19 +976,26 @@ export function ResultadoLista({ usuario }) {
                                 if (e.target.value === "1") {
                                     setEscogido(true);
                                     setEscogido2(false);
+                                    setEscogido3(false);
                                 } else if (e.target.value === "2") {
                                     setEscogido2(true);
                                     setEscogido(false);
+                                    setEscogido3(false);
+                                } else if (e.target.value === "3") {
+                                    setEscogido3(true);
+                                    setEscogido(false);
+                                    setEscogido2(false);
                                 } else {
                                     setEscogido(false);
                                     setEscogido2(false);
+                                    setEscogido3(false);
                                 }
                             }}
-
                         >
-                            <option value="0">Buscar ....</option>
+                            <option value="0">Buscar por ....</option>
                             <option value="1">Nombre de estudiante</option>
                             <option value="2">Fecha</option>
+                            <option value="3">Cédula de identidad</option>
                         </select>
                         {escogido && (
                             <form>
@@ -818,6 +1039,38 @@ export function ResultadoLista({ usuario }) {
                                                             X
                                                         </Button>
                                                         : <Button variant="success" className="my-2 my-sm-0" onClick={buscarResultadosFecha} disabled={isTamanio}>
+                                                            Buscar
+                                                        </Button>
+                                                }
+                                            </>
+                                        </div>
+                                    </div>
+                                </form>
+                            )}
+                        {
+                            escogido3 && (
+                                <form>
+                                    <div className="row form-group">
+                                        <div className="col-2 d-flex justify-content-center mt-2">
+                                            <label htmlFor="cedula" style={{ fontFamily: 'Pacifico' }}>Cédula</label>
+                                        </div>
+                                        <div className="col-10 d-flex flex-row">
+                                            <input type="text" className="form-control" id="cedula"
+                                                placeholder="Ingrese el número de cédula**" name='cedula'
+                                                maxLength={10}
+                                                value={cedula}
+                                                onChange={e => {
+                                                    if (e.target.value === "" || /^[0-9\b]+$/.test(e.target.value)) {
+                                                        setCedula(e.target.value);
+                                                    }
+                                                }} />
+                                            <>
+                                                {
+                                                    estadoBusquedaCR
+                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusquedaCedula}>
+                                                            X
+                                                        </Button>
+                                                        : <Button variant="success" className="my-2 my-sm-0" onClick={buscarResultadoCedula} disabled={isTamanio}>
                                                             Buscar
                                                         </Button>
                                                 }
@@ -999,6 +1252,7 @@ export function CursoLista() {
     const buscarCursosFecha = async () => {
         // Verificar campos vacíos
         if (isEmptyField(fecha)) {
+            resetearBusqueda();
             Swal.fire("Por favor ingrese el campo de fecha", "", "warning");
             return;
         }
@@ -1086,7 +1340,7 @@ export function CursoLista() {
                     <p className="mb-0">{error}</p>
                 </div>
             }
-            <div className="mt-4 container alineacion-triple" style={{ height: '50px', borderRadius: '10px' }}>
+            <div className="mt-2 container alineacion-triple" style={{ height: '50px', borderRadius: '10px' }}>
                 <div className="d-flex flex-row justify-content-left w-100" style={{ alignItems: 'center', marginLeft: '1px' }}>
                     <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar</a>
                     <form className="d-flex flex-row justify-content-between w-50">
@@ -1100,7 +1354,7 @@ export function CursoLista() {
                                         X
                                     </Button>
                                     : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaCurso} disabled={isTamanio}>
-                                        Buscar
+                                        Vamos
                                     </Button>
                             }
                         </>
@@ -1356,7 +1610,7 @@ export function SalaLista({ usuario }) {
                     <p className="mb-0">{error}</p>
                 </div>
             }
-            <div className="mt-4 container alineacion-triple" style={{ height: '50px', borderRadius: '10px' }}>
+            <div className="mt-2 container alineacion-triple" style={{ height: '50px', borderRadius: '10px' }}>
                 <div className="d-flex flex-row justify-content-left w-100" style={{ alignItems: 'center', marginLeft: '1px' }}>
                     <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar</a>
                     <form className="d-flex flex-row justify-content-between w-50">
@@ -1777,7 +2031,7 @@ export function SalaListaAtendidas({ usuario }) {
                     <p className="mb-0">{error}</p>
                 </div>
             }
-            <div className="mt-4 container alineacion-triple" style={{ height: '50px', borderRadius: '10px' }}>
+            <div className="mt-2 container alineacion-triple" style={{ height: '50px', borderRadius: '10px' }}>
                 <div className="d-flex flex-row justify-content-left w-100" style={{ alignItems: 'center', marginLeft: '1px' }}>
                     <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar</a>
                     <form className="d-flex flex-row justify-content-between w-50">
@@ -1852,12 +2106,15 @@ export function ReporteLista({ usuario }) {
     // Filtro de fecha
     const [fecha, setFecha] = useState("");
     const [limite, setLimite] = useState("");
+    const [cedula, setCedula] = useState("");
     const [estadoBusqueda, setEstadoBusqueda] = useState(false);
     const [estadoBusquedaSel, setEstadoBusquedaSel] = useState(false);
+    const [estadoBusquedaCedu, setEstadoBusquedaCedu] = useState(false);
     // Escoger busqueda
     const [busqueda, setBusqueda] = useState("0");
     const [escogido, setEscogido] = useState(false);
     const [escogido2, setEscogido2] = useState(false);
+    const [escogido3, setEscogido3] = useState(false);
 
     // Obtener resultados
     const cargarReporte = async () => {
@@ -1965,6 +2222,9 @@ export function ReporteLista({ usuario }) {
         setBusqueda("0");
         setEscogido(false);
         setEscogido2(false);
+        setEscogido3(false);
+        setEstadoBusquedaCedu(false);
+        setCedula("");
     }
 
     // Funcion para validar la entreada
@@ -2125,6 +2385,63 @@ export function ReporteLista({ usuario }) {
 
     }, [limite, page]);
 
+    // Metodo de busqueda
+    const buscarReporteCedula = async () => {
+        // Verificar campos vacíos
+        if (isEmptyField(cedula)) {
+            Swal.fire("Por favor ingrese el campo de cédula", "", "warning");
+            return;
+        }
+        // Verificar fecha
+        try {
+            if (cedula !== "") {
+                // Validar tamaño de cédula
+                if (cedula.length < 10) {
+                    Swal.fire("La cédula debe tener al menos 10 dígitos", "", "warning");
+                    resetearBusqueda();
+                    return;
+                }
+                const reporTecnicoCedula = await ReporteporCedula(cedula, page);
+                if (reporTecnicoCedula.data.results.length === 0) {
+                    Swal.fire("No existen reportes de estudiante con esa cédula. Ingrese uno válido.", "", "warning");
+                    resetearBusqueda();
+                    return;
+                } else {
+                    setReportes(reporTecnicoCedula.data.results);
+                    setNumeropag(Math.ceil(reporTecnicoCedula.data.count / elementosPorPagina));
+                    setEstadoBusquedaCedu(true);
+                }
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                Swal.fire("No existen reportes con esa cédula.. Ingresa una válida", "", "warning");
+            }
+        }
+    }
+
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (!estadoBusquedaCedu) {
+            resetearBusqueda();
+            cargarReporte();
+        } else {
+            buscarReporteCedula();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (!estadoBusquedaCedu) {
+                resetearBusqueda();
+                cargarReporte();
+            } else {
+                buscarReporteCedula();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+
+    }, [estadoBusquedaCedu, page]);
+
     return (
         <div>
             <div className="cabeza__Nivel">
@@ -2144,12 +2461,13 @@ export function ReporteLista({ usuario }) {
                     <p className="mb-0">{error}</p>
                 </div>
             }
-            <div className="mt-5 container alineacion-3" style={{ height: '50px', borderRadius: '10px' }}>
+            <div className="mt-3 container alineacion-3" style={{ height: '50px', borderRadius: '10px' }}>
                 <div className="alineacion-lista-busqueda">
                     <div className="col-md-12 d-flex flex-row">
                         <select
                             className={`form-select h-75 separacion-busqueda 
-                            ${escogido ? 'w-25' : escogido2 ? 'w-25' : 'w-50'
+                            ${escogido ? 'w-25' : escogido2 ? 'w-25' :
+                                    escogido3 ? 'w-25' : 'w-50'
                                 }`}
                             value={busqueda}
                             onChange={(e) => {
@@ -2158,19 +2476,27 @@ export function ReporteLista({ usuario }) {
                                 if (e.target.value === "1") {
                                     setEscogido(true);
                                     setEscogido2(false);
+                                    setEscogido3(false);
                                 } else if (e.target.value === "2") {
                                     setEscogido2(true);
+                                    setEscogido(false);
+                                    setEscogido3(false);
+                                } else if (e.target.value === "3") {
+                                    setEscogido3(true);
+                                    setEscogido2(false);
                                     setEscogido(false);
                                 } else {
                                     setEscogido(false);
                                     setEscogido2(false);
+                                    setEscogido3(false);
                                 }
                             }}
 
                         >
-                            <option value="0">Buscar ....</option>
+                            <option value="0">Buscar por....</option>
                             <option value="1">Nombre de estudiante</option>
                             <option value="2">Fecha</option>
+                            <option value="3">Número de cédula</option>
                         </select>
                         {escogido && (
                             <form>
@@ -2222,7 +2548,41 @@ export function ReporteLista({ usuario }) {
 
                                     </div>
                                 </form>
-                            )}
+                            )
+                        }
+                        {
+                            escogido3 && (
+                                <form>
+                                    <div className="row form-group">
+                                        <div className="col-2 d-flex justify-content-center mt-2">
+                                            <label htmlFor="cedula" style={{ fontFamily: 'Pacifico' }}>Cédula</label>
+                                        </div>
+                                        <div className="col-10 d-flex flex-row">
+                                            <input type="text" className="form-control" id="cedula"
+                                                placeholder="Ingrese el número de cédula**" name='cedula'
+                                                maxLength={10}
+                                                value={cedula}
+                                                onChange={e => {
+                                                    if (e.target.value === "" || /^[0-9\b]+$/.test(e.target.value)) {
+                                                        setCedula(e.target.value);
+                                                    }
+                                                }} />
+                                            <>
+                                                {
+                                                    estadoBusquedaCedu
+                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                            X
+                                                        </Button>
+                                                        : <Button variant="success" className="my-2 my-sm-0" onClick={buscarReporteCedula} disabled={isTamanio}>
+                                                            Buscar
+                                                        </Button>
+                                                }
+                                            </>
+                                        </div>
+                                    </div>
+                                </form>
+                            )
+                        }
                     </div>
                 </div>
                 <div className="alineacion-lista-busqueda">

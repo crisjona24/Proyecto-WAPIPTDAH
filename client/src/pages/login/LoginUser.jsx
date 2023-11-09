@@ -72,6 +72,9 @@ export function IniciarSesion() {
         setVerClave(!verClave);
     }
 
+    // Limpiar el local storgae
+    localStorage.clear();
+
     return (
         <div className="card" style={{ backgroundColor: '#e5e7ed', width: '100%', height: '100%', borderColor: '#e5e7ed' }}>
             <div className='login-page'>
@@ -126,12 +129,18 @@ export function IniciarSesion() {
                                     </li>
                                     <div className='login-footer'>
                                         <li style={{ listStyle: 'none', marginTop: '1%' }} >
-                                            <Link style={{ textDecoration: 'none' }} to="/registro"><h6>¿No tienes una cuenta?. CLIC AQUÍ..</h6></Link>
+                                            <Link style={{ textDecoration: 'none' }} to="/registro">
+                                                <span className="text">
+                                                    ¿No tienes una cuenta?. CLIC AQUÍ..
+                                                </span>
+                                            </Link>
                                         </li>
                                     </div>
 
                                     <div className="login-footer">
-                                        <h6>Registrate con</h6>
+                                        <span className="text">
+                                            Registrate con
+                                        </span>
                                         <ul className="social-icons">
                                             <li>
                                                 <Link className="facebook" to="/login">

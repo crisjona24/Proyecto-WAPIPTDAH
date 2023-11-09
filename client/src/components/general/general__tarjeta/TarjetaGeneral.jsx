@@ -1099,7 +1099,7 @@ export function Reporte({ datosReporte }) {
                                     className="img-fluid img__descripcion"
                                     src={
                                         ctrTiempo > (40 * 60) ? "/img/alerta - rojo.jpg" :
-                                            (ctrTiempo > 0 ? "/img/alerta - amarillo.png" : "")
+                                            (ctrTiempo > 0 ? "/img/checklist.png" : "")
                                     }
                                     alt="Sample"
                                     fluid

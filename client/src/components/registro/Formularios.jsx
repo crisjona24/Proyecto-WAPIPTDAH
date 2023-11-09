@@ -83,7 +83,7 @@ export function Actividad() {
                     name="actividad" value={actividad} onChange={e => setActividad(e.target.value)}>
                     <option value="none">----</option>
                     <option value="Tecnico">Técnico</option>
-                    <option value="Paciente">Paciente</option>
+                    <option value="Paciente">Estudiante</option>
                     <option value="Comun">Común</option>
                 </select>
             </div>

@@ -229,15 +229,21 @@ class ResultadodePacienteListView2(generics.ListAPIView):
     serializer_class = ResultadoSerializer
     pagination_class = Paginacion
     def get_queryset(self):
-        nombre, apellido = self.kwargs['nombre'].split(' ', 1)
-        if (nombre_paciente_exist(nombre , apellido)):
-            # Filtrar registros de resultados por el nombre del paciente
-            resultados = resultado_por_nombre(self.request, nombre, apellido)
-            return resultados
+        # Verificar el numero de elementos de la url en nombre
+        if len(self.kwargs['nombre'].split(' ')) == 2:
+            # Obtener nombre y apellido de la url
+            nombre, apellido = self.kwargs['nombre'].split(' ', 1)
+            if (nombre_paciente_exist(nombre , apellido)):
+                # Filtrar registros de resultados por el nombre del paciente
+                resultados = resultado_por_nombre(self.request, nombre, apellido)
+                return resultados
+            else:
+                return []
+        elif len(self.kwargs['nombre'].split(' ')) == 1:
+            return []
         else:
             return []
         
-
 def nombre_paciente_exist(nombre, apellido):
     # Verifica si el nombre del paciente ya existe
     try:
@@ -1051,4 +1057,159 @@ def reporte_por_rango(ob1, ob2):
         return []
     except Reporte.DoesNotExist:
         return []
+
+
+###### Lista de reportes en base a un número de cédula
+###### Permite el filtrado de todos los reportes de un usuario comun o técnico en base 
+###### a una cédula d estudiante
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class ReporteCedulaListView(generics.ListAPIView):
+    serializer_class = ReporteSerializer
+    pagination_class = Paginacion
+    def get_queryset(self):
+        # Obtener la fecha de la url
+        cedula_ = self.kwargs['cedula']
+        # Filtramos los resultados basados en la fecha
+        if not Paciente_Existe_Cedula(cedula_):
+            return []
+        # Filtramos los reportes basados en la cedula del Estudiante
+        reporte_cedula_comun = Reporte_por_Cedula(self.request, cedula_)
+        return reporte_cedula_comun
+
+def Reporte_por_Cedula(ob1, ob2):
+    try:
+        # Obtenemso el token del usuario comun
+        token = ob1.headers.get('Authorization').split(" ")[1]
+        user = get_user_from_token_jwt(token)
+        # Encontrar al usuario relacionado al user obtenido
+        if is_comun(user):
+            # Obtener el usuario comun
+            usuario__ob = UsuarioComun.objects.get(user=user)
+            # Obtener los reportes creados por el usuario comun y que pertenezcan a un paciente especifico 
+            # por medio de la céula
+            reportes_cedula = Reporte.objects.filter(usuario_comun=usuario__ob, paciente__dni=ob2).order_by('fecha_registro_reporte')
+            return reportes_cedula
+        elif is_tecnico(user):
+            # Obtener los reportes creados por el usuario comun y que pertenezcan a un paciente especifico 
+            # por medio de la céula
+            reportes_cedula = Reporte.objects.filter(paciente__dni=ob2).order_by('fecha_registro_reporte')
+            return reportes_cedula
+        else:
+            return []
+    except UsuarioComun.DoesNotExist:
+        return []
+    except Reporte.DoesNotExist:
+        return []
+    
+def Paciente_Existe_Cedula(ob1):
+    try:
+        if Paciente.objects.filter(dni=ob1).exists():
+            return True
+        return False
+    except Paciente.DoesNotExist:
+        return False
+    
+
+
+###### Lista de reportes en base a un número de cédula
+###### Permite el filtrado de todos los reportes de un usuario comun o técnico en base 
+###### a una cédula d estudiante
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class ResultadoCedulaListView(generics.ListAPIView):
+    serializer_class = ResultadoSerializer
+    pagination_class = Paginacion
+    def get_queryset(self):
+        # Obtener la fecha de la url
+        cedula_ = self.kwargs['cedula']
+        # Filtramos los resultados basados en la fecha
+        if not Paciente_Existe_Cedula(cedula_):
+            return []
+        # Filtramos los reportes basados en la cedula del Estudiante
+        resultado_cedula_comun = Resultado_por_Cedula(self.request, cedula_)
+        return resultado_cedula_comun
+
+def Resultado_por_Cedula(ob1, ob2):
+    try:
+        # Obtenemso el token del usuario comun
+        token = ob1.headers.get('Authorization').split(" ")[1]
+        user = get_user_from_token_jwt(token)
+        # Encontrar al usuario relacionado al user obtenido
+        if is_comun(user):
+            # Obtener el usuario comun a traves del user
+            usuario__ob = UsuarioComun.objects.get(user=user)
+            # Obtener la lista de los cursos creados por el usuario comun
+            cursos_crea = Curso.objects.filter(usuario_comun=usuario__ob)
+            # Obtener la lista de los pacientes inscritos en esos cursos
+            pacientes_inscritos_curso = Paciente.objects.filter(detalleinscripcioncurso__curso__in=cursos_crea).distinct()
+            # Obtener el paciente asociada a esa cédula
+            ob_paciente = Paciente.objects.get(dni=ob2)
+            # Obtener los resultados de ese paciente con ese numero de cédula
+            resultados_cedula = Resultado.objects.filter(paciente=ob_paciente, paciente__in=pacientes_inscritos_curso).order_by('fecha_registro_resultado')
+            return resultados_cedula
+        elif is_tecnico(user):
+            # Obtener los reportes creados por el usuario comun y que pertenezcan a un paciente especifico 
+            # por medio de la céula
+            resultados_cedula = Resultado.objects.filter(paciente__dni=ob2).order_by('fecha_registro_resultado')
+            return resultados_cedula
+        else:
+            return []
+    except UsuarioComun.DoesNotExist:
+        return []
+    except Curso.DoesNotExist:
+        return []
+    except Paciente.DoesNotExist:
+        return []
+    except Resultado.DoesNotExist:
+        return []
+
+
+###### Obtención del registro de estudiante por medio de la cédula
+###### Permite el filtrado el registro de un estudiante por medio de su cédula
+###### siempre y cuando pertenezca a un curso especifico por medio de su slug de curso
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class EstudianteCedulaListView(generics.ListAPIView):
+    serializer_class = PacienteSerializer
+    pagination_class = Paginacion
+    def get_queryset(self):
+        # Obtener la fecha de la url
+        cedula_ = self.kwargs['cedula']
+        slug_ = self.kwargs['slug']
+        # Filtramos los resultados basados en la fecha
+        if not Paciente_Existe_Cedula(cedula_):
+            return []
+        # Filtramos los reportes basados en la cedula del Estudiante
+        estudiante_cedula_comun = Estudiante_por_Cedula(self.request, cedula_, slug_)
+        return estudiante_cedula_comun
+
+
+def Estudiante_por_Cedula(ob1, ob2, ob3):
+    try:
+        # Obtenemso el token del usuario comun
+        token = ob1.headers.get('Authorization').split(" ")[1]
+        user = get_user_from_token_jwt(token)
+        # Encontrar al usuario relacionado al user obtenido
+        if is_comun(user):
+            # Obtener el usuario comun a traves del user
+            usuario__ob = UsuarioComun.objects.get(user=user)
+            # Obtener la lista de los cursos creados por el usuario comun
+            cursos_creados = Curso.objects.filter(usuario_comun=usuario__ob)
+            # Obtener el curso asociado al slug
+            curso_especifico = Curso.objects.get(slug_curso=ob3)
+            # Obtener la lista de los pacientes inscritos en ese curso
+            pacientes_inscritos = Paciente.objects.filter(detalleinscripcioncurso__curso__in=cursos_creados, detalleinscripcioncurso__curso=curso_especifico).distinct()
+            # Devolvemos el registro de paciente asociado a esa cédula dentro de la lista de pacientes dentro del curso
+            return pacientes_inscritos.filter(dni=ob2)
+        else:
+            return []
+    except UsuarioComun.DoesNotExist:
+        return []
+    except Curso.DoesNotExist:
+        return []
+    except Paciente.DoesNotExist:
+        return []
+
+
 

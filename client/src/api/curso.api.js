@@ -266,3 +266,21 @@ export const CursoporFechaTecnico = async (fecha, page = 1) => {
         throw new Error("No se puede acceder a los cursos: " + error.message);
     }
 };
+
+// Buscar estudiante por cedula
+export const EstudianteporCedula = async (cedula, slug, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/estudio/estudiante/cedula/${cedula}/${slug}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder al registro de estudiante por esa cédula: " + error.message);
+    }
+};

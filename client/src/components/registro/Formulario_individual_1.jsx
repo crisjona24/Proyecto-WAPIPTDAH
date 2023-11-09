@@ -235,10 +235,12 @@ export function FormularioUno({ context, usuario, slugContenido }) {
                 </div>
             }
             <div className="container row col-md-12 mt-4">
-                <div className="contenedor__cuerpo" id="miContainer" ref={miContainerRef} style={{
-                    pointerEvents: contenidoHabilitado ? 'auto' : 'none',
-                    opacity: contenidoHabilitado ? 1 : 0.5
-                }}>
+                <div className="contenedor__cuerpo" id="miContainer" ref={miContainerRef}
+                    
+                    style={{
+                        pointerEvents: contenidoHabilitado ? 'auto' : 'none',
+                        opacity: contenidoHabilitado ? 1 : 0.5
+                    }}>
                     <div className="contenedor__cuerpo__division">
                         <div className="alineacion__etiquetas d-flex">
                             <span className="span-2 mt-3" style={{ color: 'rgb(0, 146, 99)' }}>

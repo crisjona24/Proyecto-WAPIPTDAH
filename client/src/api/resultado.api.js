@@ -273,3 +273,20 @@ export const ResultadoporRangoTecnico = async (rango, page = 1) => {
     }
 };
 
+// Buscar reportes por cedula de estudiante para usuario comun y tecnico
+export const ResultadoporCedula = async (cedula, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/estudio/lista/resultado/cedula/${cedula}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a los resultados por esa cédula: " + error.message);
+    }
+};

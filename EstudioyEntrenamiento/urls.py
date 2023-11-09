@@ -57,6 +57,10 @@ urlpatterns = [
     path('busqueda/curso/<str:nombre>/', BusquedaCursoListView.as_view(), name='curso-busqueda'),
     path('lista/reportes/<str:nombre>/', ReportedePacienteListView.as_view(), name='reporte-list-paciente'),
 
+    path('lista/reportes/cedula/<str:cedula>/', ReporteCedulaListView.as_view(), name='reporte-list-cedula'),
+    path('lista/resultado/cedula/<str:cedula>/', ResultadoCedulaListView.as_view(), name='resultado-list-cedula'),
+    path('estudiante/cedula/<str:cedula>/<str:slug>/', EstudianteCedulaListView.as_view(), name='registro-estudiante'),
+
 
     ########### Verificaciones
     path('verificar/nivel/<str:slug>/', verificar_nivel, name='verificar_nivel'),

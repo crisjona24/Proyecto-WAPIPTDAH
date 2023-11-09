@@ -12,14 +12,14 @@ class UserSerializer(serializers.ModelSerializer):
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
-        fields = ('nombre_usuario', 'apellido_usuario', 'email_usuario',
+        fields = ('nombre_usuario', 'apellido_usuario', 'email_usuario', 'dni',
                   'username_usuario', 'celular', 'fecha_nacimiento', 'is_activo', 'user')
 
 # Clase de serialización para el usuario paciente con denominacion formal: Estudiante
 class PacienteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Paciente
-        fields = ( 'id', 'nombre_usuario', 'apellido_usuario', 'email_usuario', 'username_usuario',
+        fields = ( 'id', 'nombre_usuario', 'apellido_usuario', 'email_usuario', 'username_usuario', 'dni',
                   'celular', 'contacto_emergencia', 'fecha_nacimiento', 'direccion', 'edad', 'is_activo', 'user',
                   )
 
@@ -27,7 +27,7 @@ class PacienteSerializer(serializers.ModelSerializer):
 class ComunSerializer(serializers.ModelSerializer):
     class Meta:
         model = UsuarioComun
-        fields = ('nombre_usuario', 'apellido_usuario', 'email_usuario', 'username_usuario',
+        fields = ('nombre_usuario', 'apellido_usuario', 'email_usuario', 'username_usuario', 'dni',
                   'celular', 'genero', 'fecha_nacimiento', 'area_estudio', 'edad', 'is_activo', 'user')
 
 # Clase de serialización para los niveles de TDAH registrados en el sistema

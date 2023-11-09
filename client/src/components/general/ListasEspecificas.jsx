@@ -27,7 +27,7 @@ export function ListadodeSala({ salas, usuario, page, setPage, numeroPag }) {
     };
 
     return (
-        <div className="cuerpo-tabla-2">
+        <div className="cuerpo-tabla-4">
             <div className="row">
                 <div className="col-md-offset-1 col-md-11">
                     <div className="panel">
@@ -313,8 +313,12 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
     const [habilitado, setHabilitado] = useState(false);
     const [verModal, setVerModal] = useState(false);
     const [nombre, setNombre] = useState('');
+    const [cedula, setCedula] = useState('');
     const cerrarModal = () => setVerModal(false);
     const abrirModal = () => setVerModal(true);
+    const [busqueda, setBusqueda] = useState("0");
+    const [escogido, setEscogido] = useState(false);
+    const [escogido2, setEscogido2] = useState(false);
 
     // Formulario
     const enviarFormulario = (e) => {
@@ -330,6 +334,36 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
             // Obtenemos los datos
             const datos__post = {
                 nombre
+            };
+            // Guardamos
+            guardar(datos__post);
+        } catch (error) {
+            Swal.fire("Error al generar el reporte", "", "error");
+        }
+        // Cerrar modal
+        setHabilitado(false);
+        cerrarModal();
+    };
+
+    // Formulario
+    const enviarFormularioCedula = (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (isEmptyField(cedula)) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Flujo normal
+        setHabilitado(true);
+        try {
+            // Validar tamaño de cédula
+            if (cedula.length < 10) {
+                Swal.fire("Por favor ingrese una cédula válida", "", "warning");
+                return;
+            }
+            // Obtenemos los datos
+            const datos__post = {
+                cedula
             };
             // Guardamos
             guardar(datos__post);
@@ -360,14 +394,18 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                         Swal.fire("Reportes registrados correctamente", "", "success");
                         navigate('/reporte/all');
                     } else {
+                        resetear();
                         if (response.data.error) {
                             Swal.fire(response.data.error, '', 'error')
+                        } else if (response.data.resultado) {
+                            Swal.fire(response.data.resultado, '', 'error')
                         } else {
                             Swal.fire('Generación de reporte fallido', '', 'error')
                         }
                     }
                 } catch (error) {
-                    Swal.fire("Error al generar el reporte", "", "error");
+                    resetear();
+                    Swal.fire("No se pudo generar el reporte. Verifique el nombre del estudiante", "", "error");
                 }
             }
         })
@@ -381,6 +419,10 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
     // Reseteo
     const resetear = () => {
         setNombre('');
+        setCedula('');
+        setBusqueda("0");
+        setEscogido(false);
+        setEscogido2(false);
     }
 
     return (
@@ -395,17 +437,61 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                         <Modal.Title>Generación de reporte</Modal.Title>
                                     </Modal.Header>
                                     <Modal.Body>
-                                        <form onSubmit={enviarFormulario}>
-                                            <div className="form-group">
-                                                <label className='label' htmlFor="nombre">Nombre de estudiante:</label>
-                                                <input className='form-control w-100' type="text"
-                                                    placeholder="Ingrese el nombre del estudiante. Ejm: Luis Perez**" id="nombre"
-                                                    value={nombre} onChange={e => setNombre(e.target.value)} />
-                                            </div>
-                                            <Button type="submit" variant="success" disabled={habilitado}>
-                                                {habilitado ? 'Generando...' : 'Generar'}
-                                            </Button>
-                                        </form>
+                                        <select
+                                            className="form-select mb-3"
+                                            value={busqueda}
+                                            onChange={(e) => {
+                                                setBusqueda(e.target.value);
+                                                // Mostrar el formulario si la opción seleccionada es "1" (Nombre de estudiante)
+                                                if (e.target.value === "1") {
+                                                    setEscogido(true);
+                                                    setEscogido2(false);
+                                                } else if (e.target.value === "2") {
+                                                    setEscogido2(true);
+                                                    setEscogido(false);
+                                                } else {
+                                                    setEscogido(false);
+                                                    setEscogido2(false);
+                                                }
+                                            }}
+                                        >
+                                            <option value="0">Generar por ....</option>
+                                            <option value="1">Nombre de estudiante</option>
+                                            <option value="2">Cédula de identidad</option>
+                                        </select>
+                                        {escogido && (
+                                            <form onSubmit={enviarFormulario}>
+                                                <div className="form-group">
+                                                    <label className='label' htmlFor="nombre">Nombre de estudiante:</label>
+                                                    <input className='form-control w-100' type="text"
+                                                        placeholder="Ingrese el nombre del estudiante. Ejm: Luis Perez**" id="nombre"
+                                                        value={nombre} onChange={e => setNombre(e.target.value)} />
+                                                </div>
+                                                <Button type="submit" variant="success" disabled={habilitado}>
+                                                    {habilitado ? 'Generando...' : 'Generar'}
+                                                </Button>
+                                            </form>
+                                        )}
+                                        {escogido2 && (
+                                            <form onSubmit={enviarFormularioCedula}>
+                                                <div className="form-group">
+                                                    <label className='label' htmlFor="cedula">Cédula de estudiante:</label>
+                                                    <input className='form-control w-100' type="text"
+                                                        placeholder="Ingrese el número de cédula**" id="cedula"
+                                                        value={cedula}
+                                                        maxLength={10}
+                                                        onChange={e => {
+                                                            if (e.target.value === "" || /^[0-9\b]+$/.test(e.target.value)) {
+                                                                setCedula(e.target.value);
+                                                            }
+                                                        }} />
+                                                </div>
+                                                <Button type="submit" variant="success" disabled={habilitado}>
+                                                    {habilitado ? 'Generando...' : 'Generar'}
+                                                </Button>
+                                            </form>
+                                        )}
+
                                     </Modal.Body>
                                 </Modal>
                                 <div className="col-sm-12 col-xs-12">
@@ -413,7 +499,7 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                         {
                                             usuario.tipo === "comun" &&
                                             <Button className="btn btn-sm btn-primary pull-left" onClick={abrirModal}>
-                                                <FontAwesomeIcon icon={faPlusCircle} title="Agregar sala" /> Generar Reporte
+                                                <FontAwesomeIcon icon={faPlusCircle} title="Agregar reporte" /> Generar Reporte
                                             </Button>
                                         }
                                     </>

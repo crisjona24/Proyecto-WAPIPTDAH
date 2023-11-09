@@ -295,3 +295,21 @@ export const ReporteporRangoTecnico = async (fecha, page = 1) => {
         throw new Error("No se puede acceder a los reportes: " + error.message);
     }
 };
+
+// Buscar reportes por cedula de estudiante para usuario comun y tecnico
+export const ReporteporCedula = async (cedula, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/estudio/lista/reportes/cedula/${cedula}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a los reportes: " + error.message);
+    }
+};

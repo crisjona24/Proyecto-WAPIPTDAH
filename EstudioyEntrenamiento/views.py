@@ -1367,25 +1367,55 @@ def generar_reporte_all(request):
                     # Obtener el valor del nombre del paciente
                     data = json.loads(request.body)
                     nombre_paciente_ = data.get('nombre')
-                    # Obtener el nombre y apellido del paciente de nombre_paciente
-                    nombres_apellido = nombre_paciente_.split(' ')
-                    nombre = nombres_apellido[0]
-                    apellido = nombres_apellido[1]
-                    # Obtener el paciente
-                    paciente_ob = Paciente.objects.get(nombre_usuario__iexact=nombre, apellido_usuario__iexact=apellido)
-                    # Obtener los resultados del paciente filtrando la observacion en no nulo o la obseravion diga No resuelto
-                    resultados = Resultado.objects.filter(paciente=paciente_ob, observacion__isnull=False, estado_reporte=False).exclude(observacion__iexact="No resuelto")
-                    print("nombre :", nombre)
-                    print("apellido :", apellido)
-                    if (verificar_paciente_curso(nombre, apellido, user)):
-                        # Se crea el reporte por cada resultado
-                        for resultado in resultados:
-                            guardar_reporte(resultado.id, user)
-                        return JsonResponse({'success': True})
+                    cedula_ = data.get('cedula')
+                    # Verificar si es por nombre o cedula
+                    if nombre_paciente_:
+                        # Obtener el nombre y apellido del paciente de nombre_paciente
+                        nombres_apellido = nombre_paciente_.split(' ')
+                        # Verificar cuantos valores existen separados por un espacio
+                        if len(nombres_apellido) == 1:
+                            error_message = "El nombre del paciente no es válido."
+                            context = {'error': error_message}
+                            return JsonResponse(context)
+                        elif len(nombres_apellido) == 2:
+                            nombre = nombres_apellido[0]
+                            apellido = nombres_apellido[1]
+                        elif len(nombres_apellido) == 3:
+                            nombre = nombres_apellido[0]
+                            apellido = nombres_apellido[1] + " " + nombres_apellido[2]
+                        else:
+                            error_message = "El nombre del paciente no es válido."
+                            context = {'error': error_message}
+                            return JsonResponse(context)
                     else:
+                        # Obtener el usuario paciente por medio de la cédula
+                        if Paciente.objects.filter(dni=cedula_).exists():
+                            ob_paciente = Paciente.objects.get(dni=cedula_)
+                            # Obtenemos el nombre y apellido
+                            nombre = ob_paciente.nombre_usuario
+                            apellido = ob_paciente.apellido_usuario
+                        else:
+                            error_message = "El paciente no existe con esa cédula. No se puede generar reportes."
+                            context = {'error': error_message}
+                            return JsonResponse(context)
+                    # Ejecutamos
+                    if not verificar_paciente_curso(nombre, apellido, user):
                         error_message = "El estudiante no se encuentra inscrito en un curso o no existe."
                         context = {'error': error_message}
                         return JsonResponse(context)
+    
+                    if not verificar_resultado_estado(nombre, apellido):
+                        error_message = "El estudiante no tiene resultados con observación registrada. Verifica."
+                        context = {'resultado': error_message}
+                        return JsonResponse(context)
+                    # Guardar Reporte
+                    if Reporte_general_Nombre(nombre, apellido, user):
+                        return JsonResponse({'success': True})
+                    else:
+                        error_message = "No es posibles generar el reporte...."
+                        context = {'error': error_message}
+                        return JsonResponse(context)
+                
                 else:
                     return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
             else:
@@ -1418,6 +1448,32 @@ def verificar_paciente_curso(ob1, ob2, ob3):
     except DetalleInscripcionCurso.DoesNotExist:
         return False
 
+
+def verificar_resultado_estado(ob1, ob2):
+    try:
+        # Obtenemos el paciente
+        paciente_ = Paciente.objects.get(nombre_usuario__iexact=ob1, apellido_usuario__iexact=ob2)
+        # Obtenemos los resultados del paciente filtrando la observacion en no nulo o la obseravion diga No resuelto
+        resultados = Resultado.objects.filter(paciente=paciente_, observacion__isnull=False, estado_reporte=False).exclude(observacion__iexact="No resuelto")
+        # Si al menos hay un registro de resultado lanzamos true
+        if resultados.exists():
+            return True
+        return False
+    except Paciente.DoesNotExist:
+        return False
+    except Resultado.DoesNotExist:
+        return False
+
+
+def Reporte_general_Nombre(ob1, ob2, ob3):               
+    # Obtener el paciente
+    paciente_ob = Paciente.objects.get(nombre_usuario__iexact=ob1, apellido_usuario__iexact=ob2)                    
+    # Obtener los resultados del paciente filtrando la observacion en no nulo o la obseravion diga No resuelto
+    resultados = Resultado.objects.filter(paciente=paciente_ob, observacion__isnull=False, estado_reporte=False).exclude(observacion__iexact="No resuelto")
+    # Se crea el reporte por cada resultado
+    for resultado in resultados:
+        guardar_reporte(resultado.id, ob3)
+    return True
 
 
 

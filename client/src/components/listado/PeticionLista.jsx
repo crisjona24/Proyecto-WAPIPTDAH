@@ -189,7 +189,7 @@ export function PeticionLista() {
                 </div>
             }
             {/* Para el filtro de fecha */}
-            <div className="container mt-5 alienacion-externa">
+            <div className="container mt-3 alienacion-externa">
                 <div className="alineacion-lista-busqueda">
                     <div className="col-md-12">
                         <form>
@@ -422,7 +422,7 @@ export function PeticionListaAtendi() {
                     <div className="row">
                         <div className="col-md-12">
                             <h4 className="display-7 mt-2">
-                                Peticiones - Atendidas
+                                Peticiones Atendidas
                             </h4>
                         </div>
                     </div>
@@ -435,7 +435,7 @@ export function PeticionListaAtendi() {
                 </div>
             }
             {/* Para el filtro de fecha */}
-            <div className="container mt-5 alienacion-externa">
+            <div className="container mt-3 alienacion-externa">
                 <div className="alineacion-lista-busqueda">
                     <div className="col-md-12">
                         <form>

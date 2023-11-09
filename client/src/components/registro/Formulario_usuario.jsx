@@ -27,10 +27,12 @@ export function FormularioUsuario() {
     const [password_usuario, setPassword] = useState("");
     const [password_usuario_2, setPassword2] = useState("");
     const [celular, setCelular] = useState("");
+    const [cedula, setCedula] = useState("");
     const [fecha_nacimiento, setFecha] = useState("");
     const [error, setError] = useState("");
     const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
+
     // Mostrar clave
     const [verClave, setVerClave] = useState(false);
     const [verClave2, setVerClave2] = useState(false);
@@ -40,8 +42,48 @@ export function FormularioUsuario() {
         e.preventDefault();
         // Verificar campos vacíos
         if (isEmptyField(nombre_usuario, apellido_usuario, email_usuario, username_usuario,
-            password_usuario, celular, fecha_nacimiento, password_usuario_2)) {
+            password_usuario, celular, fecha_nacimiento, password_usuario_2, cedula)) {
             Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Validar cédula
+        if (cedula.length !== 10) {
+            Swal.fire("La cédula debe tener 10 dígitos", "", "warning");
+            return;
+        }
+        // Flujo normal
+        setHabilitado(true);
+        try {
+            const datos__post = {
+                nombre_usuario,
+                apellido_usuario,
+                email_usuario,
+                username_usuario,
+                password_usuario,
+                celular,
+                fecha_nacimiento,
+                cedula
+            };
+            if (!compararClave(password_usuario, password_usuario_2)) {
+                Swal.fire("Las claves no coinciden", "", "warning");
+                setHabilitado(false);
+                return;
+            }
+            // Realizar la petición POST al servidor
+            guardar(datos__post);
+
+        } catch (error) {
+            mostrarError('Error al registrar usuario');
+        }
+        setHabilitado(false);
+    };
+
+    const enviarFTEdicion = async (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (isEmptyField(nombre_usuario, apellido_usuario,
+            celular, fecha_nacimiento)) {
+            Swal.fire("Por favor ingrese todos los campos de edición", "", "warning");
             return;
         }
         // Flujo normal
@@ -51,28 +93,11 @@ export function FormularioUsuario() {
                 const datos__edit = {
                     nombre_usuario,
                     apellido_usuario,
-                    email_usuario,
                     celular,
                     fecha_nacimiento
                 };
                 // Llamamos a la función de editar usuario
                 await confirmEdicion(datos__edit);
-            } else {
-                const datos__post = {
-                    nombre_usuario,
-                    apellido_usuario,
-                    email_usuario,
-                    username_usuario,
-                    password_usuario,
-                    celular,
-                    fecha_nacimiento
-                };
-                if (!compararClave(password_usuario, password_usuario_2)) {
-                    Swal.fire("Las claves no coinciden", "", "warning");
-                    return;
-                }
-                // Realizar la petición POST al servidor
-                guardar(datos__post);
             }
         } catch (error) {
             mostrarError('Error al registrar usuario');
@@ -95,6 +120,8 @@ export function FormularioUsuario() {
                 mostrarError('La clave debe tener mínimo 8 caracteres que incluye una letra mayúscula, un número y un símbolo');
             } else if (response.data.correo) {
                 Swal.fire(response.data.correo, '', 'error');
+            } else if (response.data.cedula) {
+                Swal.fire(response.data.cedula, '', 'error');
             } else {
                 mostrarError('Datos no válidos');
             }
@@ -110,8 +137,6 @@ export function FormularioUsuario() {
                 const datos__user = await UsuarioIndividual(cont.data.identificador);
                 setNombre(datos__user.data.nombre_usuario);
                 setApellido(datos__user.data.apellido_usuario);
-                setEmail(datos__user.data.email_usuario);
-                setUsername(datos__user.data.username_usuario);
                 setPassword("---");
                 setCelular(datos__user.data.celular);
                 setFecha(datos__user.data.fecha_nacimiento);
@@ -153,7 +178,7 @@ export function FormularioUsuario() {
                     Swal.fire("Datos actualizados", "", "success");
                     navigate('/perfil');
                 } catch (error) {
-                    Swal.fire('Error al actualizar', '', 'error');
+                    Swal.fire('Error al actualizar perfil', '', 'error');
                 }
             } else if (result.isDenied) {
                 Swal.fire('Los cambios no se guardaron', '', 'info');
@@ -192,8 +217,18 @@ export function FormularioUsuario() {
         }
     };
 
+    // Validar cedula que sea entrada solo numerica
+    const validarCedula = (e) => {
+        if (e.target.value === "" || /^[0-9\b]+$/.test(e.target.value)) {
+            setCedula(e.target.value);
+            return true;
+        }
+        return false;
+    }
     return (
-        <form onSubmit={enviarFT}>
+        <form onSubmit={
+            datos?.tipo ? enviarFTEdicion : enviarFT
+        }>
             <>
                 {error && <span>{error}</span>}
             </>
@@ -210,19 +245,23 @@ export function FormularioUsuario() {
                     />
                 </div>
             </div>
-            <div className='form-row row'>
-                <div className="form-group col-md-6">
-                    <label className='label' htmlFor="email"> Correo Electrónico::</label>
-                    <input className='form-control w-100' type="text" placeholder="Ingrese el correo electrónico**" name='email' id="email"
-                        value={email_usuario} onChange={e => setEmail(e.target.value)} />
-                </div>
-                <div className="form-group col-md-6">
-                    <label className='label' htmlFor="username">Usuario:</label>
-                    <input className='form-control w-100' type="text" placeholder="Ingrese el username**" name='username' id="username"
-                        value={username_usuario} onChange={e => setUsername(e.target.value)} />
-                </div>
-            </div>
+
             <>
+                {
+                    !datos?.tipo &&
+                    <div className='form-row row'>
+                        <div className="form-group col-md-6">
+                            <label className='label' htmlFor="email"> Correo Electrónico::</label>
+                            <input className='form-control w-100' type="text" placeholder="Ingrese el correo electrónico**" name='email' id="email"
+                                value={email_usuario} onChange={e => setEmail(e.target.value)} />
+                        </div>
+                        <div className="form-group col-md-6">
+                            <label className='label' htmlFor="username">Usuario:</label>
+                            <input className='form-control w-100' type="text" placeholder="Ingrese el username**" name='username' id="username"
+                                value={username_usuario} onChange={e => setUsername(e.target.value)} />
+                        </div>
+                    </div>
+                }
                 {
                     !datos?.tipo &&
                     <div className='form-row row'>
@@ -278,6 +317,12 @@ export function FormularioUsuario() {
                         value={fecha_nacimiento} onChange={e => setFecha(e.target.value)} />
                 </div>
             </div>
+            <div className='form-group'>
+                <label className='label' htmlFor="cedula">Cédula de identidad:</label>
+                <input className='form-control w-100' maxLength={10} type="text" placeholder="Ingrese el número de cédula**" name='cedula' id="cedula"
+                    value={cedula}
+                    onChange={validarCedula} />
+            </div>
             <Button type="submit" variant="success" disabled={habilitado}>
                 {habilitado ? 'Guardando...' : 'Guardar'}
             </Button>
@@ -298,6 +343,7 @@ export function FormularioComun() {
     const [password_usuario, setPassword] = useState("");
     const [password_usuario_2, setPassword2] = useState("");
     const [celular, setCelular] = useState("");
+    const [cedula, setCedula] = useState("");
     const [fecha_nacimiento, setFecha] = useState("");
     const [genero, setGenero] = useState("");
     const [area_estudio, setAreaEstudio] = useState("");
@@ -312,12 +358,53 @@ export function FormularioComun() {
     const enviarFComun = async (e) => {
         e.preventDefault();
         // Verificar campos vacíos
-        if (isEmptyField(nombre_usuario, apellido_usuario, email_usuario, username_usuario,
+        if (isEmptyField(nombre_usuario, apellido_usuario, email_usuario, username_usuario, cedula,
             password_usuario, celular, fecha_nacimiento, genero, area_estudio, password_usuario_2)) {
             Swal.fire("Por favor ingrese todos los campos", "", "warning");
             return;
         }
+        // Validar cédula
+        if (cedula.length !== 10) {
+            Swal.fire("La cédula debe tener 10 dígitos", "", "warning");
+            return;
+        }
+        // Flujo normal
+        setHabilitado(true);
+        try {
+            const datos__post = {
+                nombre_usuario,
+                apellido_usuario,
+                email_usuario,
+                username_usuario,
+                password_usuario,
+                celular,
+                fecha_nacimiento,
+                genero,
+                area_estudio,
+                cedula
+            };
+            if (!compararClave(password_usuario, password_usuario_2)) {
+                Swal.fire("Las claves no coinciden", "", "warning");
+                setHabilitado(false);
+                return;
+            }
+            // Realizar la petición POST al servidor
+            guardar(datos__post);
+        } catch (error) {
+            mostrarError('Error al registrar usuario');
+        }
+        setHabilitado(false);
+    };
 
+    // Operacion de guardar datos
+    const enviarFComunEdicion = async (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (isEmptyField(nombre_usuario, apellido_usuario,
+            celular, fecha_nacimiento, genero, area_estudio)) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
         // Flujo normal
         setHabilitado(true);
         try {
@@ -325,8 +412,6 @@ export function FormularioComun() {
                 const datos__edit = {
                     nombre_usuario,
                     apellido_usuario,
-                    email_usuario,
-                    username_usuario,
                     celular,
                     fecha_nacimiento,
                     genero,
@@ -334,24 +419,6 @@ export function FormularioComun() {
                 }
                 // Llamamos a la función de editar usuario
                 await confirmEdicion(datos__edit);
-            } else {
-                const datos__post = {
-                    nombre_usuario,
-                    apellido_usuario,
-                    email_usuario,
-                    username_usuario,
-                    password_usuario,
-                    celular,
-                    fecha_nacimiento,
-                    genero,
-                    area_estudio
-                };
-                if (!compararClave(password_usuario, password_usuario_2)) {
-                    Swal.fire("Las claves no coinciden", "", "warning");
-                    return;
-                }
-                // Realizar la petición POST al servidor
-                guardar(datos__post);
             }
         } catch (error) {
             mostrarError('Error al registrar usuario');
@@ -374,7 +441,10 @@ export function FormularioComun() {
                 mostrarError('La clave debe tener mínimo 8 caracteres que incluye una letra mayúscula, un número y un símbolo');
             } else if (response.data.correo) {
                 Swal.fire(response.data.correo, '', 'error');
-            } else {
+            } else if (response.data.cedula) {
+                Swal.fire(response.data.cedula, '', 'error');
+            }
+            else {
                 mostrarError('Datos no válidos');
             }
 
@@ -390,8 +460,6 @@ export function FormularioComun() {
                 const datos__user = await ComunIndividual(contUC.data.identificador);
                 setNombre(datos__user.data.nombre_usuario);
                 setApellido(datos__user.data.apellido_usuario);
-                setEmail(datos__user.data.email_usuario);
-                setUsername(datos__user.data.username_usuario);
                 setPassword("---");
                 setCelular(datos__user.data.celular);
                 setFecha(datos__user.data.fecha_nacimiento);
@@ -434,7 +502,7 @@ export function FormularioComun() {
                     Swal.fire("Datos actualizados", "", "success");
                     navigate('/perfil');
                 } catch (error) {
-                    Swal.fire('Error al actualizar', '', 'error');
+                    Swal.fire('Error al actualizar perfil', '', 'error');
                 }
             } else if (result.isDenied) {
                 Swal.fire('Los cambios no se guardaron', '', 'info');
@@ -473,9 +541,19 @@ export function FormularioComun() {
         }
     };
 
+    // Validar cedula que sea entrada solo numerica
+    const validarCedula = (e) => {
+        if (e.target.value === "" || /^[0-9\b]+$/.test(e.target.value)) {
+            setCedula(e.target.value);
+            return true;
+        }
+        return false;
+    }
 
     return (
-        <form onSubmit={enviarFComun}>
+        <form onSubmit={
+            datos?.tipo ? enviarFComunEdicion : enviarFComun
+        }>
             <>
                 {error && <span>{error}</span>}
             </>
@@ -492,19 +570,22 @@ export function FormularioComun() {
                     />
                 </div>
             </div>
-            <div className='form-row row'>
-                <div className='form-group col-md-6'>
-                    <label className='label' htmlFor="email"> Correo Electrónico::</label>
-                    <input className='form-control w-100' type="text" placeholder="Ingrese el correo electrónico**" name='email' id="email"
-                        value={email_usuario} onChange={e => setEmail(e.target.value)} />
-                </div>
-                <div className='form-group col-md-6'>
-                    <label className='label' htmlFor="username">Usuario:</label>
-                    <input className='form-control w-100' type="text" placeholder="Ingrese el username**" name='username' id="username"
-                        value={username_usuario} onChange={e => setUsername(e.target.value)} />
-                </div>
-            </div>
             <>
+                {
+                    !datos?.tipo &&
+                    <div className='form-row row'>
+                        <div className='form-group col-md-6'>
+                            <label className='label' htmlFor="email"> Correo Electrónico::</label>
+                            <input className='form-control w-100' type="text" placeholder="Ingrese el correo electrónico**" name='email' id="email"
+                                value={email_usuario} onChange={e => setEmail(e.target.value)} />
+                        </div>
+                        <div className='form-group col-md-6'>
+                            <label className='label' htmlFor="username">Usuario:</label>
+                            <input className='form-control w-100' type="text" placeholder="Ingrese el username**" name='username' id="username"
+                                value={username_usuario} onChange={e => setUsername(e.target.value)} />
+                        </div>
+                    </div>
+                }
                 {
                     !datos?.tipo &&
                     <div className='form-row row'>
@@ -581,6 +662,12 @@ export function FormularioComun() {
                     </select>
                 </div>
             </div>
+            <div className='form-group'>
+                <label className='label' htmlFor="cedula">Cédula de identidad:</label>
+                <input className='form-control w-100' maxLength={10} type="text" placeholder="Ingrese el número de cédula**" name='cedula' id="cedula"
+                    value={cedula}
+                    onChange={validarCedula} />
+            </div>
             <Button type="submit" variant="success" disabled={habilitado}>
                 {habilitado ? 'Guardando...' : 'Guardar'}
             </Button>
@@ -602,6 +689,7 @@ export function FormularioPaciente() {
     const [password_usuario, setPassword] = useState("");
     const [password_usuario_2, setPassword2] = useState("");
     const [celular, setCelular] = useState("");
+    const [cedula, setCedula] = useState("");
     const [fecha_nacimiento, setFecha] = useState("");
     const [contacto_emergencia, setContactoEmergencia] = useState("");
     const [direccion, setDireccion] = useState("");
@@ -616,8 +704,49 @@ export function FormularioPaciente() {
     const enviarFP = async (e) => {
         e.preventDefault();
         // Verificar campos vacíos
-        if (isEmptyField(nombre_usuario, apellido_usuario, email_usuario, username_usuario,
+        if (isEmptyField(nombre_usuario, apellido_usuario, email_usuario, username_usuario, cedula,
             password_usuario, celular, fecha_nacimiento, contacto_emergencia, direccion, password_usuario_2)) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Validar tamaño de cédula
+        if (cedula.length !== 10) {
+            Swal.fire("La cédula debe tener 10 dígitos", "", "warning");
+            return;
+        }
+        // Flujo normal
+        setHabilitado(true);
+        try {
+            const datos__post = {
+                nombre_usuario,
+                apellido_usuario,
+                email_usuario,
+                username_usuario,
+                password_usuario,
+                celular,
+                fecha_nacimiento,
+                contacto_emergencia,
+                direccion,
+                cedula
+            };
+            if (!compararClave(password_usuario, password_usuario_2)) {
+                Swal.fire("Las claves no coinciden", "", "warning");
+                setHabilitado(false);
+                return;
+            }
+            // Realizar la petición POST al servidor
+            guardar(datos__post);
+        } catch (error) {
+            mostrarError('Error al registrar usuario');
+        }
+        setHabilitado(false);
+    };
+
+    const enviarFPEdicion = async (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (isEmptyField(nombre_usuario, apellido_usuario,
+            celular, fecha_nacimiento, contacto_emergencia, direccion)) {
             Swal.fire("Por favor ingrese todos los campos", "", "warning");
             return;
         }
@@ -628,8 +757,6 @@ export function FormularioPaciente() {
                 const datos__edit = {
                     nombre_usuario,
                     apellido_usuario,
-                    email_usuario,
-                    username_usuario,
                     celular,
                     fecha_nacimiento,
                     contacto_emergencia,
@@ -637,25 +764,6 @@ export function FormularioPaciente() {
                 }
                 // Llamamos a la función de editar usuario
                 await confirmEdicion(datos__edit);
-            } else {
-
-                const datos__post = {
-                    nombre_usuario,
-                    apellido_usuario,
-                    email_usuario,
-                    username_usuario,
-                    password_usuario,
-                    celular,
-                    fecha_nacimiento,
-                    contacto_emergencia,
-                    direccion
-                };
-                if (!compararClave(password_usuario, password_usuario_2)) {
-                    Swal.fire("Las claves no coinciden", "", "warning");
-                    return;
-                }
-                // Realizar la petición POST al servidor
-                guardar(datos__post);
             }
         } catch (error) {
             mostrarError('Error al registrar usuario');
@@ -678,6 +786,8 @@ export function FormularioPaciente() {
                 mostrarError('La clave debe tener mínimo 8 caracteres que incluye una letra mayúscula, un número y un símbolo');
             } else if (response.data.correo) {
                 Swal.fire(response.data.correo, '', 'error');
+            } else if (response.data.cedula) {
+                Swal.fire(response.data.cedula, '', 'error');
             } else {
                 mostrarError('Datos no válidos');
             }
@@ -693,8 +803,6 @@ export function FormularioPaciente() {
                 const datos__user = await PacienteIndividual(contP.data.identificador);
                 setNombre(datos__user.data.nombre_usuario);
                 setApellido(datos__user.data.apellido_usuario);
-                setEmail(datos__user.data.email_usuario);
-                setUsername(datos__user.data.username_usuario);
                 setCelular(datos__user.data.celular);
                 setPassword("---");
                 setContactoEmergencia(datos__user.data.contacto_emergencia);
@@ -715,6 +823,7 @@ export function FormularioPaciente() {
             }
         }
     }
+
     // Use  effect
     useEffect(() => {
         if (token) {
@@ -737,7 +846,7 @@ export function FormularioPaciente() {
                     Swal.fire("Datos actualizados", "", "success");
                     navigate('/perfil');
                 } catch (error) {
-                    Swal.fire('Error al actualizar', '', 'error');
+                    Swal.fire('Error al actualizar perfil', '', 'error');
                 }
             } else if (result.isDenied) {
                 Swal.fire('Los cambios no se guardaron', '', 'info');
@@ -776,8 +885,19 @@ export function FormularioPaciente() {
         }
     };
 
+    // Validar cedula que sea entrada solo numerica
+    const validarCedula = (e) => {
+        if (e.target.value === "" || /^[0-9\b]+$/.test(e.target.value)) {
+            setCedula(e.target.value);
+            return true;
+        }
+        return false;
+    }
+
     return (
-        <form onSubmit={enviarFP}>
+        <form onSubmit={
+            datos?.tipo ? enviarFPEdicion : enviarFP
+        }>
             <>
                 {error && <span>{error}</span>}
             </>
@@ -794,19 +914,22 @@ export function FormularioPaciente() {
                     />
                 </div>
             </div>
-            <div className='form-row row'>
-                <div className='form-group col-md-6'>
-                    <label className='label' htmlFor="email"> Correo Electrónico:</label>
-                    <input className='form-control w-100' type="text" placeholder="Ingrese el correo electrónico**" name='email' id="email"
-                        value={email_usuario} onChange={e => setEmail(e.target.value)} />
-                </div>
-                <div className='form-group col-md-6'>
-                    <label className='label' htmlFor="username">Usuario:</label>
-                    <input className='form-control w-100' type="text" placeholder="Ingrese el username**" name='username' id="username"
-                        value={username_usuario} onChange={e => setUsername(e.target.value)} />
-                </div>
-            </div>
             <>
+                {
+                    !datos?.tipo &&
+                    <div className='form-row row'>
+                        <div className='form-group col-md-6'>
+                            <label className='label' htmlFor="email"> Correo Electrónico:</label>
+                            <input className='form-control w-100' type="text" placeholder="Ingrese el correo electrónico**" name='email' id="email"
+                                value={email_usuario} onChange={e => setEmail(e.target.value)} />
+                        </div>
+                        <div className='form-group col-md-6'>
+                            <label className='label' htmlFor="username">Usuario:</label>
+                            <input className='form-control w-100' type="text" placeholder="Ingrese el username**" name='username' id="username"
+                                value={username_usuario} onChange={e => setUsername(e.target.value)} />
+                        </div>
+                    </div>
+                }
                 {
                     !datos?.tipo &&
                     <div className='form-row row'>
@@ -879,6 +1002,12 @@ export function FormularioPaciente() {
                         value={direccion} onChange={e => setDireccion(e.target.value)}
                     />
                 </div>
+            </div>
+            <div className='form-group'>
+                <label className='label' htmlFor="cedula">Cédula de identidad:</label>
+                <input className='form-control w-100' maxLength={10} type="text" placeholder="Ingrese el número de cédula**" name='cedula' id="cedula"
+                    value={cedula}
+                    onChange={validarCedula} />
             </div>
             <Button type="submit" variant="success" disabled={habilitado}>
                 {habilitado ? 'Guardando...' : 'Guardar'}

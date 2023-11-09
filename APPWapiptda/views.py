@@ -97,6 +97,87 @@ def validar_clave(ob1):
     return True
 
 
+## Método para confirmar que el correo electrónico es único y pertenezca a un solo usuario
+def correo_unico(ob1):
+    """Verifica si el correo es único."""
+    try:
+        # Filtramos existencia de correo en el modleo User
+        if User.objects.filter(email=ob1).exists():
+            return False
+        return True
+    except User.objects.DoesNotExist:
+        return False
+
+
+## Validar cédula única
+def cedula_unica(ob1):
+    """Verifica si la cédula es única."""
+    try:
+        # Buscamos la cedula en los modelos Usuario. Usuario comun y paciente
+        if Usuario.objects.filter(cedula=ob1).exists():
+            return False
+        elif UsuarioComun.objects.filter(cedula=ob1).exists():
+            return False
+        elif Paciente.objects.filter(cedula=ob1).exists():
+            return False
+        return True
+    except Usuario.DoesNotExist:
+        return False
+    except Paciente.DoesNotExist:
+        return False
+    except UsuarioComun.DoesNotExist:
+        return False
+
+
+## Método para validar que la cédula registrada sea válida
+def verificar_cedula_ecuatoriana(cedula):
+    """ 
+    Algoritmo de Verificación:
+    1: Se agrupan los nueve primeros dígitos en dos conjuntos: los que están en posiciones impares y 
+    los que están en pares. Por ejemplo, para la cédula de identidad 1713175071, las posiciones 
+    impares serían 1, 1, 1, 5 y 7, mientras que las posiciones pares serían 7, 3, 7 y 0.
+    2: A las posiciones impares se multiplican por dos (2). Si el resultado de esta multiplicación 
+    es mayor a nueve, se le resta nueve. Por ejemplo, si los números en posiciones impares son 1, 1, 
+    1, 5 y 7, la multiplicación por dos de cada número sería 2, 2, 2, 10 y 14. Ya que algunos resultados 
+    son mayores a nueve, se procede a restar nueve a esos valores, quedando así: 2, 2, 2, 1 y 5.
+    3: Se suman los dígitos en posiciones pares, más los resultados de las operaciones en las posiciones 
+    impares. Por ejemplo, si los dígitos pares son 7, 3, 7 y 0, la suma de dígitos en posiciones pares 
+    sería 17. Por otro lado, si el resultado de las operaciones en las posiciones impares es 2, 2, 2, 1 y 5, 
+    su suma sería 12. El total de la suma sería 17 + 12 = 29
+    4: Se obtiene el módulo 10 de la suma total anterior, es decir, se toma el dígito más a la derecha del 
+    resultado de la suma. Por ejemplo, si suma 29, el módulo 10 sería 9.
+    5: Si el resultado anterior es cero entonces el dígito verificador es cero, caso contrario al número 
+    10 se le resta el resultado obtenido en el anterior paso. Por ejemplo, si el resultado del paso anterior 
+    es 9, la resta sería 10 menos 9 = 1, siendo 1 el dígito verificador calculado.
+
+    Tomado de: https://www.jybaro.com/blog/cedula-de-identidad-ecuatoriana/
+    """
+    # Verificar si la cédula tiene 10 dígitos
+    if len(cedula) != 10:
+        return False
+    # Obtener los nueve primeros dígitos
+    digitos = list(map(int, cedula[:9]))
+    # Calcular el décimo dígito
+    suma_impares = 0
+    for i in range(0, 9, 2):
+        resultado = digitos[i] * 2
+        if resultado > 9:
+            resultado -= 9
+        suma_impares += resultado
+    suma_pares = sum(digitos[1::2])
+    suma_total = suma_impares + suma_pares
+    decimo_digito = suma_total % 10
+
+    # Calcular el dígito verificador
+    if decimo_digito == 0:
+        digito_verificador = 0
+    else:
+        digito_verificador = 10 - decimo_digito
+    # Comparar el dígito verificador con el décimo dígito de la cédula
+    return digito_verificador == int(cedula[9])
+
+
+
 ###### METODOS PARA VALIDACIONES DE ROL DE USUARIO #####
 
 
@@ -420,7 +501,16 @@ def validar_correo_link(_email):
         # Email
         subject = 'Confirmación de cuenta'
         #message = f'Haz clic en el siguiente enlace para verificar tu cuenta: {settings.SITE_URL}/verificar/{token_firmado}'
-        message = f'Copia y pega el siguiente código especial para verificar tu cuenta: {token_firmado}'
+        message = f'Reciba un cordial saludo de los administradores de WAPIPTDAH. ' \
+            f'\nRecibimos una solicitud de activación de cuenta para el correo: {_email}. ' \
+            f'\nEste es un mensaje para activar su cuenta por lo tanto debe seguir las instrucciones: ' \
+            f'\n\n1. Copia y pega el siguiente código especial para activar tu cuenta: ' \
+            f'\n{token_firmado}'\
+            f'\n\n2. Ingresa los datos solicitados en la ventana que aparecerá. ' \
+            f'\n' \
+            f'\nSi usted no hizo esta solicitud, ignore completamente este mensaje. ' \
+            f'\n' \
+            f'\nAtentamente: WAPIPTDAH.'
         from_email = settings.EMAIL_HOST_USER
         receiver_email = [_email]
         send_mail(subject, message, from_email, receiver_email, fail_silently=False)
@@ -651,6 +741,7 @@ def verificar_email_recuperacion(request):
 # METODO DE RESTABLECIMIENTO DE CLAVE
 
 
+
 # Permite restablecer la nueva clave enviada por parte del usuario
 # esto se realiza previo a una verificacion de correo mediante token
 @api_view(['POST'])
@@ -701,6 +792,8 @@ def verificar_email_firmado(request):
             signer = Signer()
             email_original = signer.unsign(token)
             user_ob = User.objects.get(email=email_original)
+            if not user_ob:
+                return JsonResponse({'error': 'Código de verificación inválido o ha expirado'})
             if is_tecnico(user_ob):
                 usuario__ob = Usuario.objects.get(user=user_ob)
                 if verificado_correo(usuario__ob):
@@ -751,11 +844,21 @@ def api_user_register(request):
             password_ = data.get('password_usuario')
             celular_ = data.get('celular')
             fecha_ = data.get('fecha_nacimiento')
+            cedula_ = data.get('cedula')
+            # Verificar valides de cédula
+            if not cedula_unica(cedula_):
+                return JsonResponse({'cedula': 'Cédula ya registrada'})
+            # Verificar valides de cédula
+            if not verificar_cedula_ecuatoriana(cedula_):
+                return JsonResponse({'cedula': 'Cédula invalida, verifica el número de cédula ingresado.'})
             # Veriicar correo valido
-            if es_correo_valido(email_) == False:
+            if not es_correo_valido(email_):
                 return JsonResponse({'correo': 'Correo invalido'})
+            # Validar correo único
+            if not correo_unico(email_):
+                return JsonResponse({'correo': 'Correo ya registrado'})
             # Verificar clave
-            if validar_clave(password_) == False:
+            if not validar_clave(password_):
                 return JsonResponse({'clave': 'Clave sin requisitos mínimos'})
             # Verificar si el usuario ya existe
             if existe__registro(first_name_, last_name_):
@@ -777,14 +880,14 @@ def api_user_register(request):
                     )
                     # Añadimos a usuario
                     user.save()
-                    crear_usuario_normal(first_name_, last_name_, email_, username_, fecha_, celular_, user)
+                    crear_usuario_normal(first_name_, last_name_, email_, username_, fecha_, celular_, user, cedula_)
                     return JsonResponse({'success': True})
         else:
             return JsonResponse({'error': 'Método no permitido'})
     except Exception as e:
         return JsonResponse({'error': 'Error al crear el usuario'})
 
-def crear_usuario_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7):
+def crear_usuario_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8):
     # Capturamos el la fecha de registro
     fecha_registro_usuario_ = datetime.now().date()
     # Guardamos el registro
@@ -796,6 +899,7 @@ def crear_usuario_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7):
         fecha_nacimiento=ob5,
         celular=ob6,
         user=ob7,
+        dni=ob8,
         fecha_registro_usuario=fecha_registro_usuario_
     )
     # Añadimos a usuario
@@ -817,11 +921,21 @@ def api_paciente_register(request):
             fecha_ = data.get('fecha_nacimiento')
             contacto_emergencia_ = data.get('contacto_emergencia')
             direccion_ = data.get('direccion')
+            cedula_ = data.get('cedula')
+            # Verificar valides de cédula
+            if not cedula_unica(cedula_):
+                return JsonResponse({'cedula': 'Cédula ya registrada'})
+            # Verificar valides de cédula
+            if not verificar_cedula_ecuatoriana(cedula_):
+                return JsonResponse({'cedula': 'Cédula invalida, verifica el número de cédula ingresado.'})
             # Veriicar correo valido
-            if es_correo_valido(email_) == False:
+            if not es_correo_valido(email_):
                 return JsonResponse({'correo': 'Correo invalido'})
+            # Validar correo único
+            if not correo_unico(email_):
+                return JsonResponse({'correo': 'Correo ya registrado'})
             # Verificar clave
-            if validar_clave(password_) == False:
+            if not validar_clave(password_):
                 return JsonResponse({'clave': 'Clave sin requisitos mínimos'})
             # Verificar si el usuario ya existe
             if existe__registro(first_name_, last_name_):
@@ -843,14 +957,14 @@ def api_paciente_register(request):
                     )
                     # Añadimos a usuario
                     user_new.save()
-                    crear_paciente_normal(first_name_, last_name_, email_, username_, celular_, contacto_emergencia_, fecha_, direccion_, user_new)
+                    crear_paciente_normal(first_name_, last_name_, email_, username_, celular_, contacto_emergencia_, fecha_, direccion_, user_new, cedula_)
                     return JsonResponse({'success': True})
         else:
             return JsonResponse({'error': 'Método no permitido'})
     except Exception as e:
         return JsonResponse({'error': 'Error al crear el usuario'})
 
-def crear_paciente_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9):
+def crear_paciente_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, ob10):
     # Capturamos el la fecha de registro
     fecha_registro_usuario_ = datetime.now().date()
     # Guardamos el registro
@@ -864,6 +978,7 @@ def crear_paciente_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9):
         fecha_nacimiento=ob7,
         direccion=ob8,
         user=ob9,
+        dni=ob10,
         fecha_registro_usuario=fecha_registro_usuario_
     )
     # Añadimos a usuario
@@ -885,11 +1000,21 @@ def api_comun_register(request):
             fecha_ = data.get('fecha_nacimiento')
             genero_ = data.get('genero')
             area_ = data.get('area_estudio')
+            cedula_ = data.get('cedula')
+            # Verificar valides de cédula
+            if not cedula_unica(cedula_):
+                return JsonResponse({'cedula': 'Cédula ya registrada'})
+            # Verificar valides de cédula
+            if not verificar_cedula_ecuatoriana(cedula_):
+                return JsonResponse({'cedula': 'Cédula invalida, verifica el número de cédula ingresado.'})
             # Veriicar correo valido
-            if es_correo_valido(email_) == False:
+            if not es_correo_valido(email_):
                 return JsonResponse({'correo': 'Correo invalido'})
+            # Validar correo único
+            if not correo_unico(email_):
+                return JsonResponse({'correo': 'Correo ya registrado'})
             # Verificar clave
-            if validar_clave(password_) == False:
+            if not validar_clave(password_):
                 return JsonResponse({'clave': 'Clave sin requisitos mínimos'})
             # Verificar si el usuario ya existe
             if existe__registro(first_name_, last_name_):
@@ -911,14 +1036,14 @@ def api_comun_register(request):
                     )
                     # Añadimos a usuario
                     user.save()
-                    crear_comun_normal(first_name_, last_name_, email_, username_, celular_, fecha_, genero_, area_, user)
+                    crear_comun_normal(first_name_, last_name_, email_, username_, celular_, fecha_, genero_, area_, user, cedula_)
                     return JsonResponse({'success': True})
         else:
             return JsonResponse({'error': 'Método no permitido'})
     except Exception as e:
         return JsonResponse({'error': 'Error al crear el usuario'})
 
-def crear_comun_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9):
+def crear_comun_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, ob10):
     # Capturamos el la fecha de registro
     fecha_registro_usuario_ = datetime.now().date()
     # Gaurdamos el registro
@@ -932,6 +1057,7 @@ def crear_comun_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9):
         genero=ob7,
         area_estudio=ob8,
         user=ob9,
+        dni=ob10,
         fecha_registro_usuario=fecha_registro_usuario_
     )
     # Añadimos a usuario

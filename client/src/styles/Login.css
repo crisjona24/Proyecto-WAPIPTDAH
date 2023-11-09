@@ -113,6 +113,10 @@ main {
     opacity: 1
 }
 
+.login-footer span{
+    color: #333;
+}
+
 .login-links {
     padding: 15px 5px 0;
     font-size: 13px;

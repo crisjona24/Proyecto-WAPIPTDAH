@@ -172,7 +172,7 @@ export function ListaPeticionAtendida({ peticiones, page, setPage, numeroPag }) 
     };
 
     return (
-        <div className="cuerpo-tabla">
+        <div className="cuerpo-tabla-2">
             <div className="row">
                 <div className="col-md-offset-1 col-md-11">
                     <div className="panel">
@@ -185,7 +185,7 @@ export function ListaPeticionAtendida({ peticiones, page, setPage, numeroPag }) 
                                 <thead>
                                     <tr>
 
-                                        <th>Acciones</th>
+                                        <th className="text-center">Acciones</th>
                                         <th>Estado</th>
                                         <th>Motivo</th>
                                         <th>Tipo</th>
@@ -197,7 +197,7 @@ export function ListaPeticionAtendida({ peticiones, page, setPage, numeroPag }) 
                                         {
                                             peticiones.map((peticion) => (
                                                 <tr key={peticion.id}>
-                                                    <td >
+                                                    <td className="d-flex justify-content-center">
                                                         <ul className="action-list">
                                                             <Link to={`/ver/peticion/${peticion.id}/`} className="btn btn-success separacion--boton h" title="Ver petición">
                                                                 <FontAwesomeIcon icon={faEye} />

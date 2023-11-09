@@ -47,7 +47,7 @@ export function ListadodeCursos({ cursos, page, setPage, numeroPag }) {
     };
 
     return (
-        <div className="cuerpo-tabla-2">
+        <div className="cuerpo-tabla-4">
             <div className="row">
                 <div className="col-md-offset-1 col-md-11">
                     <div className="panel">
