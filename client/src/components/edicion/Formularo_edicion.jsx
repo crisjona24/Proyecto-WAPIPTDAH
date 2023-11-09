@@ -155,7 +155,7 @@ export function FormularioEdicionNivel() {
             <div className="form-group">
                 <label className='label' htmlFor="nombre">Nombre de nivel:</label>
                 <input className='form-control w-100' type="text" placeholder="Ingrese el nombre**" id="nombre"
-                    value={nombre_nivel} onChange={e => setNombre(e.target.value)} />
+                    value={nombre_nivel} onChange={e => setNombre(e.target.value)} autoFocus />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="descripcion">Descripción de nivel:</label>
@@ -323,7 +323,7 @@ export function FormularioEdicion() {
             <div className="form-group">
                 <label className='label' htmlFor="nombre">Nombre de dominio:</label>
                 <input className='form-control w-100' type="text" placeholder="Ingrese el nombre**" id="nombre"
-                    value={nombre_dominio} onChange={e => setNombreDominio(e.target.value)} />
+                    value={nombre_dominio} onChange={e => setNombreDominio(e.target.value)} autoFocus />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="descripcion">Descripción:</label>
@@ -481,7 +481,7 @@ export function FormularioEdicionContenido({ slugDominio }) {
             <div className="form-group">
                 <label className='label' htmlFor="nombre">Nombre de contenido:</label>
                 <input className='form-control w-100' type="text" placeholder="Ingrese el nombre**" id="nombre"
-                    value={nombre_contenido} onChange={e => setNombreContenido(e.target.value)} />
+                    value={nombre_contenido} onChange={e => setNombreContenido(e.target.value)} autoFocus />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="dominio">Tipo de contenido:</label>
@@ -750,7 +750,7 @@ export function FormularioEdicionIndividual({ slugContenido }) {
                 <textarea onClick={info__contenido} className='form-control w-100 tamanio-text-area'
                     type="text" id="descripcion"
                     value={descripcion_individual} onChange={e => setDescripcion(e.target.value)}
-                    name='descripcion'
+                    name='descripcion' autoFocus
                     placeholder="Ingresa la indicación de la actividad**"
                 />
             </div>
@@ -981,7 +981,7 @@ export function FormularioEdicionCurso() {
             <div className="form-group">
                 <label className='label' htmlFor="nombre">Nombre de curso:</label>
                 <input className='form-control w-100' type="text" placeholder="Ingrese el nombre**" id="nombre"
-                    value={nombre_curso} onChange={e => setNombreCurso(e.target.value)} />
+                    value={nombre_curso} onChange={e => setNombreCurso(e.target.value)} autoFocus />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="descripcion">Descripción de curso:</label>
@@ -1115,7 +1115,7 @@ export function FormularioEdicionResultado() {
             <div className="form-group">
                 <label className='label' htmlFor="resultado">Observación de resultado:</label>
                 <textarea class="form-control tamanio-text-area w-100" placeholder="Ingrese las observaciones**"
-                    id="resultado" required
+                    id="resultado" required autoFocus
                     value={observacion}
                     onChange={e => setObservacion(e.target.value)}>
                 </textarea>
@@ -1262,7 +1262,7 @@ export function FormularioEdicionSala() {
             <div className="form-group">
                 <label className='label' htmlFor="nombre">Nombre de sala:</label>
                 <input className='form-control w-100' type="text" placeholder="Ingrese el nombre de sala**" id="nombre"
-                    name="nombre" value={nombre_sala} onChange={e => setNombre(e.target.value)} />
+                    name="nombre" value={nombre_sala} onChange={e => setNombre(e.target.value)} autoFocus />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="anotacion">Descripción de actividad:</label>
@@ -1401,7 +1401,7 @@ export function FormularioEdicionReporte() {
                 <label className='label' htmlFor="reporte">Observación de reporte:</label>
                 <textarea class="form-control w-100 tamanio-text-area"
                     placeholder="Ingrese las observaciones**"
-                    id="reporte" required
+                    id="reporte" required autoFocus
                     value={descripcion_reporte}
                     onChange={e => setDescripcionReporte(e.target.value)}>
                 </textarea>

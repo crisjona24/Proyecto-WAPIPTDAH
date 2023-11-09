@@ -710,52 +710,6 @@ def nombre_curso_exist(nombre):
     return False
 
 
-##### Lista de pacientes filtrados mediante el nombre de un paciente
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class BusquedaPacienteCursoListView(generics.ListAPIView):
-    serializer_class = PacienteSerializer
-    pagination_class = Paginacion
-    def get_queryset(self):
-        # Encontrar el nombre del paciente de la url
-        nombre, apellido = self.kwargs['nombre'].split(' ', 1)
-        slug_cur = self.kwargs['slug']
-        if (paciente_exist_curso(nombre, apellido, slug_cur)):
-            # obtener paciente
-            paciente = obtener_paciente(nombre, apellido)
-            return paciente
-        else:
-            return []
-        
-def paciente_exist_curso(ob1, ob2, ob3):
-    # Verifica si el nombre del paciente ya existe en un curso
-    try:
-        # obtener el registro de curso del detalle de inscripcion
-        curso = Curso.objects.get(slug_curso=ob3)
-        # obtener el paciente por nombre y apellido ignorando mayusculas y minusculas
-        paciente = Paciente.objects.get(nombre_usuario__iexact=ob1, apellido_usuario__iexact=ob2)
-        # Verificar una inscripcion a ese curso del paciente
-        if DetalleInscripcionCurso.objects.filter(paciente=paciente, curso=curso).exists():
-            return True
-    except DetalleInscripcionCurso.DoesNotExist:
-        return False
-    except Paciente.DoesNotExist:
-        return False
-    except Curso.DoesNotExist:
-        return False
-    return False
-
-
-def obtener_paciente(ob1, ob2):
-    # Verifica si el nombre del paciente ya existe en un curso
-    try:
-        # obtener el paciente por nombre y apellido ignorando mayusculas y minusculas
-        paciente = Paciente.objects.filter(nombre_usuario__iexact=ob1, apellido_usuario__iexact=ob2).order_by('nombre_usuario')
-        return paciente
-    except Paciente.DoesNotExist:
-        return []   
-
-
 ##### Lista de resultados filtrados 
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1177,7 +1131,7 @@ class EstudianteCedulaListView(generics.ListAPIView):
         # Obtener la fecha de la url
         cedula_ = self.kwargs['cedula']
         slug_ = self.kwargs['slug']
-        # Filtramos los resultados basados en la fecha
+        # Filtramos la existencia del paciente basados en la cédula
         if not Paciente_Existe_Cedula(cedula_):
             return []
         # Filtramos los reportes basados en la cedula del Estudiante
@@ -1212,4 +1166,194 @@ def Estudiante_por_Cedula(ob1, ob2, ob3):
         return []
 
 
+###### Obtención de los registros de reportes generados por un usuario comun asociados
+###### a un estudiante a travs de sus nombre y apellidos. Se considera que el estudiante
+###### debe ser buscado por sus dos nombres y apellidos completos debido a problemas
+###### de nombre o incluso apellidos similares: casos familiares
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class EstudianteNomApeListView(generics.ListAPIView):
+    serializer_class = ReporteSerializer
+    pagination_class = Paginacion
+    def get_queryset(self):
+        # Obtener los nombres y apellidosde la url
+        nombres_completos = self.kwargs['nombre']
+        # Dividir los nombres y apellidos en una lista
+        nombres_apellidos = nombres_completos.split()
+        # Controlar que nombres_apellidos tenga 4 elementos
+        if len(nombres_apellidos) != 4:
+            return []
+        # Obtener el nombre y apellido
+        if len(nombres_apellidos) == 4:
+            nombre = ' '.join(nombres_apellidos[:2])
+            apellido = ' '.join(nombres_apellidos[2:])
+            # Controlar valides de entrada
+            if not validar_nombres(nombre, apellido):
+                return []
+            # Validar existencia de cedula
+            if not Obtener_Cedula(nombre, apellido):
+                return []
+            cedula_paciente = Obtener_Cedula(nombre, apellido)
+            # Filtramos la existencia del estudiante basados en la cédula
+            if not Paciente_Existe_Cedula(cedula_paciente):
+                return []
+            # Filtramos
+            reportes = Reporte_por_Nombre_Apellido(self.request, nombre, apellido)
+            return reportes
+        return []
+
+#### Método para obtener la cedula de un estudiante
+def Obtener_Cedula(ob1, ob2):
+    try:
+        cedula_paciente = Paciente.objects.get(nombre_usuario__iexact=ob1, apellido_usuario__iexact=ob2).dni
+        return cedula_paciente
+    except Paciente.DoesNotExist:
+        return []
+
+#### Filtrar los reportes por nombres y apellidos del estudiante
+def Reporte_por_Nombre_Apellido(request, nombre, apellido):
+    try:
+        # Decodifica el token para obtener el usuario
+        token = request.headers.get('Authorization').split(" ")[1]
+        user = get_user_from_token_jwt(token)
+        # Encontrar al usuario relacionado al user
+        if is_comun(user):
+            # Obtener el usuario comun
+            usuario__ob = UsuarioComun.objects.get(user=user)
+            # Obtener el paciente por nombre y apellido ignorando mayusculas y minusculas
+            paciente__ob = Paciente.objects.get(nombre_usuario__icontains=nombre, apellido_usuario__icontains=apellido)
+            # Obtener los cursos creados por el usuario comun
+            cursos = Curso.objects.filter(usuario_comun=usuario__ob)
+            # Obtener los cursos a los que está inscrito el paciente
+            inscripciones = DetalleInscripcionCurso.objects.filter(paciente=paciente__ob, curso__in=cursos).exists()
+            if inscripciones:
+                # Obtener los reportes  del paciente
+                reportes = Reporte.objects.filter(paciente=paciente__ob).order_by('fecha_registro_reporte')
+                return reportes
+            else :
+                return []
+        else:
+            if is_tecnico(user):
+                # Obtener el paciente por nombre y apellido ignorando mayusculas y minusculas
+                paciente__ob = Paciente.objects.get(nombre_usuario__icontains=nombre, apellido_usuario__icontains=apellido)
+                # Obtener los reportes  del paciente
+                reportes = Reporte.objects.filter(paciente=paciente__ob).order_by('fecha_registro_reporte')
+                return reportes
+            else:
+                return []
+    except UsuarioComun.DoesNotExist:
+        return []
+    except Paciente.DoesNotExist:
+        return []
+    except Curso.DoesNotExist:
+        return []
+    except Reporte.DoesNotExist:
+        return []
+
+
+
+###### Obtención de los registros de resultados generados por un estudiante asociados
+###### a un uuario comun a travs de sus nombre y apellidos. Se considera que el estudiante
+###### debe ser buscado por sus dos nombres y apellidos completos debido a problemas
+###### de nombre o incluso apellidos similares: casos familiares y obtener la cedula para
+###### ser filtrado por medio de ella|
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class ResultadoNomApeListView(generics.ListAPIView):
+    serializer_class = ResultadoSerializer
+    pagination_class = Paginacion
+    def get_queryset(self):
+        # Obtener los nombres y apellidosde la url
+        nombres_completos = self.kwargs['nombre']
+        # Dividir los nombres y apellidos en una lista
+        nombres_apellidos = nombres_completos.split()
+        # Controlar que nombres_apellidos tenga 4 elementos
+        if len(nombres_apellidos) != 4:
+            return []
+        # Obtener el nombre y apellido
+        if len(nombres_apellidos) == 4:
+            nombre = ' '.join(nombres_apellidos[:2])
+            apellido = ' '.join(nombres_apellidos[2:])
+            # Controlar valides de entrada
+            if not validar_nombres(nombre, apellido):
+                return []
+            # Validar existencia de cedula
+            if not Obtener_Cedula(nombre, apellido):
+                return []
+            cedula_paciente = Obtener_Cedula(nombre, apellido)
+            # Filtramos la existencia del estudiante basados en la cédula
+            if not Paciente_Existe_Cedula(cedula_paciente):
+                return []
+            # Filtramos
+            resultados = Resultado_por_Cedula(self.request, cedula_paciente)
+            return resultados
+        return []
+
+
+
+###### Obtención de los registros de estudiante inscritos a un curso asociado
+###### a un uuario comun; a traves de sus nombre y apellidos del estudiante. Se considera que el estudiante
+###### debe ser buscado por sus dos nombres y apellidos completos debido a problemas
+###### de nombre o incluso apellidos similares: casos familiares. Y con ello obtener la cedula para
+###### ser filtrado por medio de ella|
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class BusquedaPacienteCursoListView(generics.ListAPIView):
+    serializer_class = PacienteSerializer
+    pagination_class = Paginacion
+    def get_queryset(self):
+        # Obtener los nombres y apellidosde la url
+        slug_ = self.kwargs['slug']
+        nombres_completos = self.kwargs['nombre']
+        # Dividir los nombres y apellidos en una lista
+        nombres_apellidos = nombres_completos.split()
+        # Controlar que nombres_apellidos tenga 4 elementos
+        if len(nombres_apellidos) != 4:
+            return []
+        # Obtener el nombre y apellido
+        if len(nombres_apellidos) == 4:
+            nombre = ' '.join(nombres_apellidos[:2])
+            apellido = ' '.join(nombres_apellidos[2:])
+            # Controlar valides de entrada
+            if not validar_nombres(nombre, apellido):
+                return []
+            # Validar existencia de cedula
+            if not Obtener_Cedula(nombre, apellido):
+                return []
+            cedula_paciente = Obtener_Cedula(nombre, apellido)
+            # Filtramos la existencia del estudiante basados en la cédula
+            if not Paciente_Existe_Cedula(cedula_paciente):
+                return []
+            # Filtramos
+            registro_estudiante = Estudiante_por_Cedula(self.request, cedula_paciente, slug_)
+            return registro_estudiante
+        return []
+        
+def paciente_exist_curso(ob1, ob2, ob3):
+    # Verifica si el nombre del paciente ya existe en un curso
+    try:
+        # obtener el registro de curso del detalle de inscripcion
+        curso = Curso.objects.get(slug_curso=ob3)
+        # obtener el paciente por nombre y apellido ignorando mayusculas y minusculas
+        paciente = Paciente.objects.get(nombre_usuario__iexact=ob1, apellido_usuario__iexact=ob2)
+        # Verificar una inscripcion a ese curso del paciente
+        if DetalleInscripcionCurso.objects.filter(paciente=paciente, curso=curso).exists():
+            return True
+    except DetalleInscripcionCurso.DoesNotExist:
+        return False
+    except Paciente.DoesNotExist:
+        return False
+    except Curso.DoesNotExist:
+        return False
+    return False
+
+
+def obtener_paciente(ob1, ob2):
+    # Verifica si el nombre del paciente ya existe en un curso
+    try:
+        # obtener el paciente por nombre y apellido ignorando mayusculas y minusculas
+        paciente = Paciente.objects.filter(nombre_usuario__iexact=ob1, apellido_usuario__iexact=ob2).order_by('nombre_usuario')
+        return paciente
+    except Paciente.DoesNotExist:
+        return []   
 

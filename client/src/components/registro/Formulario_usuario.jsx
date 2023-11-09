@@ -32,18 +32,30 @@ export function FormularioUsuario() {
     const [error, setError] = useState("");
     const [habilitado, setHabilitado] = useState(false);
     const navigate = useNavigate();
+    // Validar entrada
+    const [entradaValida, setEntradaValida] = useState(false);
+    const [entradaValidaApellido, setEntradaValidaApellido] = useState(false);
 
     // Mostrar clave
     const [verClave, setVerClave] = useState(false);
     const [verClave2, setVerClave2] = useState(false);
 
-    // OPERACIONES
+    // REGISTRO DE USUARIO
     const enviarFT = async (e) => {
         e.preventDefault();
         // Verificar campos vacíos
         if (isEmptyField(nombre_usuario, apellido_usuario, email_usuario, username_usuario,
             password_usuario, celular, fecha_nacimiento, password_usuario_2, cedula)) {
             Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Verificar formato de nombre
+        if (!entradaValida) {
+            Swal.fire("Ingrese el formato: Nombre Nombre", "", "warning");
+            return;
+        }
+        if (!entradaValidaApellido) {
+            Swal.fire("Ingrese el formato: Apellido Apellido", "", "warning");
             return;
         }
         // Validar cédula
@@ -78,33 +90,6 @@ export function FormularioUsuario() {
         setHabilitado(false);
     };
 
-    const enviarFTEdicion = async (e) => {
-        e.preventDefault();
-        // Verificar campos vacíos
-        if (isEmptyField(nombre_usuario, apellido_usuario,
-            celular, fecha_nacimiento)) {
-            Swal.fire("Por favor ingrese todos los campos de edición", "", "warning");
-            return;
-        }
-        // Flujo normal
-        setHabilitado(true);
-        try {
-            if (token) {
-                const datos__edit = {
-                    nombre_usuario,
-                    apellido_usuario,
-                    celular,
-                    fecha_nacimiento
-                };
-                // Llamamos a la función de editar usuario
-                await confirmEdicion(datos__edit);
-            }
-        } catch (error) {
-            mostrarError('Error al registrar usuario');
-        }
-        setHabilitado(false);
-    };
-
     // Funcion para guardar datos
     const guardar = async (datos__post) => {
         const response = await UsuarioCrearNuevo(datos__post);
@@ -127,6 +112,43 @@ export function FormularioUsuario() {
             }
         }
     }
+
+    // EDICION DE REGISTRO DE USUARIO 
+    const enviarFTEdicion = async (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (isEmptyField(nombre_usuario, apellido_usuario,
+            celular, fecha_nacimiento)) {
+            Swal.fire("Por favor ingrese todos los campos de edición", "", "warning");
+            return;
+        }
+        // Verificar formato de nombre
+        if (!entradaValida) {
+            Swal.fire("Ingrese el formato: Nombre Nombre", "", "warning");
+            return;
+        }
+        if (!entradaValidaApellido) {
+            Swal.fire("Ingrese el formato: Apellido Apellido", "", "warning");
+            return;
+        }
+        // Flujo normal
+        setHabilitado(true);
+        try {
+            if (token) {
+                const datos__edit = {
+                    nombre_usuario,
+                    apellido_usuario,
+                    celular,
+                    fecha_nacimiento
+                };
+                // Llamamos a la función de editar usuario
+                await confirmEdicion(datos__edit);
+            }
+        } catch (error) {
+            mostrarError('Error al registrar usuario');
+        }
+        setHabilitado(false);
+    };
 
     // Obtener datos de tecnico
     const obtenerDatosUsuario = async () => {
@@ -156,6 +178,7 @@ export function FormularioUsuario() {
             }
         }
     }
+
     // Use effect
     useEffect(() => {
         if (token) {
@@ -187,6 +210,7 @@ export function FormularioUsuario() {
         });
     };
 
+    // CONTROLES DE ENTRADA Y SALIDA DE DATOS
     // Control de entrada de datos
     const isEmptyField = (...fields) => {
         return fields.some(field => field.trim() === "");
@@ -204,6 +228,7 @@ export function FormularioUsuario() {
     const observarClave = () => {
         setVerClave(!verClave);
     }
+
     const observarClave2 = () => {
         setVerClave2(!verClave2);
     }
@@ -225,6 +250,35 @@ export function FormularioUsuario() {
         }
         return false;
     }
+
+    // Controlar que Nombre tenga dos valores separados por un espacio delimitador
+    const Entrada_Nombre = (e) => {
+        const value = e.target.value;
+        setNombre(value);
+        if (!validarEntrada(value)) {
+            setEntradaValida(false);
+        } else {
+            setEntradaValida(true);
+        }
+    };
+
+    const Entrada_Apellido = (e) => {
+        const value = e.target.value;
+        setApellido(value);
+        if (!validarEntrada(value)) {
+            setEntradaValidaApellido(false);
+        } else {
+            setEntradaValidaApellido(true);
+        }
+    };
+
+    const validarEntrada = (value) => {
+        // Evaluar dos valoes letras y que permita la ñ
+        const generar = /^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$/;
+        return generar.test(value);
+    };
+
+
     return (
         <form onSubmit={
             datos?.tipo ? enviarFTEdicion : enviarFT
@@ -236,12 +290,12 @@ export function FormularioUsuario() {
                 <div className="form-group col-md-6">
                     <label className='label' htmlFor="nombre">Nombre:</label>
                     <input className='form-control w-100' type="text" placeholder="Ingrese el nombre**" name='nombre' id="nombre"
-                        value={nombre_usuario} onChange={e => setNombre(e.target.value)} autoFocus />
+                        value={nombre_usuario} onChange={Entrada_Nombre} autoFocus />
                 </div>
                 <div className='form-group col-md-6'>
                     <label className='label' htmlFor="apellido">Apellido:</label>
                     <input className='form-control w-100' type="text" placeholder="Ingrese el apellido**" name='apellido' id="apellido"
-                        value={apellido_usuario} onChange={e => setApellido(e.target.value)}
+                        value={apellido_usuario} onChange={Entrada_Apellido}
                     />
                 </div>
             </div>
@@ -353,7 +407,11 @@ export function FormularioComun() {
     // Mostrar clave
     const [verClave, setVerClave] = useState(false);
     const [verClave2, setVerClave2] = useState(false);
+    // Validar entrada
+    const [entradaValida, setEntradaValida] = useState(false);
+    const [entradaValidaApellido, setEntradaValidaApellido] = useState(false);
 
+    // REGISTRO 
     // Operacion de guardar datos
     const enviarFComun = async (e) => {
         e.preventDefault();
@@ -361,6 +419,15 @@ export function FormularioComun() {
         if (isEmptyField(nombre_usuario, apellido_usuario, email_usuario, username_usuario, cedula,
             password_usuario, celular, fecha_nacimiento, genero, area_estudio, password_usuario_2)) {
             Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Verificar formato de nombre
+        if (!entradaValida) {
+            Swal.fire("Ingrese el formato: Nombre Nombre", "", "warning");
+            return;
+        }
+        if (!entradaValidaApellido) {
+            Swal.fire("Ingrese el formato: Apellido Apellido", "", "warning");
             return;
         }
         // Validar cédula
@@ -383,6 +450,7 @@ export function FormularioComun() {
                 area_estudio,
                 cedula
             };
+            console.log(datos__post)
             if (!compararClave(password_usuario, password_usuario_2)) {
                 Swal.fire("Las claves no coinciden", "", "warning");
                 setHabilitado(false);
@@ -396,37 +464,7 @@ export function FormularioComun() {
         setHabilitado(false);
     };
 
-    // Operacion de guardar datos
-    const enviarFComunEdicion = async (e) => {
-        e.preventDefault();
-        // Verificar campos vacíos
-        if (isEmptyField(nombre_usuario, apellido_usuario,
-            celular, fecha_nacimiento, genero, area_estudio)) {
-            Swal.fire("Por favor ingrese todos los campos", "", "warning");
-            return;
-        }
-        // Flujo normal
-        setHabilitado(true);
-        try {
-            if (token) {
-                const datos__edit = {
-                    nombre_usuario,
-                    apellido_usuario,
-                    celular,
-                    fecha_nacimiento,
-                    genero,
-                    area_estudio
-                }
-                // Llamamos a la función de editar usuario
-                await confirmEdicion(datos__edit);
-            }
-        } catch (error) {
-            mostrarError('Error al registrar usuario');
-        }
-        setHabilitado(false);
-    };
-
-    // Guardar datos
+    // Guardar datos de usuario comun
     const guardar = async (datos__post) => {
         const response = await CrearComunNew(datos__post);
         // Confirmar operación
@@ -451,6 +489,7 @@ export function FormularioComun() {
         }
     }
 
+    // EDICION DE REGISTRO 
     // Obtener datos de comun
     const obtenerDatosComun = async () => {
         try {
@@ -480,6 +519,46 @@ export function FormularioComun() {
             }
         }
     }
+
+    // Operacion de guardar datos
+    const enviarFComunEdicion = async (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (isEmptyField(nombre_usuario, apellido_usuario,
+            celular, fecha_nacimiento, genero, area_estudio)) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Verificar formato de nombre y apellido
+        if (!entradaValida) {
+            Swal.fire("Ingrese el formato: Nombre Nombre", "", "warning");
+            return;
+        }
+        if (!entradaValidaApellido) {
+            Swal.fire("Ingrese el formato: Apellido Apellido", "", "warning");
+            return;
+        }
+        // Flujo normal
+        setHabilitado(true);
+        try {
+            if (token) {
+                const datos__edit = {
+                    nombre_usuario,
+                    apellido_usuario,
+                    celular,
+                    fecha_nacimiento,
+                    genero,
+                    area_estudio
+                }
+                // Llamamos a la función de editar usuario
+                await confirmEdicion(datos__edit);
+            }
+        } catch (error) {
+            mostrarError('Error al registrar usuario');
+        }
+        setHabilitado(false);
+    };
+
     // Use Effect
     useEffect(() => {
         if (token) {
@@ -511,6 +590,7 @@ export function FormularioComun() {
         });
     };
 
+    // CONTROLES DE ENTRADA Y SALIDA
     // Control de entrada de datos
     const isEmptyField = (...fields) => {
         return fields.some(field => field.trim() === "");
@@ -528,6 +608,7 @@ export function FormularioComun() {
     const observarClave = () => {
         setVerClave(!verClave);
     }
+
     const observarClave2 = () => {
         setVerClave2(!verClave2);
     }
@@ -550,6 +631,33 @@ export function FormularioComun() {
         return false;
     }
 
+    // Controlar que Nombre tenga dos valores separados por un espacio delimitador
+    const Entrada_Nombre = (e) => {
+        const value = e.target.value;
+        setNombre(value);
+        if (!validarEntrada(value)) {
+            setEntradaValida(false);
+        } else {
+            setEntradaValida(true);
+        }
+    };
+
+    const Entrada_Apellido = (e) => {
+        const value = e.target.value;
+        setApellido(value);
+        if (!validarEntrada(value)) {
+            setEntradaValidaApellido(false);
+        } else {
+            setEntradaValidaApellido(true);
+        }
+    };
+
+    const validarEntrada = (value) => {
+        // Evaluar dos valoes letras y que permita la ñ
+        const generar = /^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$/;
+        return generar.test(value);
+    };
+
     return (
         <form onSubmit={
             datos?.tipo ? enviarFComunEdicion : enviarFComun
@@ -559,14 +667,16 @@ export function FormularioComun() {
             </>
             <div className='form-row row mt-1'>
                 <div className="form-group col-md-6">
-                    <label className='label' htmlFor="nombre">Nombre:</label>
+                    <label className='label' htmlFor="nombre">Nombres:</label>
                     <input className='form-control w-100' type="text" placeholder="Ingrese el nombre**" name='nombre' id="nombre"
-                        value={nombre_usuario} onChange={e => setNombre(e.target.value)} autoFocus />
+                        value={nombre_usuario}
+                        onChange={Entrada_Nombre}
+                        autoFocus/>
                 </div>
                 <div className='form-group col-md-6'>
-                    <label className='label' htmlFor="apellido">Apellido:</label>
+                    <label className='label' htmlFor="apellido">Apellidos:</label>
                     <input className='form-control w-100' type="text" placeholder="Ingrese el apellido**" name='apellido' id="apellido"
-                        value={apellido_usuario} onChange={e => setApellido(e.target.value)}
+                        value={apellido_usuario} onChange={Entrada_Apellido}
                     />
                 </div>
             </div>
@@ -699,7 +809,11 @@ export function FormularioPaciente() {
     // Mostrar clave
     const [verClave, setVerClave] = useState(false);
     const [verClave2, setVerClave2] = useState(false);
+    // Validar entrada
+    const [entradaValida, setEntradaValida] = useState(false);
+    const [entradaValidaApellido, setEntradaValidaApellido] = useState(false);
 
+    // REGISTRO DE DATOS DE ESTUDIANTE
     // Operacion de guardar datos
     const enviarFP = async (e) => {
         e.preventDefault();
@@ -707,6 +821,15 @@ export function FormularioPaciente() {
         if (isEmptyField(nombre_usuario, apellido_usuario, email_usuario, username_usuario, cedula,
             password_usuario, celular, fecha_nacimiento, contacto_emergencia, direccion, password_usuario_2)) {
             Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Verificar formato de nombre
+        if (!entradaValida) {
+            Swal.fire("Ingrese el formato: Nombre Nombre", "", "warning");
+            return;
+        }
+        if (!entradaValidaApellido) {
+            Swal.fire("Ingrese el formato: Apellido Apellido", "", "warning");
             return;
         }
         // Validar tamaño de cédula
@@ -742,35 +865,6 @@ export function FormularioPaciente() {
         setHabilitado(false);
     };
 
-    const enviarFPEdicion = async (e) => {
-        e.preventDefault();
-        // Verificar campos vacíos
-        if (isEmptyField(nombre_usuario, apellido_usuario,
-            celular, fecha_nacimiento, contacto_emergencia, direccion)) {
-            Swal.fire("Por favor ingrese todos los campos", "", "warning");
-            return;
-        }
-        // Flujo normal
-        setHabilitado(true);
-        try {
-            if (token) {
-                const datos__edit = {
-                    nombre_usuario,
-                    apellido_usuario,
-                    celular,
-                    fecha_nacimiento,
-                    contacto_emergencia,
-                    direccion
-                }
-                // Llamamos a la función de editar usuario
-                await confirmEdicion(datos__edit);
-            }
-        } catch (error) {
-            mostrarError('Error al registrar usuario');
-        }
-        setHabilitado(false);
-    };
-
     // Guardar datos
     const guardar = async (datos__post) => {
         const response = await CrearPaciente(datos__post);
@@ -793,6 +887,45 @@ export function FormularioPaciente() {
             }
         }
     }
+
+    // EDICION DEL REGISTRO DE ESTUDIANTE
+    const enviarFPEdicion = async (e) => {
+        e.preventDefault();
+        // Verificar campos vacíos
+        if (isEmptyField(nombre_usuario, apellido_usuario,
+            celular, fecha_nacimiento, contacto_emergencia, direccion)) {
+            Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Verificar formato de nombre
+        if (!entradaValida) {
+            Swal.fire("Ingrese el formato: Nombre Nombre", "", "warning");
+            return;
+        }
+        if (!entradaValidaApellido) {
+            Swal.fire("Ingrese el formato: Apellido Apellido", "", "warning");
+            return;
+        }
+        // Flujo normal
+        setHabilitado(true);
+        try {
+            if (token) {
+                const datos__edit = {
+                    nombre_usuario,
+                    apellido_usuario,
+                    celular,
+                    fecha_nacimiento,
+                    contacto_emergencia,
+                    direccion
+                }
+                // Llamamos a la función de editar usuario
+                await confirmEdicion(datos__edit);
+            }
+        } catch (error) {
+            mostrarError('Error al registrar usuario');
+        }
+        setHabilitado(false);
+    };
 
     // Obtener datos de paciente
     const obtenerDatosP = async () => {
@@ -824,7 +957,7 @@ export function FormularioPaciente() {
         }
     }
 
-    // Use  effect
+    // Use  effect para obtener los datos
     useEffect(() => {
         if (token) {
             obtenerDatosP();
@@ -855,6 +988,7 @@ export function FormularioPaciente() {
         });
     };
 
+    // CONTROL DE ENTRADAS Y SALIDAS
     // Control de entrada de datos
     const isEmptyField = (...fields) => {
         return fields.some(field => field.trim() === "");
@@ -872,6 +1006,7 @@ export function FormularioPaciente() {
     const observarClave = () => {
         setVerClave(!verClave);
     }
+
     const observarClave2 = () => {
         setVerClave2(!verClave2);
     }
@@ -894,6 +1029,33 @@ export function FormularioPaciente() {
         return false;
     }
 
+    // Controlar que Nombre tenga dos valores separados por un espacio delimitador
+    const Entrada_Nombre = (e) => {
+        const value = e.target.value;
+        setNombre(value);
+        if (!validarEntrada(value)) {
+            setEntradaValida(false);
+        } else {
+            setEntradaValida(true);
+        }
+    };
+
+    const Entrada_Apellido = (e) => {
+        const value = e.target.value;
+        setApellido(value);
+        if (!validarEntrada(value)) {
+            setEntradaValidaApellido(false);
+        } else {
+            setEntradaValidaApellido(true);
+        }
+    };
+
+    const validarEntrada = (value) => {
+        // Evaluar dos valoes letras y que permita la ñ
+        const generar = /^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$/;
+        return generar.test(value);
+    };
+
     return (
         <form onSubmit={
             datos?.tipo ? enviarFPEdicion : enviarFP
@@ -905,12 +1067,12 @@ export function FormularioPaciente() {
                 <div className="form-group col-md-6">
                     <label className='label' htmlFor="nombre">Nombre:</label>
                     <input className='form-control w-100' type="text" placeholder="Ingrese el nombre**" name='nombre' id="nombre"
-                        value={nombre_usuario} onChange={e => setNombre(e.target.value)} autoFocus />
+                        value={nombre_usuario} onChange={Entrada_Nombre} autoFocus />
                 </div>
                 <div className='form-group col-md-6'>
                     <label className='label' htmlFor="apellido">Apellido:</label>
                     <input className='form-control w-100' type="text" placeholder="Ingrese el apellido**" name='apellido' id="apellido"
-                        value={apellido_usuario} onChange={e => setApellido(e.target.value)}
+                        value={apellido_usuario} onChange={Entrada_Apellido}
                     />
                 </div>
             </div>

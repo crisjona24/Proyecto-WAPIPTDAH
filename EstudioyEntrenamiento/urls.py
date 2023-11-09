@@ -15,7 +15,7 @@ urlpatterns = [
     path('peticion/atendida/', PeticionListViewSi.as_view(), name='peticion-list-si'),
     path('peticion/usuario/<int:id>/', PeticionUCListView.as_view(), name='peticion-list-usuario'),
     path('lista/pacientes/<int:id>/', PacientesListView.as_view(), name='peticion-list-usuario'),
-    path('lista/resultados/<str:nombre>/', ResultadodePacienteListView2.as_view(), name='resultado-list-paciente'),
+    path('lista/resultados/<str:nombre>/', ResultadoNomApeListView.as_view(), name='resultado-list-paciente'),
     ########### LISTA DE SALA
     path('lista/salas/<int:id>/', SalasListView.as_view(), name='sala-list-usuario'),
     ###########LISTA DE PETICION POR FECHA Y UN RANGO DE DIAS
@@ -55,7 +55,7 @@ urlpatterns = [
     path('busqueda/paciente/curso/<str:nombre>/<str:slug>/', BusquedaPacienteCursoListView.as_view(), name='paciente-curso-busqueda'),
     path('busqueda/contenido/<str:nombre>/<str:slug>/', BusquedaContenidoListView.as_view(), name='contenido-busqueda'),
     path('busqueda/curso/<str:nombre>/', BusquedaCursoListView.as_view(), name='curso-busqueda'),
-    path('lista/reportes/<str:nombre>/', ReportedePacienteListView.as_view(), name='reporte-list-paciente'),
+    path('lista/reportes/<str:nombre>/', EstudianteNomApeListView.as_view(), name='reporte-list-paciente'),
 
     path('lista/reportes/cedula/<str:cedula>/', ReporteCedulaListView.as_view(), name='reporte-list-cedula'),
     path('lista/resultado/cedula/<str:cedula>/', ResultadoCedulaListView.as_view(), name='resultado-list-cedula'),

@@ -200,7 +200,7 @@ export function FormularioContenido({ slug }) {
             <div className="form-group">
                 <label className='label' htmlFor="nombre">Nombre de contenido:</label>
                 <input className='form-control w-100' type="text" placeholder="Ingrese el nombre**" id="nombre"
-                    value={nombre} onChange={e => setNombre(e.target.value)} />
+                    value={nombre} onChange={e => setNombre(e.target.value)} autoFocus />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="dominio">Tipo de contenido:</label>
@@ -310,7 +310,7 @@ export function FormularioCurso() {
             <div className="form-group">
                 <label className='label' htmlFor="nombre">Nombre de curso:</label>
                 <input className='form-control w-100' type="text" placeholder="Ingrese el nombre**" id="nombre"
-                    value={nombre_curso} onChange={e => setNombreCurso(e.target.value)} />
+                    value={nombre_curso} onChange={e => setNombreCurso(e.target.value)} autoFocus />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="descripcion">Descripción de curso:</label>
@@ -422,7 +422,7 @@ export function FormularioNivel() {
             <div className="form-group">
                 <label className='label' htmlFor="nombre">Nombre de nivel:</label>
                 <input className='form-control w-100' type="text" placeholder="Ingrese el nombre**" id="nombre"
-                    value={nombre} onChange={e => setNombre(e.target.value)} />
+                    value={nombre} onChange={e => setNombre(e.target.value)} autoFocus />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="descripcion">Descripción de nivel:</label>
@@ -541,7 +541,7 @@ export function FormularioDominio() {
             <div className="form-group">
                 <label className='label' htmlFor="nombre">Nombre de dominio:</label>
                 <input className='form-control w-100' type="text" placeholder="Ingrese el nombre**" id="nombre"
-                    value={nombre} onChange={e => setNombre(e.target.value)} />
+                    value={nombre} onChange={e => setNombre(e.target.value)} autoFocus />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="descripcion">Descripción:</label>
@@ -650,7 +650,7 @@ export function FormularioPeticion() {
             <div className="form-group">
                 <label className='label' htmlFor="motivo">Motivo de petición:</label>
                 <input className='form-control w-100' type="text" placeholder="Ingrese el motivo**" id="motivo"
-                    name="motivo" value={motivo} onChange={e => setMotivo(e.target.value)} />
+                    name="motivo" value={motivo} onChange={e => setMotivo(e.target.value)} autoFocus />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="tipo">Selecciona el tipo:</label>
@@ -825,7 +825,7 @@ export function FormularioSala() {
             <div className="form-group">
                 <label className='label' htmlFor="nombre">Nombre de sala:</label>
                 <input className='form-control w-100' type="text" placeholder="Ingrese el nombre de sala**" id="nombre"
-                    name="nombre" value={nombre_sala} onChange={cambioNombre} />
+                    name="nombre" value={nombre_sala} onChange={cambioNombre} autoFocus />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="anotacion">Descripción de actividad:</label>
@@ -955,7 +955,8 @@ export function FormularioPeticionRevision() {
             <div className="form-group">
                 <label className='label' htmlFor="veredicto">Ingrese la decisión de la revisión :</label>
                 <textarea className='form-control w-100' placeholder="Ingrese la decisión**" id="veredicto"
-                    name="veredicto" value={vereficto} onChange={e => setVeredicto(e.target.value)} cols="30" rows="20">
+                    name="veredicto" value={vereficto} onChange={e => setVeredicto(e.target.value)}
+                    cols="30" rows="20" autoFocus>
 
                 </textarea>
             </div>
@@ -1069,7 +1070,7 @@ export function FormularioConfirmacion() {
             <div className="form-group">
                 <label className='label' htmlFor="codigo">Ingrese el código proporcionado :</label>
                 <textarea class="form-control w-100 tamanio-text-area" placeholder="Ingrese el código**"
-                    id="codigo" required
+                    id="codigo" required autoFocus
                     name="codigo"
                     value={tokenVerificacion}
                     onChange={e => setToken(e.target.value)}>
@@ -1172,7 +1173,7 @@ export function FormularioContacto() {
             <div className="form-group">
                 <label className='label' htmlFor="correo">Correo personal:</label>
                 <input className='form-control w-100' type="email" placeholder="Ingrese su correo**" id="correo"
-                    value={correo} onChange={e => setCorreo(e.target.value)} />
+                    value={correo} onChange={e => setCorreo(e.target.value)} autoFocus />
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="motivo">Motivo de contacto:</label>
@@ -1355,7 +1356,7 @@ export function FormularioRecuperacion() {
                             <label className='label' htmlFor="correo">Ingrese su dirección de correo electrónico :</label>
                             <input className='form-control w-100' type="email"
                                 placeholder="Ingrese su correo electrónico**"
-                                id="correo" required
+                                id="correo" required autoFocus
                                 name="correo"
                                 value={correo}
                                 onChange={e => setCorreo(e.target.value)}
@@ -1515,7 +1516,7 @@ export function FormularioCambio() {
                 <label className='label' htmlFor="correo">Ingrese su dirección de correo electrónico :</label>
                 <input className='form-control w-100' type="email"
                     placeholder="Ingrese su correo electrónico**"
-                    id="correo" required
+                    id="correo" required autoFocus
                     name="correo"
                     value={correo}
                     onChange={e => setCorreo(e.target.value)}
@@ -1534,7 +1535,7 @@ export function FormularioCambio() {
                 </div>
                 <div className="form-group col-md-2 mt-4 d-flex justify-content-center">
                     <Button variant="success" onClick={observarC2} className={mostrarC2 ? "opaco" : "no-opaco"}
-                        >
+                    >
                         <FontAwesomeIcon icon={faEye} />
                     </Button>
                 </div>

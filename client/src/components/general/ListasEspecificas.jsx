@@ -319,6 +319,7 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
     const [busqueda, setBusqueda] = useState("0");
     const [escogido, setEscogido] = useState(false);
     const [escogido2, setEscogido2] = useState(false);
+    const [entradaValida, setEntradavaldia] = useState(true);
 
     // Formulario
     const enviarFormulario = (e) => {
@@ -326,6 +327,11 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
         // Verificar campos vacíos
         if (isEmptyField(nombre)) {
             Swal.fire("Por favor ingrese todos los campos", "", "warning");
+            return;
+        }
+        // Verificar entrada válida
+        if (!entradaValida) {
+            Swal.fire("Por favor ingrese el formato: Nombre Apellidos", "", "warning");
             return;
         }
         // Flujo normal
@@ -425,6 +431,25 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
         setEscogido2(false);
     }
 
+    // Funcion para validar la entreada
+    const cambioEntrada = (e) => {
+        const value = e.target.value;
+        setNombre(value);
+
+        if (!validarEntrada(value)) {
+            setEntradavaldia(false);
+        } else {
+            setEntradavaldia(true);
+        }
+    };
+
+    // Validacion de entrada
+    const validarEntrada = (value) => {
+        // Control de entrada para cuatro valores
+        const generar = /^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$/;
+        return generar.test(value);
+    };
+
     return (
         <div className="cuerpo-tabla-2">
             <div className="row">
@@ -464,8 +489,8 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                                 <div className="form-group">
                                                     <label className='label' htmlFor="nombre">Nombre de estudiante:</label>
                                                     <input className='form-control w-100' type="text"
-                                                        placeholder="Ingrese el nombre del estudiante. Ejm: Luis Perez**" id="nombre"
-                                                        value={nombre} onChange={e => setNombre(e.target.value)} />
+                                                        placeholder="Ingrese el nombre del estudiante. Ejm: Luis Luis Perez Perez**" id="nombre"
+                                                        value={nombre} onChange={cambioEntrada} />
                                                 </div>
                                                 <Button type="submit" variant="success" disabled={habilitado}>
                                                     {habilitado ? 'Generando...' : 'Generar'}
@@ -506,12 +531,11 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                 </div>
                             </div>
                         </div>
-                        <div className="panel-body_2_2 table-responsive">
+                        <div className="panel-body_5 table-responsive">
                             <Table responsive="sm" className="table">
                                 <thead>
                                     <tr>
-
-                                        <th>Estudiante</th>
+                                        <th className="text-center">Estudiante</th>
                                         <th>Tiempo</th>
                                         <th>Observación</th>
                                         <th style={{ textAlign: 'center' }}>Fecha</th>
@@ -523,7 +547,7 @@ export function ListadodeResultado({ resultados, usuario, page, setPage, numeroP
                                         {
                                             resultados.map((resultado) => (
                                                 <tr key={resultado.id}>
-                                                    <td>{resultado.nombre_paciente} {resultado.apellido_paciente}</td>
+                                                    <td className="text-center">{resultado.nombre_paciente} {resultado.apellido_paciente}</td>
                                                     <td>{resultado.tiempo_m}m {resultado.tiempo_s}s</td>
                                                     <>
                                                         {

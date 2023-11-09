@@ -1373,17 +1373,22 @@ def generar_reporte_all(request):
                         # Obtener el nombre y apellido del paciente de nombre_paciente
                         nombres_apellido = nombre_paciente_.split(' ')
                         # Verificar cuantos valores existen separados por un espacio
-                        if len(nombres_apellido) == 1:
+                        # Mayor o igual a 1
+                        if len(nombres_apellido) <= 3:
                             error_message = "El nombre del paciente no es válido."
+                            print("Mequede aqui")
                             context = {'error': error_message}
                             return JsonResponse(context)
-                        elif len(nombres_apellido) == 2:
-                            nombre = nombres_apellido[0]
-                            apellido = nombres_apellido[1]
-                        elif len(nombres_apellido) == 3:
-                            nombre = nombres_apellido[0]
-                            apellido = nombres_apellido[1] + " " + nombres_apellido[2]
+                        elif len(nombres_apellido) == 4:
+                            nombre = nombres_apellido[0] + " " + nombres_apellido[1]
+                            apellido = nombres_apellido[2] + " " + nombres_apellido[3]
                         else:
+                            error_message = "El nombre del paciente no es válido."
+                            print("Mequede aqui x2")
+                            context = {'error': error_message}
+                            return JsonResponse(context)
+                        # Validar entradas validas
+                        if not validar_nombres(nombre, apellido):
                             error_message = "El nombre del paciente no es válido."
                             context = {'error': error_message}
                             return JsonResponse(context)

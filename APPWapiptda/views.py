@@ -114,11 +114,11 @@ def cedula_unica(ob1):
     """Verifica si la cédula es única."""
     try:
         # Buscamos la cedula en los modelos Usuario. Usuario comun y paciente
-        if Usuario.objects.filter(cedula=ob1).exists():
+        if Usuario.objects.filter(dni=ob1).exists():
             return False
-        elif UsuarioComun.objects.filter(cedula=ob1).exists():
+        elif UsuarioComun.objects.filter(dni=ob1).exists():
             return False
-        elif Paciente.objects.filter(cedula=ob1).exists():
+        elif Paciente.objects.filter(dni=ob1).exists():
             return False
         return True
     except Usuario.DoesNotExist:
@@ -175,6 +175,17 @@ def verificar_cedula_ecuatoriana(cedula):
         digito_verificador = 10 - decimo_digito
     # Comparar el dígito verificador con el décimo dígito de la cédula
     return digito_verificador == int(cedula[9])
+
+
+## Validar entradas de nombres para evitar expresiones regulares
+def validar_nombres(ob1, ob2):
+    # Expresión regular para verificar que ambos nombres cumplan con el formato deseado
+    formato_valido = re.compile(r'^[A-Za-zÁáÉéÍíÓóÚúÑñ]+\s[A-Za-zÁáÉéÍíÓóÚúÑñ]+$')
+
+    if formato_valido.match(ob1) and formato_valido.match(ob2):
+        return True
+    else:
+        return False
 
 
 
@@ -845,6 +856,11 @@ def api_user_register(request):
             celular_ = data.get('celular')
             fecha_ = data.get('fecha_nacimiento')
             cedula_ = data.get('cedula')
+            if not validar_nombres(first_name_, last_name_):
+                return JsonResponse({'error': 'Nombres y apellidos inválidos. Un solo espacio entre los valores..'})
+            # Verificar si el usuario ya existe
+            if existe__registro(first_name_, last_name_):
+                return JsonResponse({'error': 'El usuario ya existe'})
             # Verificar valides de cédula
             if not cedula_unica(cedula_):
                 return JsonResponse({'cedula': 'Cédula ya registrada'})
@@ -860,9 +876,6 @@ def api_user_register(request):
             # Verificar clave
             if not validar_clave(password_):
                 return JsonResponse({'clave': 'Clave sin requisitos mínimos'})
-            # Verificar si el usuario ya existe
-            if existe__registro(first_name_, last_name_):
-                return JsonResponse({'error': 'El usuario ya existe'})
             else:
                 if username_exist(username_):
                     return JsonResponse({'error': 'El nombre de usuario ya existe'})
@@ -922,6 +935,11 @@ def api_paciente_register(request):
             contacto_emergencia_ = data.get('contacto_emergencia')
             direccion_ = data.get('direccion')
             cedula_ = data.get('cedula')
+            if not validar_nombres(first_name_, last_name_):
+                return JsonResponse({'error': 'Nombres y apellidos inválidos. Un solo espacio entre los valores..'})
+            # Verificar si el usuario ya existe
+            if existe__registro(first_name_, last_name_):
+                return JsonResponse({'error': 'El usuario ya existe'})
             # Verificar valides de cédula
             if not cedula_unica(cedula_):
                 return JsonResponse({'cedula': 'Cédula ya registrada'})
@@ -937,9 +955,6 @@ def api_paciente_register(request):
             # Verificar clave
             if not validar_clave(password_):
                 return JsonResponse({'clave': 'Clave sin requisitos mínimos'})
-            # Verificar si el usuario ya existe
-            if existe__registro(first_name_, last_name_):
-                return JsonResponse({'error': 'El usuario ya existe'})
             else:
                 if username_exist(username_):
                     return JsonResponse({'error': 'El nombre de usuario ya existe'})
@@ -1001,6 +1016,11 @@ def api_comun_register(request):
             genero_ = data.get('genero')
             area_ = data.get('area_estudio')
             cedula_ = data.get('cedula')
+            if not validar_nombres(first_name_, last_name_):
+                return JsonResponse({'error': 'Nombres y apellidos inválidos. Un solo espacio entre los valores..'})
+            # Verificar si el usuario ya existe
+            if existe__registro(first_name_, last_name_):
+                return JsonResponse({'error': 'El usuario ya existe'})
             # Verificar valides de cédula
             if not cedula_unica(cedula_):
                 return JsonResponse({'cedula': 'Cédula ya registrada'})
@@ -1016,9 +1036,6 @@ def api_comun_register(request):
             # Verificar clave
             if not validar_clave(password_):
                 return JsonResponse({'clave': 'Clave sin requisitos mínimos'})
-            # Verificar si el usuario ya existe
-            if existe__registro(first_name_, last_name_):
-                return JsonResponse({'error': 'El usuario ya existe'})
             else:
                 if username_exist(username_):
                     return JsonResponse({'error': 'El nombre de usuario ya existe'})
@@ -1107,11 +1124,6 @@ def comprobar_separacion_coma(valor_respuesta):
         return True  # Si hay una coma, entonces hay varios valores
     else:
         return False  # Si no hay una coma, entonces solo hay un valor
-
-
-
-
-
 
 
 

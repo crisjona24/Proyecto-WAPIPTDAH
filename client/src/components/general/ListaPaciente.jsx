@@ -36,10 +36,10 @@ export function ListadodePacientes({ pacientes, page, setPage, numeroPag }) {
                                 <thead>
                                     <tr>
 
-                                        <th>Estudiante</th>
+                                        <th className="text-center">Estudiante</th>
                                         <th>Contacto</th>
                                         <th>Email</th>
-                                        <th>Emergencia</th>
+                                        <th>DNI</th>
                                         <th className="text-center">Edad</th>
                                         <th>Opciones</th>
                                     </tr>
@@ -49,10 +49,10 @@ export function ListadodePacientes({ pacientes, page, setPage, numeroPag }) {
                                         {
                                             pacientes.map((paciente) => (
                                                 <tr key={paciente.id}>
-                                                    <td>{paciente.nombre_usuario} {paciente.apellido_usuario}</td>
+                                                    <td className="text-center">{paciente.nombre_usuario} {paciente.apellido_usuario}</td>
                                                     <td>{paciente.celular}</td>
                                                     <td>{paciente.email_usuario}</td>
-                                                    <td>{paciente.contacto_emergencia}</td>
+                                                    <td>{paciente.dni}</td>
                                                     <td className="text-center">{paciente.edad}</td>
                                                     <td>
                                                         <ul className="action-list d-flex justify-content-center">

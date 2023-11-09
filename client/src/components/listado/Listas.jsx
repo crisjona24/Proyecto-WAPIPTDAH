@@ -326,14 +326,6 @@ export function PacienteListado() {
         }
     }, [slug, page, mostrarBusqueda]);
 
-    // Funcion para mostrar errores
-    const mostrarError = (message) => {
-        setError(message);
-        setTimeout(() => {
-            setError("");
-        }, 5000);
-    };
-
     // Busqueda
     const busquedaPaciente = async () => {
         // Verificar campos vacíos
@@ -343,7 +335,8 @@ export function PacienteListado() {
         }
         // Entrada
         if (!entradaValida) {
-            Swal.fire("Por favor ingrese el formato: Nombre Apellido", "", "warning");
+            Swal.fire("Por favor ingrese el formato: Nombres Apellidos", "", "warning");
+            resetearBusqueda();
             return;
         }
         // Flujo normal
@@ -362,40 +355,6 @@ export function PacienteListado() {
             Swal.fire("No existe un paciente con ese nombre. Ingresa un nombre válido", "", "warning");
         }
     }
-
-    // Resetear busqueda
-    const resetearBusqueda = () => {
-        setMostrarBusqueda(false);
-        setNombreBuscarP("");
-        setBusquedaPaci("0");
-        setEscogido(false);
-        // Paciente
-        setEstadoBusquedaCR(false);
-        setCedula("");
-        setEscogido2(false);
-    }
-
-    // Control de entrada de datos
-    const isEmptyField = (...fields) => {
-        return fields.some(field => field.trim() === "");
-    }
-
-    // Funcion para validar la entreada
-    const cambioEntrada = (e) => {
-        const value = e.target.value;
-        setNombreBuscarP(value);
-
-        if (!validarEntrada(value)) {
-            setEntradavaldia(false);
-        } else {
-            setEntradavaldia(true);
-        }
-    };
-
-    const validarEntrada = (value) => {
-        const generar = /^[a-zA-Z]+ [a-zA-Z]+$/;
-        return generar.test(value);
-    };
 
     // BUSCAR POR CEDULA
     // Metodo de busqueda por cédula
@@ -457,6 +416,46 @@ export function PacienteListado() {
 
     }, [slug, estadoBusquedaCR, page]);
 
+    // VALIDACIONES DE ENTRADA Y SALIDA
+    // Funcion para mostrar errores
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
+    // Resetear busqueda
+    const resetearBusqueda = () => {
+        setMostrarBusqueda(false);
+        setNombreBuscarP("");
+        setBusquedaPaci("0");
+        setEscogido(false);
+        // Paciente
+        setEstadoBusquedaCR(false);
+        setCedula("");
+        setEscogido2(false);
+    }
+    // Control de entrada de datos
+    const isEmptyField = (...fields) => {
+        return fields.some(field => field.trim() === "");
+    }
+    // Funcion para validar la entreada
+    const cambioEntrada = (e) => {
+        const value = e.target.value;
+        setNombreBuscarP(value);
+
+        if (!validarEntrada(value)) {
+            setEntradavaldia(false);
+        } else {
+            setEntradavaldia(true);
+        }
+    };
+
+    const validarEntrada = (value) => {
+        const generar = /^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$/;
+        return generar.test(value);
+    };
+
     return (
         <div>
             <div className="cabeza__Nivel">
@@ -504,15 +503,15 @@ export function PacienteListado() {
                             <option value="2">Cédula de identidad</option>
                         </select>
                         {escogido && (
-                            <form>
+                            <form style={{width: '400px'}}>
                                 <div className="row form-group">
                                     <div className="col-2 d-flex justify-content-center mt-2">
                                         <label htmlFor="nombre" style={{ fontFamily: 'Pacifico' }}
                                         >Nombre</label>
                                     </div>
-                                    <div className="col-9 d-flex flex-row">
+                                    <div className="col-10 d-flex flex-row">
                                         <input type="text" className="form-control" id="nombre"
-                                            value={nombrebuscarP} onChange={cambioEntrada} placeholder="Ingrese el nombre.." />
+                                            value={nombrebuscarP} onChange={cambioEntrada} placeholder="Ingrese nombres apellidos**" />
                                         <>
                                             {
                                                 mostrarBusqueda
@@ -530,7 +529,7 @@ export function PacienteListado() {
                         )}
                         {
                             escogido2 && (
-                                <form>
+                                <form style={{width: '400px'}}>
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
                                             <label htmlFor="cedula" style={{ fontFamily: 'Pacifico' }}>Cédula</label>
@@ -660,14 +659,6 @@ export function ResultadoLista({ usuario }) {
 
     }, [mostrarBusqueda, page]);
 
-    // Funcion para mostrar errores
-    const mostrarError = (message) => {
-        setError(message);
-        setTimeout(() => {
-            setError("");
-        }, 5000);
-    };
-
     // Busqueda
     const busquedaResultado = async () => {
         // Verificar campos vacíos
@@ -677,7 +668,7 @@ export function ResultadoLista({ usuario }) {
         }
         // Validar entradade nombre 
         if (!entradaValida) {
-            Swal.fire("Por favor ingrese el formato: Nombre Apellido", "", "warning");
+            Swal.fire("Por favor ingrese el formato: Nombres Apellidos", "", "warning");
             return;
         }
         // Flujo normal
@@ -697,43 +688,6 @@ export function ResultadoLista({ usuario }) {
             Swal.fire("No existen resultados con ese nombre de paciente. Ingresa un nombre válido", "", "warning");
         }
     }
-
-    // Control de entrada de datos
-    const isEmptyField = (...fields) => {
-        return fields.some(field => field.trim() === "");
-    }
-
-    // Resetear busqueda
-    const resetearBusqueda = () => {
-        setMostrarBusqueda(false);
-        setNombreBuscar("");
-        setEstadoBusqueda(false);
-        setFecha("");
-        setEstadoBusquedaSel(false);
-        setLimite("");
-        setBusqueda("0");
-        setEscogido(false);
-        setEscogido2(false);
-    }
-
-    // Funcion para validar la entreada
-    const cambioEntrada = (e) => {
-        const value = e.target.value;
-        setNombreBuscar(value);
-
-        if (!validarEntrada(value)) {
-            setEntradavaldia(false);
-        } else {
-            setEntradavaldia(true);
-        }
-    };
-
-    const validarEntrada = (value) => {
-        // Evaluar dos o tres valores
-
-        const generar = /^[a-zA-Z]+ [a-zA-Z]+$/;
-        return generar.test(value);
-    };
 
     // Metodo de busqueda
     const buscarResultadosFecha = async () => {
@@ -934,6 +888,19 @@ export function ResultadoLista({ usuario }) {
 
     }, [estadoBusquedaCR, page]);
 
+    // CONTROLES DE ENTRADA Y SALIDA
+
+    // Funcion para mostrar errores
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
+    // Control de entrada de datos
+    const isEmptyField = (...fields) => {
+        return fields.some(field => field.trim() === "");
+    }
     // Reseteo de cédula
     const resetearBusquedaCedula = () => {
         setEscogido3(false);
@@ -941,6 +908,37 @@ export function ResultadoLista({ usuario }) {
         setCedula("");
         setBusqueda("0");
     }
+    // Resetear busqueda
+    const resetearBusqueda = () => {
+        setMostrarBusqueda(false);
+        setNombreBuscar("");
+        setEstadoBusqueda(false);
+        setFecha("");
+        setEstadoBusquedaSel(false);
+        setLimite("");
+        setBusqueda("0");
+        setEscogido(false);
+        setEscogido2(false);
+    }
+
+    // Funcion para validar la entreada
+    const cambioEntrada = (e) => {
+        const value = e.target.value;
+        setNombreBuscar(value);
+
+        if (!validarEntrada(value)) {
+            setEntradavaldia(false);
+        } else {
+            setEntradavaldia(true);
+        }
+    };
+
+    // Validacion de entrada
+    const validarEntrada = (value) => {
+        // Control de entrada para cuatro valores
+        const generar = /^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$/;
+        return generar.test(value);
+    };
 
     return (
         <div>
@@ -998,15 +996,15 @@ export function ResultadoLista({ usuario }) {
                             <option value="3">Cédula de identidad</option>
                         </select>
                         {escogido && (
-                            <form>
+                            <form style={{width: '380px'}}>
                                 <div className="row form-group">
                                     <div className="col-2 d-flex justify-content-center mt-2">
                                         <label htmlFor="nombre" style={{ fontFamily: 'Pacifico' }}
                                         >Nombre</label>
                                     </div>
-                                    <div className="col-9 d-flex flex-row">
+                                    <div className="col-10 d-flex flex-row">
                                         <input type="text" className="form-control" id="nombre"
-                                            value={nombrebuscar} onChange={cambioEntrada} placeholder="Ingrese el nombre.." />
+                                            value={nombrebuscar} onChange={cambioEntrada} placeholder="Ingrese nombres y apellidos.**" />
                                         <>
                                             {
                                                 mostrarBusqueda
@@ -1024,7 +1022,7 @@ export function ResultadoLista({ usuario }) {
                         )}
                         {
                             escogido2 && (
-                                <form>
+                                <form style={{width: '380px'}}>
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
                                             <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
@@ -1049,7 +1047,7 @@ export function ResultadoLista({ usuario }) {
                             )}
                         {
                             escogido3 && (
-                                <form>
+                                <form style={{width: '380px'}}>
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
                                             <label htmlFor="cedula" style={{ fontFamily: 'Pacifico' }}>Cédula</label>
@@ -2169,14 +2167,6 @@ export function ReporteLista({ usuario }) {
 
     }, [mostrarBusqueda, page]);
 
-    // Funcion para mostrar errores
-    const mostrarError = (message) => {
-        setError(message);
-        setTimeout(() => {
-            setError("");
-        }, 5000);
-    };
-
     // BUSQUEDA
     // Metodo de busqueda
     const busquedaReporte = async () => {
@@ -2187,7 +2177,7 @@ export function ReporteLista({ usuario }) {
         }
         // Entrada
         if (!entradaValida) {
-            Swal.fire("Por favor ingrese el formato: Nombre Apellido", "", "warning");
+            Swal.fire("Por favor ingrese el formato: Nombres Apellidos", "", "warning");
             return;
         }
         // Flujo normal
@@ -2206,44 +2196,6 @@ export function ReporteLista({ usuario }) {
             Swal.fire("No existen reportes con ese nombre de paciente. Ingresa un nombre válido", "", "warning");
         }
     }
-    // Control de entrada de datos
-    const isEmptyField = (...fields) => {
-        return fields.some(field => field.trim() === "");
-    }
-
-    // Resetear busqueda
-    const resetearBusqueda = () => {
-        setMostrarBusqueda(false);
-        setNombreBuscar("");
-        setEstadoBusqueda(false);
-        setFecha("");
-        setEstadoBusquedaSel(false);
-        setLimite("");
-        setBusqueda("0");
-        setEscogido(false);
-        setEscogido2(false);
-        setEscogido3(false);
-        setEstadoBusquedaCedu(false);
-        setCedula("");
-    }
-
-    // Funcion para validar la entreada
-    const cambioEntrada = (e) => {
-        const value = e.target.value;
-        setNombreBuscar(value);
-
-        if (!validarEntrada(value)) {
-            setEntradavaldia(false);
-        } else {
-            setEntradavaldia(true);
-        }
-    };
-
-    // Validacion de entrada
-    const validarEntrada = (value) => {
-        const generar = /^[a-zA-Z]+ [a-zA-Z]+$/;
-        return generar.test(value);
-    };
 
     // Metodo de busqueda
     const buscarReportesFecha = async () => {
@@ -2442,6 +2394,53 @@ export function ReporteLista({ usuario }) {
 
     }, [estadoBusquedaCedu, page]);
 
+    // VALIDACIONES DE ENTRADA Y SALIDA DE DATOS
+
+    // Funcion para validar la entreada
+    const cambioEntrada = (e) => {
+        const value = e.target.value;
+        setNombreBuscar(value);
+
+        if (!validarEntrada(value)) {
+            setEntradavaldia(false);
+        } else {
+            setEntradavaldia(true);
+        }
+    };
+    // Validacion de entrada
+    const validarEntrada = (value) => {
+        // Control de entrada para cuatro valores
+        const generar = /^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$/;
+        return generar.test(value);
+    };
+    // Control de entrada de datos
+    const isEmptyField = (...fields) => {
+        return fields.some(field => field.trim() === "");
+    }
+    // Resetear busqueda
+    const resetearBusqueda = () => {
+        setMostrarBusqueda(false);
+        setNombreBuscar("");
+        setEstadoBusqueda(false);
+        setFecha("");
+        setEstadoBusquedaSel(false);
+        setLimite("");
+        setBusqueda("0");
+        setEscogido(false);
+        setEscogido2(false);
+        setEscogido3(false);
+        setEstadoBusquedaCedu(false);
+        setCedula("");
+    }
+    // Funcion para mostrar errores
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
+
+
     return (
         <div>
             <div className="cabeza__Nivel">
@@ -2499,15 +2498,15 @@ export function ReporteLista({ usuario }) {
                             <option value="3">Número de cédula</option>
                         </select>
                         {escogido && (
-                            <form>
+                            <form style={{width: '380px'}}>
                                 <div className="row form-group">
                                     <div className="col-2 d-flex justify-content-center mt-2">
                                         <label htmlFor="nombre" style={{ fontFamily: 'Pacifico' }}
                                         >Nombre</label>
                                     </div>
-                                    <div className="col-9 d-flex flex-row">
+                                    <div className="col-10 d-flex flex-row">
                                         <input type="text" className="form-control" id="nombre"
-                                            value={nombrebuscar} onChange={cambioEntrada} placeholder="Ingrese el nombre.." />
+                                            value={nombrebuscar} onChange={cambioEntrada} placeholder="Ingrese nombres y apellidos**" />
                                         <>
                                             {
                                                 mostrarBusqueda
@@ -2525,7 +2524,7 @@ export function ReporteLista({ usuario }) {
                         )}
                         {
                             escogido2 && (
-                                <form>
+                                <form style={{width: '380px'}}>
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
                                             <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
@@ -2552,7 +2551,7 @@ export function ReporteLista({ usuario }) {
                         }
                         {
                             escogido3 && (
-                                <form>
+                                <form style={{width: '380px'}}>
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
                                             <label htmlFor="cedula" style={{ fontFamily: 'Pacifico' }}>Cédula</label>
