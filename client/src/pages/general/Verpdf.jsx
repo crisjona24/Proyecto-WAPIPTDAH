@@ -181,7 +181,7 @@ export function VerPeticion() {
         <div className="w-100 h-100">
             <CabeceraRegister />
             <div className="container-fluid p-0 m-0 w-100 h-100">
-                <div className="almacenador ml-0">
+                <div className="almacenador ml-0 tamanio_almacenador_peti">
                     <>
                         {loading ? (
                             <div className="preloader">

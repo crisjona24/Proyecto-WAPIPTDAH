@@ -303,22 +303,29 @@ export function SalasPaciente() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
-                        <div id="content">
-                            <button type="button" id="sidebarCollapse" onClick={activarSidebar}
-                                className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
-                                title="Menú">
-                                <i className="fas fa-align-left"></i>
-                                <FontAwesomeIcon icon={faBars} />
-                            </button>
-                            {/* COMPONENTE DEL CUERPO */}
-                            <SalaPacienteLista />
-                        </div>
-                    </section>
+                    <SeccionSalaPaciente activarSidebar={activarSidebar} />
                 </div>
             </div>
             <PieRegister />
         </div>
+    )
+}
+
+function SeccionSalaPaciente({ activarSidebar }) {
+    const colorGuardado = localStorage.getItem('color');
+    return (
+        <section className="section col-9 border-general" id="mysection" style={{ backgroundColor: colorGuardado }}>
+            <div id="content">
+                <button type="button" id="sidebarCollapse" onClick={activarSidebar}
+                    className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
+                    title="Menú">
+                    <i className="fas fa-align-left"></i>
+                    <FontAwesomeIcon icon={faBars} />
+                </button>
+                {/* COMPONENTE DEL CUERPO */}
+                <SalaPacienteLista />
+            </div>
+        </section>
     )
 }
 

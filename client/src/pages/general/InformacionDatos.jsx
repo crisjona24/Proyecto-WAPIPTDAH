@@ -426,6 +426,7 @@ export function InformacionPaciente() {
     )
 }
 
+
 /* INFORMACION DE APLICACION */
 export function InformacionAPP() {
     // Pre loader
@@ -594,8 +595,8 @@ export function InformacionReporte() {
     return (
         <div className="w-100 h-100">
             <CabeceraRegister />
-            <div className="container-fluid p-0 m-0 w-100 h-100">
-                <div className="almacenador ml-0" style={{ height: '1250px' }}>
+            <div className="container-fluid p-0 m-0 w-100 h-100 ">
+                <div className="almacenador ml-0 tamanio_almacenador">
                     <>
                         {loading ? (
                             <div className="preloader">
@@ -610,7 +611,7 @@ export function InformacionReporte() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
+                    <section className="section col-9 section_almacenador" id="mysection">
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
@@ -697,7 +698,7 @@ export function InformacionResultado() {
         <div className="w-100 h-100">
             <CabeceraRegister />
             <div className="container-fluid p-0 m-0 w-100 h-100">
-                <div className="almacenador ml-0" style={{ height: '1150px' }}>
+                <div className="almacenador ml-0 tamanio_almacenador_resul">
                     <>
                         {loading ? (
                             <div className="preloader">
@@ -712,7 +713,7 @@ export function InformacionResultado() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
+                    <section className="section col-9 section_almacenador_resul" id="mysection">
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}

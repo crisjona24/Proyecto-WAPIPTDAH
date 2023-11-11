@@ -142,31 +142,38 @@ export function ContenidoIndividual() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
-                        <div id="content">
-                            <button type="button" id="sidebarCollapse" onClick={activarSidebar}
-                                className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
-                                title="Menú">
-                                <i className="fas fa-align-left"></i>
-                                <FontAwesomeIcon icon={faBars} />
-                            </button>
-                            {/* COMPONENTE DEL CUERPO */}
-                            <>
-                                {error &&
-                                    <div id="alert" className="alert alert-success" role="alert">
-                                        <h5 className="alert-heading">!Atención!</h5>
-                                        <p className="mb-0">{error}</p>
-                                    </div>
-                                }
-                                {/* Renderiza el componente almacenado en la variable contenidoComponente */}
-                            </>
-                            <ContenidoCuerpo context={contenidosI} slugContenido={slugContenido} tipoUsuarioP={tipoUsuario} />
-                        </div>
-                    </section>
+                    <>
+                        {error &&
+                            <div id="alert" className="alert alert-success" role="alert">
+                                <h5 className="alert-heading">!Atención!</h5>
+                                <p className="mb-0">{error}</p>
+                            </div>
+                        }
+                        {/* Renderiza el componente almacenado en la variable contenidoComponente */}
+                    </>
+                    <SeccionContenido activarSidebar={activarSidebar} tipoUsuario={tipoUsuario} contenidosI={contenidosI} slugContenido={slugContenido} />
                 </div>
             </div>
             <PieRegister />
         </div>
 
+    )
+}
+
+function SeccionContenido({ activarSidebar, tipoUsuario, contenidosI, slugContenido }) {
+    const colorGuardado = localStorage.getItem('color');
+    return (
+        <section className="section col-9 border-general" id="mysection" style={{ backgroundColor: colorGuardado }}>
+            <div id="content">
+                <button type="button" id="sidebarCollapse" onClick={activarSidebar}
+                    className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
+                    title="Menú">
+                    <i className="fas fa-align-left"></i>
+                    <FontAwesomeIcon icon={faBars} />
+                </button>
+                {/* COMPONENTE DEL CUERPO */}
+                <ContenidoCuerpo context={contenidosI} slugContenido={slugContenido} tipoUsuarioP={tipoUsuario} />
+            </div>
+        </section>
     )
 }

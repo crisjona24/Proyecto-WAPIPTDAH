@@ -509,6 +509,8 @@ export function Navbar_C() {
 
 // Navbar de Paciente
 export function Navbar_Paci() {
+
+    // General
     const navigate = useNavigate();
     const [verificacion, setVerificacion] = useState([]);
     const [expandedMenu, setExpandedMenu] = useState(null);
@@ -651,10 +653,12 @@ export function Navbar_Paci() {
                         <li>
                             <select id="colorSelect" className="form-select" onChange={cambiarColorFondo}>
                                 <option value="#D9DBF1">Base</option>
-                                <option value="#E8A596">Rojo</option>
+                                <option value="#F9D0D0">Crema</option>
                                 <option value="#7F92B2">Azul</option>
-                                <option value="#9DCF8B">Verde</option>
+                                <option value="#A2D9CE">Verde</option>
                                 <option value="#FFDF79">Amarillo</option>
+                                <option value="#ABB2B9">Oscuro</option>
+                                <option value="#E8DAEF">Violeta</option>
                             </select>
                         </li>
                     </ul>

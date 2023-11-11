@@ -49,8 +49,12 @@ function alerta__contenido(mensaje) {
 export function cambiarColorFondo() {
     var select = document.getElementById("colorSelect");
     var colorSeleccionado = select.value;
+    /* cargar color al local storge*/
+    localStorage.setItem("color", colorSeleccionado);
     var section = document.getElementById("mysection");
+    //var section2 = document.getElementById("mysection2");
     section.style.backgroundColor = colorSeleccionado;
+    //section2.style.backgroundColor = colorSeleccionado;
 }
 
 /* Descarga de archivos */

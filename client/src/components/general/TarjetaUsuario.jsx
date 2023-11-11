@@ -17,10 +17,7 @@ export function Tarjeta() {
 
     // Obtener datos de usuario
     const obtener = async () => {
-        // Promesa
-        if (!token) {
-            navigate('/login');
-        }
+        
         // Flujo normal
         try {
             let cont = await DatosUser();
@@ -41,6 +38,10 @@ export function Tarjeta() {
 
     // Obtener datos
     useEffect(() => {
+        // Promesa
+        if (!token) {
+            navigate('/login');
+        }
         obtener();
     }, []);
 

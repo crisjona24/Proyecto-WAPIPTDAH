@@ -16,7 +16,7 @@ import { UsuarioEliminar } from '../../../api/usuario.api'
 export function Tecnico({ datos }) {
     const navigate = useNavigate();
     return (
-        <div className="align-items-center" style={{ height: '100vh', marginLeft: '20%', marginTop: '10%' }}>
+        <div className="align-items-center contenedor_perfil">
             <Card className="mb-3" style={{ maxWidth: '75%' }}>
                 <Row>
                     <Col md={4}>
@@ -124,8 +124,8 @@ export function Tecnico({ datos }) {
 export function Comun({ datos }) {
     const navigate = useNavigate();
     return (
-        <div className="align-items-center" style={{ height: '100vh', marginLeft: '20%', marginTop: '10%' }}>
-            <Card className="mb-3" style={{ maxWidth: '75%' }}>
+        <div className="align-items-center contenedor_perfil">
+            <Card className="tarjeta_perfil" style={{ maxWidth: '75%' }}>
                 <Row >
                     <Col md={4}>
                         <Image

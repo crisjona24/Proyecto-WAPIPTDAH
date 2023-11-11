@@ -118,7 +118,7 @@ export function NivelLista({ usuario }) {
                         <div className="card-body">
                             <form className="d-flex flex-row" >
                                 <div className="input-group">
-                                    <input type="search" className="form-control rounded" placeholder="Inserta código de sala"
+                                    <input type="text" className="form-control rounded" placeholder="Inserta código de sala"
                                         aria-label="Search" aria-describedby="search-addon" value={codigosala}
                                         onChange={e => {
                                             const entrada = e.target.value;

@@ -12,7 +12,7 @@ export function Contacto() {
     return (
         <div style={{ width: '100%', height: '100%' }}>
             <CabeceraRegister />
-            <Container className="contenedor__edicion">
+            <Container className="contenedor__edicion" >
                 <Container className='barraSup mt-5' >
                     <Row className='col-md-12'>
                         <div className="card-body col-md-9">

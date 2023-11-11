@@ -4,7 +4,7 @@ import "../../styles/Registro.css"
 
 export function CabeceraRegister() {
     return (
-        <header className="header">
+        <header className="header" id="mysection2">
             <div className="left-section">
                 <h1 className="title_header">
                     WAPIPTDAH

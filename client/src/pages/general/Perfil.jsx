@@ -84,7 +84,7 @@ export function Perfil_User() {
         <div className="w-100 h-100">
             <CabeceraRegister />
             <div className="container-fluid p-0 m-0 w-100 h-100">
-                <div className="almacenador ml-0">
+                <div className="almacenador ml-0 tamanio_almacenador_perfil">
                     <>
                         {loading ? (
                             <div className="preloader">
@@ -99,21 +99,29 @@ export function Perfil_User() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
-                        <div id="content">
-                            <button type="button" id="sidebarCollapse" onClick={activarSidebar}
-                                className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
-                                title="Menú">
-                                <i className="fas fa-align-left"></i>
-                                <FontAwesomeIcon icon={faBars} />
-                            </button>
-                            {/* COMPONENTE DEL CUERPO */}
-                            <Tarjeta />
-                        </div>
-                    </section>
+                    {/* COMPONENTE SECTION */}
+                    <SeccionPerfil activarSidebar={activarSidebar} tipoUsuario={tipoUsuario} />
                 </div>
             </div>
             <PieRegister />
         </div>
+    )
+}
+
+function SeccionPerfil({ activarSidebar, tipoUsuario }) {
+    const colorGuardado = localStorage.getItem('color');
+    return (
+        <section className="section col-9 border-general section_almacenador_perfil" id="mysection" style={{ backgroundColor: colorGuardado }}>
+            <div id="content">
+                <button type="button" id="sidebarCollapse" onClick={activarSidebar}
+                    className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}
+                    title="Menú">
+                    <i className="fas fa-align-left"></i>
+                    <FontAwesomeIcon icon={faBars} />
+                </button>
+                {/* COMPONENTE DEL CUERPO */}
+                <Tarjeta usuario={tipoUsuario} />
+            </div>
+        </section>
     )
 }

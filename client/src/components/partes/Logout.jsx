@@ -29,6 +29,7 @@ export function LogoutNew() {
         if (response.success) {
             localStorage.removeItem('token'); // Elimina el token
             localStorage.removeItem('loginTimestamp'); // Elimina el token
+            localStorage.removeItem('color'); // Elimina el color
             navigate('/'); // Redirecciona a la página de inicio de sesión
         }
     };

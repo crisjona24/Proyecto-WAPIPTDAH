@@ -634,7 +634,7 @@ export function Peticion({ datos }) {
             </div>
 
             <div className="mt-5 align-items-center" style={{ height: '100vh', marginLeft: '20%' }}>
-                <Card className="mb-3" style={{ maxWidth: '75%' }}>
+                <Card className="mb-3" style={{ maxWidth: '75%', border: '1px solid #ccc' }}>
                     <Row >
                         <Col md={4}>
                             <Image
@@ -1030,8 +1030,8 @@ export function Reporte({ datosReporte }) {
                 </div>
             </div>
 
-            <div className="mt-3 align-items-center" style={{ height: '100vh', marginLeft: '10%', marginRight: '10%' }}>
-                <Card className="mb-3" style={{ maxWidth: '100%' }}>
+            <div className="align-items-center contenedor_reporte">
+                <Card className="tarjeta__reporte" >
                     <div className="d-flex">
                         <div className="container d-flex justify-content-left">
                             <img src="/img/tarjeta-paciente.png" style={{ width: '6%' }} />
@@ -1199,7 +1199,7 @@ export function Reporte({ datosReporte }) {
                                     </Col>
                                 </Row>
                                 <hr />
-                                <Row className="mb-1">
+                                <Row>
                                     <Card.Title style={{ fontSize: '1rem' }}>Tiempo de actividad realizada:</Card.Title>
                                     <Card.Text className="texto-peticion">
                                         {datosReporte.tiempo_m_} minutos con {datosReporte.tiempo_s_} segundos
@@ -1320,8 +1320,8 @@ export function Resultado({ datosResultado }) {
                 </div>
             </div>
 
-            <div className="mt-5 align-items-center" style={{ height: '100vh', marginLeft: '10%', marginRight: '10%' }}>
-                <Card className="mb-3" style={{ maxWidth: '100%' }}>
+            <div className="align-items-center contenedor_resultado">
+                <Card className="tarjeta__reporte">
                     <Row >
                         <Col md={4}>
                             <Image
