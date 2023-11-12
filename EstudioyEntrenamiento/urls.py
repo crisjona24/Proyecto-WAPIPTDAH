@@ -60,6 +60,9 @@ urlpatterns = [
     path('lista/reportes/cedula/<str:cedula>/', ReporteCedulaListView.as_view(), name='reporte-list-cedula'),
     path('lista/resultado/cedula/<str:cedula>/', ResultadoCedulaListView.as_view(), name='resultado-list-cedula'),
     path('estudiante/cedula/<str:cedula>/<str:slug>/', EstudianteCedulaListView.as_view(), name='registro-estudiante'),
+    path('lista/peticion/tipo/pendiente/<str:tipo>/', PeticionTipoPendienteListView.as_view(), name='peticion-list-tipo-p'),
+    path('lista/peticion/tipo/atendida/<str:tipo>/', PeticionTipoPendienteListViewAA.as_view(), name='peticion-list-tipo-a'),
+    path('lista/peticion/usuario/tipo/<str:tipo>/<int:id>/', PeticionTipo_U_ListView.as_view(), name='peticion-list-tipo-u'),
 
 
     ########### Verificaciones

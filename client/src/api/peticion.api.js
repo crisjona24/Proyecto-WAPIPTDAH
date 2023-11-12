@@ -430,3 +430,58 @@ export const RevisorPeticion = (id) => {
         throw new Error("No se puede acceder a los datos de peticion: " + error.message);
     }
 };
+
+// Peticion por TIPO DE PETICION    
+export const PeticionPendienteporTipo = async (tipo, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/estudio/lista/peticion/tipo/pendiente/${tipo}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                    //'Authorization': `Token ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a las peticiones: " + error.message);
+    }
+};
+
+export const PeticionAtendidaporTipo = async (tipo, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/estudio/lista/peticion/tipo/atendida/${tipo}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                    //'Authorization': `Token ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a las peticiones: " + error.message);
+    }
+};
+
+export const PeticionUsuarioporTipo = async (tipo, id, page = 1) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get(`wapiptdah/estudio/lista/peticion/usuario/tipo/${tipo}/${id}/?page=${page}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                    //'Authorization': `Token ${token}`
+                }
+            })
+    } catch (error) {
+        throw new Error("No se puede acceder a las peticiones: " + error.message);
+    }
+};

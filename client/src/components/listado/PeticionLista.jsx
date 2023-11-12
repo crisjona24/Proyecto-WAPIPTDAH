@@ -9,7 +9,10 @@ import { Button } from "react-bootstrap";
 import { PeticionPendiente, PeticionAtendida, PeticionesUC, PeticionporFecha, PeticionporRango } from "../../api/peticion.api"
 import { ListaPeticion, ListaPeticionAtendida, ListaPeticionesUsuario } from "../general/ListaPeticion"
 import { VerificarUsuario } from "../../api/usuario.api"
-import { PeticionPendienteporFecha, PeticionPendienteporRango, PeticionAtendidaporFecha, PeticionAtendidaporRango } from "../../api/peticion.api"
+import {
+    PeticionPendienteporFecha, PeticionPendienteporRango, PeticionAtendidaporFecha,
+    PeticionAtendidaporRango, PeticionPendienteporTipo, PeticionAtendidaporTipo, PeticionUsuarioporTipo
+} from "../../api/peticion.api"
 
 // Peticiones pendientes
 export function PeticionLista() {
@@ -25,9 +28,15 @@ export function PeticionLista() {
     // Filtro de fecha
     const [fecha, setFecha] = useState("");
     const [limite, setLimite] = useState("");
+    const [tipo, setTipo] = useState("");
     const [estadoBusqueda, setEstadoBusqueda] = useState(false);
     const [estadoBusquedaSel, setEstadoBusquedaSel] = useState(false);
+    const [estadoBusquedaTipo, setEstadoBusquedaTipo] = useState(false);
     const [isTamanio, setIstamanio] = useState(false);
+    // Escoger busqueda
+    const [tipoBusqueda, setTipoBusqueda] = useState("0");
+    const [escogido1, setEscogido1] = useState(false);
+    const [escogido2, setEscogido2] = useState(false);
 
     // Obtener datos
     const cargarPeticiones = async () => {
@@ -113,7 +122,7 @@ export function PeticionLista() {
     const buscarPeticionesRango = async () => {
         // Verificar fecha
         try {
-            if (limite !== "") {
+            if (limite !== "" && limite !== "0") {
                 // cargar datos de cursos
                 const peticion = await PeticionPendienteporRango(limite, page);
                 if (peticion.data.results.length === 0) {
@@ -137,22 +146,9 @@ export function PeticionLista() {
         }
     }
 
-    // Resetear busqueda
-    const resetearBusqueda = () => {
-        setEstadoBusqueda(false);
-        setEstadoBusquedaSel(false);
-        setFecha("");
-        setLimite("");
-    }
-
-    // Control de entrada de datos
-    const isEmptyField = (...fields) => {
-        return fields.some(field => field.trim() === "");
-    }
-
     // Estado de los datos
     useEffect(() => {
-        if (limite === "0") {
+        if (limite === "0" || limite === "") {
             resetearBusqueda();
             cargarPeticiones();
         } else {
@@ -160,7 +156,8 @@ export function PeticionLista() {
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (limite === "0") {
+            if (limite === "0" || limite === "") {
+                resetearBusqueda();
                 cargarPeticiones();
             } else {
                 buscarPeticionesRango();
@@ -168,6 +165,78 @@ export function PeticionLista() {
         }, 3600000); // 1 hora
         return () => clearInterval(interval);
     }, [limite, page]);
+
+    // Busqueda de peticions por tipo de peticion
+    const buscarPeticionesTipo = async () => {
+        // Verificar fecha
+        try {
+            if (tipo !== "" && tipo !== "0") {
+                // cargar datos de cursos
+                const peticionTipo = await PeticionPendienteporTipo(tipo, page);
+                if (peticionTipo.data.results.length === 0) {
+                    Swal.fire("No existen peticiones de ese tipo. Escoja otro", "", "warning");
+                    resetearBusquedaTipo();
+                    return;
+                } else {
+                    setPeticiones(peticionTipo.data.results);
+                    setNumeropag(Math.ceil(peticionTipo.data.count / elementosPorPagina));
+                    setEstadoBusquedaTipo(true);
+                }
+            } else {
+                cargarPeticiones();
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                Swal.fire("No existen peticiones de ese tipo. Ingresa otro tipo de petición.", "", "warning");
+            }
+        }
+    }
+
+    // Estado de los datos
+    useEffect(() => {
+        if (tipo === "0" || tipo === "") {
+            resetearBusquedaTipo();
+            cargarPeticiones();
+        } else {
+            buscarPeticionesTipo();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (tipo === "0" || tipo === "") {
+                resetearBusquedaTipo();
+                cargarPeticiones();
+            } else {
+                buscarPeticionesTipo();
+            }
+        }, 3600000); // 1 hora
+        return () => clearInterval(interval);
+    }, [tipo, page]);
+
+    // CONTROLES DE ENTRADA Y SALIDA
+
+    // Resetear busqueda
+    const resetearBusqueda = () => {
+        setEstadoBusqueda(false);
+        setEstadoBusquedaSel(false);
+        setFecha("");
+        setLimite("");
+        // Escoger busqueda
+        setEscogido1(false);
+        setTipoBusqueda("0");
+    }
+    const resetearBusquedaTipo = () => {
+        // Escoger busqueda
+        setEstadoBusquedaTipo(false);
+        setEscogido2(false);
+        setTipoBusqueda("0");
+        setTipo("");
+    }
+    // Control de entrada de datos
+    const isEmptyField = (...fields) => {
+        return fields.some(field => field.trim() === "");
+    }
 
     return (
         <div>
@@ -191,30 +260,88 @@ export function PeticionLista() {
             {/* Para el filtro de fecha */}
             <div className="container mt-3 alienacion-externa">
                 <div className="alineacion-lista-busqueda">
-                    <div className="col-md-12">
-                        <form>
-                            <div className="row form-group">
-                                <div className="col-2 d-flex justify-content-center mt-2">
-                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
-                                </div>
-                                <div className="col-9 d-flex flex-row">
-                                    <input type="date" className="form-control" id="fecha"
-                                        value={fecha} onChange={(e) => setFecha(e.target.value)} />
-                                    <>
-                                        {
-                                            estadoBusqueda
-                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
-                                                    X
-                                                </Button>
-                                                : <Button variant="success" className="my-2 my-sm-0" onClick={buscarPeticionesTodas} disabled={isTamanio}>
-                                                    Buscar
-                                                </Button>
-                                        }
-                                    </>
-                                </div>
+                    <div className="col-md-12 d-flex flex-row">
+                        <select
+                            className={`form-select h-75 separacion-busqueda 
+                            ${escogido1 ? 'w-25' : escogido2 ? 'w-25' : 'w-75'
+                                }`}
+                            value={tipoBusqueda}
+                            onChange={(e) => {
+                                setTipoBusqueda(e.target.value);
+                                if (e.target.value === "1") {
+                                    setEscogido1(true);
+                                    setEscogido2(false);
+                                } else if (e.target.value === "2") {
+                                    setEscogido2(true);
+                                    setEscogido1(false);
+                                } else {
+                                    setEscogido1(false);
+                                    setEscogido2(false);
+                                }
+                            }}
+                        >
+                            <option value="0">Buscar por ....</option>
+                            <option value="1">Fecha</option>
+                            <option value="2">Tipo de petición</option>
+                        </select>
+                        {
+                            escogido1 && (
+                                <form className="w-100">
+                                    <div className="row form-group">
+                                        <div className="col-2 d-flex justify-content-center mt-2">
+                                            <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                        </div>
+                                        <div className="col-9 d-flex flex-row">
+                                            <input type="date" className="form-control" id="fecha"
+                                                value={fecha} onChange={(e) => setFecha(e.target.value)} />
+                                            <>
+                                                {
+                                                    estadoBusqueda
+                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                            X
+                                                        </Button>
+                                                        : <Button variant="success" className="my-2 my-sm-0" onClick={buscarPeticionesTodas} disabled={isTamanio}>
+                                                            Buscar
+                                                        </Button>
+                                                }
+                                            </>
+                                        </div>
 
-                            </div>
-                        </form>
+                                    </div>
+                                </form>
+                            )
+                        }
+                        {
+                            escogido2 && (
+                                <form>
+                                    <div className="row form-group">
+                                        <div className="col-2 d-flex justify-content-center mt-2">
+                                            <label htmlFor="tipo" style={{ fontFamily: 'Pacifico' }}>Tipo</label>
+                                        </div>
+                                        <div className="col-10 d-flex flex-row">
+                                            <select name="tipo" id="tipo"
+                                                value={tipo} onChange={(e) => setTipo(e.target.value)} className="form-select w-100"
+                                            >
+                                                <option value="0">Ninguno</option>
+                                                <option value="Editar">Edición</option>
+                                                <option value="Eliminar">Eliminación</option>
+                                                <option value="Agregar">Agregación</option>
+                                            </select>
+                                            <>
+                                                {
+                                                    estadoBusquedaTipo
+                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusquedaTipo}>
+                                                            X
+                                                        </Button>
+                                                        : <> </>
+                                                }
+                                            </>
+                                        </div>
+
+                                    </div>
+                                </form>
+                            )
+                        }
                     </div>
                 </div>
                 <div className="alineacion-lista-busqueda">
@@ -271,9 +398,15 @@ export function PeticionListaAtendi() {
     // Filtro de fecha
     const [fecha, setFecha] = useState("");
     const [limite, setLimite] = useState("");
+    const [tipo, setTipo] = useState("");
     const [estadoBusqueda, setEstadoBusqueda] = useState(false);
     const [estadoBusquedaSel, setEstadoBusquedaSel] = useState(false);
+    const [estadoBusquedaTipo, setEstadoBusquedaTipo] = useState(false);
     const [isTamanio, setIstamanio] = useState(false);
+    // Escoger busqueda
+    const [tipoBusqueda, setTipoBusqueda] = useState("0");
+    const [escogido1, setEscogido1] = useState(false);
+    const [escogido2, setEscogido2] = useState(false);
 
     // Obtener datos
     const cargarPeticiones = async () => {
@@ -314,15 +447,6 @@ export function PeticionListaAtendi() {
         return () => clearInterval(interval);
     }, [estadoBusqueda, page]);
 
-    // Funcion para mostrar errores
-    const mostrarError = (message) => {
-        setError(message);
-        setTimeout(() => {
-            setError("");
-        }, 5000);
-    };
-
-
     // Metodo de busqueda
     const buscarPeticionesTodasA = async () => {
         // Verificar campos vacíos
@@ -359,7 +483,7 @@ export function PeticionListaAtendi() {
     const buscarPeticionesRangoA = async () => {
         // Verificar fecha
         try {
-            if (limite !== "") {
+            if (limite !== "" && limite !== "0") {
                 // cargar datos de cursos
                 const peticion = await PeticionAtendidaporRango(limite, page);
                 if (peticion.data.results.length === 0) {
@@ -383,22 +507,9 @@ export function PeticionListaAtendi() {
         }
     }
 
-    // Resetear busqueda
-    const resetearBusqueda = () => {
-        setEstadoBusqueda(false);
-        setEstadoBusquedaSel(false);
-        setFecha("");
-        setLimite("");
-    }
-
-    // Control de entrada de datos
-    const isEmptyField = (...fields) => {
-        return fields.some(field => field.trim() === "");
-    }
-
     // Estado de los datos
     useEffect(() => {
-        if (limite === "0") {
+        if (limite === "0" || limite === "") {
             resetearBusqueda();
             cargarPeticiones();
         } else {
@@ -406,7 +517,7 @@ export function PeticionListaAtendi() {
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (limite === "0") {
+            if (limite === "0" || limite === "") {
                 cargarPeticiones();
             } else {
                 buscarPeticionesRangoA();
@@ -414,6 +525,85 @@ export function PeticionListaAtendi() {
         }, 3600000); // 1 hora
         return () => clearInterval(interval);
     }, [limite, page]);
+
+    // Busqueda de peticions por tipo de peticion
+    const buscarPeticionesTipoAA = async () => {
+        // Verificar fecha
+        try {
+            if (tipo !== "" && tipo !== "0") {
+                // cargar datos de cursos
+                const peticionTipoAA = await PeticionAtendidaporTipo(tipo, page);
+                if (peticionTipoAA.data.results.length === 0) {
+                    Swal.fire("No existen peticiones de ese tipo. Escoja otro", "", "warning");
+                    resetearBusquedaTipo();
+                    return;
+                } else {
+                    setPeticiones(peticionTipoAA.data.results);
+                    setNumeropag(Math.ceil(peticionTipoAA.data.count / elementosPorPagina));
+                    setEstadoBusquedaTipo(true);
+                }
+            } else {
+                cargarPeticiones();
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                Swal.fire("No existen peticiones de ese tipo. Ingresa otro tipo de petición.", "", "warning");
+            }
+        }
+    }
+
+    // Estado de los datos
+    useEffect(() => {
+        if (tipo === "0" || tipo === "") {
+            resetearBusquedaTipo();
+            cargarPeticiones();
+        } else {
+            buscarPeticionesTipoAA();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (tipo === "0" || tipo === "") {
+                resetearBusquedaTipo();
+                cargarPeticiones();
+            } else {
+                buscarPeticionesTipoAA();
+            }
+        }, 3600000); // 1 hora
+        return () => clearInterval(interval);
+    }, [tipo, page]);
+
+    // CONTROLES DE ENTRADA Y SALIDA 
+
+    // Funcion para mostrar errores
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
+    // Resetear busqueda
+    const resetearBusqueda = () => {
+        setEstadoBusqueda(false);
+        setEstadoBusquedaSel(false);
+        setFecha("");
+        setLimite("");
+        // Tipo de busqueda
+        setEscogido1(false);
+        setTipoBusqueda("0");
+    }
+    const resetearBusquedaTipo = () => {
+        // Escoger busqueda
+        setEstadoBusquedaTipo(false);
+        setEscogido2(false);
+        setTipoBusqueda("0");
+        setTipo("");
+    }
+    // Control de entrada de datos
+    const isEmptyField = (...fields) => {
+        return fields.some(field => field.trim() === "");
+    }
 
     return (
         <div>
@@ -437,30 +627,88 @@ export function PeticionListaAtendi() {
             {/* Para el filtro de fecha */}
             <div className="container mt-3 alienacion-externa">
                 <div className="alineacion-lista-busqueda">
-                    <div className="col-md-12">
-                        <form>
-                            <div className="row form-group">
-                                <div className="col-2 d-flex justify-content-center mt-2">
-                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
-                                </div>
-                                <div className="col-9 d-flex flex-row">
-                                    <input type="date" className="form-control" id="fecha"
-                                        value={fecha} onChange={(e) => setFecha(e.target.value)} />
-                                    <>
-                                        {
-                                            estadoBusqueda
-                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
-                                                    X
-                                                </Button>
-                                                : <Button variant="success" className="my-2 my-sm-0" onClick={buscarPeticionesTodasA} disabled={isTamanio}>
-                                                    Buscar
-                                                </Button>
-                                        }
-                                    </>
-                                </div>
+                    <div className="col-md-12 d-flex flex-row">
+                        <select
+                            className={`form-select h-75 separacion-busqueda 
+                            ${escogido1 ? 'w-25' : escogido2 ? 'w-25' : 'w-75'
+                                }`}
+                            value={tipoBusqueda}
+                            onChange={(e) => {
+                                setTipoBusqueda(e.target.value);
+                                if (e.target.value === "1") {
+                                    setEscogido1(true);
+                                    setEscogido2(false);
+                                } else if (e.target.value === "2") {
+                                    setEscogido2(true);
+                                    setEscogido1(false);
+                                } else {
+                                    setEscogido1(false);
+                                    setEscogido2(false);
+                                }
+                            }}
+                        >
+                            <option value="0">Buscar por ....</option>
+                            <option value="1">Fecha</option>
+                            <option value="2">Tipo de petición</option>
+                        </select>
+                        {
+                            escogido1 && (
+                                <form className="w-100">
+                                    <div className="row form-group">
+                                        <div className="col-2 d-flex justify-content-center mt-2">
+                                            <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                        </div>
+                                        <div className="col-9 d-flex flex-row">
+                                            <input type="date" className="form-control" id="fecha"
+                                                value={fecha} onChange={(e) => setFecha(e.target.value)} />
+                                            <>
+                                                {
+                                                    estadoBusqueda
+                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                            X
+                                                        </Button>
+                                                        : <Button variant="success" className="my-2 my-sm-0" onClick={buscarPeticionesTodasA} disabled={isTamanio}>
+                                                            Buscar
+                                                        </Button>
+                                                }
+                                            </>
+                                        </div>
 
-                            </div>
-                        </form>
+                                    </div>
+                                </form>
+                            )
+                        }
+                        {
+                            escogido2 && (
+                                <form>
+                                    <div className="row form-group">
+                                        <div className="col-2 d-flex justify-content-center mt-2">
+                                            <label htmlFor="tipo" style={{ fontFamily: 'Pacifico' }}>Tipo</label>
+                                        </div>
+                                        <div className="col-10 d-flex flex-row">
+                                            <select name="tipo" id="tipo"
+                                                value={tipo} onChange={(e) => setTipo(e.target.value)} className="form-select w-100"
+                                            >
+                                                <option value="0">Ninguno</option>
+                                                <option value="Editar">Edición</option>
+                                                <option value="Eliminar">Eliminación</option>
+                                                <option value="Agregar">Agregación</option>
+                                            </select>
+                                            <>
+                                                {
+                                                    estadoBusquedaTipo
+                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusquedaTipo}>
+                                                            X
+                                                        </Button>
+                                                        : <> </>
+                                                }
+                                            </>
+                                        </div>
+
+                                    </div>
+                                </form>
+                            )
+                        }
                     </div>
                 </div>
                 <div className="alineacion-lista-busqueda">
@@ -517,9 +765,15 @@ export function PeticionListaUsuario() {
     // Filtro de fecha
     const [fecha, setFecha] = useState("");
     const [limite, setLimite] = useState("");
+    const [tipo, setTipo] = useState("");
     const [estadoBusqueda, setEstadoBusqueda] = useState(false);
     const [estadoBusquedaSel, setEstadoBusquedaSel] = useState(false);
+    const [estadoBusquedaTipo, setEstadoBusquedaTipo] = useState(false);
     const [isTamanio, setIstamanio] = useState(false);
+    // Escoger busqueda
+    const [tipoBusqueda, setTipoBusqueda] = useState("0");
+    const [escogido1, setEscogido1] = useState(false);
+    const [escogido2, setEscogido2] = useState(false);
 
     // Obtener datos
     const cargarPeticiones = async () => {
@@ -566,14 +820,6 @@ export function PeticionListaUsuario() {
         }, 3600000); // 1 hora
         return () => clearInterval(interval);
     }, [estadoBusqueda, page]);
-
-    // Funcion para mostrar errores
-    const mostrarError = (message) => {
-        setError(message);
-        setTimeout(() => {
-            setError("");
-        }, 5000);
-    };
 
     // Metodo de busqueda
     const buscarPeticiones = async () => {
@@ -647,18 +893,91 @@ export function PeticionListaUsuario() {
         }
     }
 
+    // Busqueda de peticions por tipo de peticion
+    const peticion_tipo_usuario = async () => {
+        // Verificar fecha
+        try {
+            if (tipo !== "" && tipo !== "0") {
+                const usuarioC = await VerificarUsuario();
+                if (usuarioC.data.success) {
+                    // cargar datos de peticiones
+                    const peticionTipoU = await PeticionUsuarioporTipo(tipo, usuarioC.data.identificador, page);
+                    if (peticionTipoU.data.results.length === 0) {
+                        Swal.fire("No existen peticiones de ese tipo de usted. Escoja otro", "", "warning");
+                        resetearBusquedaTipo();
+                        return;
+                    } else {
+                        setPeticiones(peticionTipoU.data.results);
+                        setNumeropag(Math.ceil(peticionTipoU.data.count / elementosPorPagina));
+                        setEstadoBusquedaTipo(true);
+                    }
+                } else {
+                    navigate('/login');
+                }
+            } else {
+                cargarPeticiones();
+            }
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                Swal.fire("No existen peticiones de ese tipo. Ingresa otro tipo de petición.", "", "warning");
+            }
+        }
+    }
+
+    // Estado de los datos
+    useEffect(() => {
+        if (tipo === "0" || tipo === "") {
+            resetearBusquedaTipo();
+            cargarPeticiones();
+        } else {
+            peticion_tipo_usuario();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (tipo === "0" || tipo === "") {
+                resetearBusquedaTipo();
+                cargarPeticiones();
+            } else {
+                peticion_tipo_usuario();
+            }
+        }, 3600000); // 1 hora
+        return () => clearInterval(interval);
+    }, [tipo, page]);
+
+    // CONTROLES DE ENTRADA Y SALIDA
+
+    // Funcion para mostrar errores
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
     // Resetear busqueda
     const resetearBusqueda = () => {
         setEstadoBusqueda(false);
         setEstadoBusquedaSel(false);
         setFecha("");
         setLimite("");
-    }
+        // Tipo de busqueda
+        setEscogido1(false);
+        setTipoBusqueda("0");
+
+    };
+    const resetearBusquedaTipo = () => {
+        // Escoger busqueda
+        setEstadoBusquedaTipo(false);
+        setEscogido2(false);
+        setTipoBusqueda("0");
+        setTipo("");
+    };
 
     // Control de entrada de datos
     const isEmptyField = (...fields) => {
         return fields.some(field => field.trim() === "");
-    }
+    };
 
     // Estado de los datos
     useEffect(() => {
@@ -701,30 +1020,88 @@ export function PeticionListaUsuario() {
             {/* Para el filtro de fecha */}
             <div className="container mt-4 alienacion-externa">
                 <div className="alineacion-lista-busqueda">
-                    <div className="col-md-12">
-                        <form>
-                            <div className="row form-group">
-                                <div className="col-2 d-flex justify-content-center mt-2">
-                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
-                                </div>
-                                <div className="col-9 d-flex flex-row">
-                                    <input type="date" className="form-control" id="fecha"
-                                        value={fecha} onChange={(e) => setFecha(e.target.value)} />
-                                    <>
-                                        {
-                                            estadoBusqueda
-                                                ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
-                                                    X
-                                                </Button>
-                                                : <Button variant="success" className="my-2 my-sm-0" onClick={buscarPeticiones} disabled={isTamanio}>
-                                                    Buscar
-                                                </Button>
-                                        }
-                                    </>
-                                </div>
+                    <div className="col-md-12 d-flex flex-row">
+                        <select
+                            className={`form-select h-75 separacion-busqueda 
+                            ${escogido1 ? 'w-25' : escogido2 ? 'w-25' : 'w-75'
+                                }`}
+                            value={tipoBusqueda}
+                            onChange={(e) => {
+                                setTipoBusqueda(e.target.value);
+                                if (e.target.value === "1") {
+                                    setEscogido1(true);
+                                    setEscogido2(false);
+                                } else if (e.target.value === "2") {
+                                    setEscogido2(true);
+                                    setEscogido1(false);
+                                } else {
+                                    setEscogido1(false);
+                                    setEscogido2(false);
+                                }
+                            }}
+                        >
+                            <option value="0">Buscar por ....</option>
+                            <option value="1">Fecha</option>
+                            <option value="2">Tipo de petición</option>
+                        </select>
+                        {
+                            escogido1 && (
+                                <form className="w-100">
+                                    <div className="row form-group">
+                                        <div className="col-2 d-flex justify-content-center mt-2">
+                                            <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                        </div>
+                                        <div className="col-9 d-flex flex-row">
+                                            <input type="date" className="form-control" id="fecha"
+                                                value={fecha} onChange={(e) => setFecha(e.target.value)} />
+                                            <>
+                                                {
+                                                    estadoBusqueda
+                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
+                                                            X
+                                                        </Button>
+                                                        : <Button variant="success" className="my-2 my-sm-0" onClick={buscarPeticiones} disabled={isTamanio}>
+                                                            Buscar
+                                                        </Button>
+                                                }
+                                            </>
+                                        </div>
 
-                            </div>
-                        </form>
+                                    </div>
+                                </form>
+                            )
+                        }
+                        {
+                            escogido2 && (
+                                <form>
+                                    <div className="row form-group">
+                                        <div className="col-2 d-flex justify-content-center mt-2">
+                                            <label htmlFor="tipo" style={{ fontFamily: 'Pacifico' }}>Tipo</label>
+                                        </div>
+                                        <div className="col-10 d-flex flex-row">
+                                            <select name="tipo" id="tipo"
+                                                value={tipo} onChange={(e) => setTipo(e.target.value)} className="form-select w-100"
+                                            >
+                                                <option value="0">Ninguno</option>
+                                                <option value="Editar">Edición</option>
+                                                <option value="Eliminar">Eliminación</option>
+                                                <option value="Agregar">Agregación</option>
+                                            </select>
+                                            <>
+                                                {
+                                                    estadoBusquedaTipo
+                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusquedaTipo}>
+                                                            X
+                                                        </Button>
+                                                        : <> </>
+                                                }
+                                            </>
+                                        </div>
+
+                                    </div>
+                                </form>
+                            )
+                        }
                     </div>
                 </div>
                 <div className="alineacion-lista-busqueda">

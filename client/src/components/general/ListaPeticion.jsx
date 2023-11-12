@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Table, Modal } from "react-bootstrap";
 // Componentes
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faEye, faTimes, faCheckCircle, faBatteryFull, faBackward, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faEye, faTimes, faCheckCircle, faBatteryFull, faBackward, faCheck, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { Link, useNavigate } from 'react-router-dom';
 //import { useNavigate } from 'react-router-dom';
 import { useState } from "react";
@@ -300,6 +300,11 @@ export function ListaPeticionesUsuario({ peticiones, page, setPage, numeroPag })
                     <div className="panel">
                         <div className="panel-heading">
                             <div className="row">
+                                <div className="col-sm-12 col-xs-12">
+                                    <Link to={'/peticion/registro'} className="btn btn-sm btn-primary pull-left">
+                                        <FontAwesomeIcon icon={faPlusCircle} /> Agregar nueva petición
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                         <div className="panel-body_2 table-responsive">

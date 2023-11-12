@@ -125,7 +125,7 @@ export function Navbar_T() {
         <nav id="sidebar__">
             <ul className="list-unstyled components">
                 <li className="active">
-                    <Link to={'/nivel/all'}><FontAwesomeIcon icon={faHome} style={{ marginRight: '4%' }} />Home</Link>
+                    <Link to={'/nivel/all'}><FontAwesomeIcon icon={faHome} style={{ marginRight: '4%' }} />Inicio</Link>
                 </li>
                 <li>
                     <Link to={'/perfil'}><FontAwesomeIcon icon={faUser} style={{ marginRight: '4%' }} />Perfil</Link>
@@ -370,7 +370,7 @@ export function Navbar_C() {
         <nav id="sidebar__">
             <ul className="list-unstyled components">
                 <li className="active">
-                    <Link to={'/nivel/all'}><FontAwesomeIcon icon={faHome} style={{ marginRight: '4%' }} />Home</Link>
+                    <Link to={'/nivel/all'}><FontAwesomeIcon icon={faHome} style={{ marginRight: '4%' }} />Inicio</Link>
                 </li>
                 <li>
                     <Link to={'/perfil'}><FontAwesomeIcon icon={faUser} style={{ marginRight: '4%' }} />Perfil</Link>
@@ -615,7 +615,7 @@ export function Navbar_Paci() {
                     {
                         verificacion.inscrito === "1" &&
                         <li className="active">
-                            <Link to={'/nivel/all'}><FontAwesomeIcon icon={faHome} style={{ marginRight: '4%' }} />Home</Link>
+                            <Link to={'/nivel/all'}><FontAwesomeIcon icon={faHome} style={{ marginRight: '4%' }} />Inicio</Link>
                         </li>
                     }
                     {

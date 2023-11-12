@@ -342,9 +342,23 @@ class PeticionFechaPendienteListView(generics.ListAPIView):
         # Obtener la fecha de la url
         fecha = self.kwargs['fecha']
         # Filtramos las peticiones por fecha y usuario
-        peticiones = Peticion.objects.filter(fecha_registro_peticion=fecha, estado_revision=False)
+        peticiones = Peticion_Pendiente_Fecha(self.request, fecha)
         return peticiones
 
+def Peticion_Pendiente_Fecha(ob1, ob2):
+    try:
+        # Decodifica el token para obtener el usuario que inicio sesion
+        token = ob1.headers.get('Authorization').split(" ")[1]
+        user = get_user_from_token_jwt(token)
+        # Encontrar al usuario relacionado al user de tipo tecnico
+        if is_tecnico(user):
+            # Obtener las peticiones por tipo y que no han sido revisadas
+            peticiones_fecha = Peticion.objects.filter(fecha_registro_peticion=ob2, estado_revision=False)
+            return peticiones_fecha
+        else:
+            return []
+    except Peticion.DoesNotExist:
+        return []
 
 ##### Lista de peticiones pendientes filtradas a traves de un rango de días específico
 # PROTECCION CON JWT
@@ -357,8 +371,24 @@ class PeticionRangoPendienteListView(generics.ListAPIView):
         # Obtener el valor del rango de la url
         rango = self.kwargs['rango']
         # Filtramos las peticiones desde la fecha actual hasta el rango de dias y usuario
-        peticiones = Peticion.objects.filter(fecha_registro_peticion__range=[datetime.now()-timedelta(days=rango), datetime.now()], estado_revision=False)
+        peticiones = Peticion_Pendiente_Rango(self.request, rango)
         return peticiones
+
+
+def Peticion_Pendiente_Rango(ob1, ob2):
+    try:
+        # Decodifica el token para obtener el usuario que inicio sesion
+        token = ob1.headers.get('Authorization').split(" ")[1]
+        user = get_user_from_token_jwt(token)
+        # Encontrar al usuario relacionado al user de tipo tecnico
+        if is_tecnico(user):
+            # Obtener las peticiones por tipo y que no han sido revisadas
+            peticiones_rango = Peticion.objects.filter(fecha_registro_peticion__range=[datetime.now()-timedelta(days=ob2), datetime.now()], estado_revision=False)
+            return peticiones_rango
+        else:
+            return []
+    except Peticion.DoesNotExist:
+        return []
 
 
 ##### Lista de peticiones pendientes filtradas por una fecha específica 
@@ -1357,3 +1387,95 @@ def obtener_paciente(ob1, ob2):
     except Paciente.DoesNotExist:
         return []   
 
+
+
+#### Permite obtener la lista de peticiones que existe por medio del tipo y que su estado de revision sea falso
+### la busqueda es general ya que pertenece al usuario tecnico
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class PeticionTipoPendienteListView(generics.ListAPIView):
+    serializer_class = PeticionSerializer
+    pagination_class = Paginacion
+    def get_queryset(self):
+        # Obtener el valor del rango de la url
+        tipo = self.kwargs['tipo']
+        # Filtramos las peticiones desde la fecha actual hasta el rango de dias y usuario
+        peticiones_tipo = Peticion_por_Tipo(self.request, tipo)
+        return peticiones_tipo
+
+### Busqueda de las peticiones pendiante por medio del tipo de petición
+def Peticion_por_Tipo(ob1, ob2):
+    try:
+        # Decodifica el token para obtener el usuario
+        token = ob1.headers.get('Authorization').split(" ")[1]
+        user = get_user_from_token_jwt(token)
+        # Encontrar al usuario relacionado al user de tipo tecnico
+        if is_tecnico(user):
+            # Obtener las peticiones por tipo y que no han sido revisadas
+            peticiones_tipo = Peticion.objects.filter(tipo_peticion=ob2, estado_revision=False)
+            return peticiones_tipo
+        else:
+            return []
+    except Peticion.DoesNotExist:
+        return []
+
+
+
+#### Permite obtener la lista de peticiones que existe por medio del tipo y que su estado de revision sea true
+### la busqueda es general ya que pertenece al usuario tecnico
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class PeticionTipoPendienteListViewAA(generics.ListAPIView):
+    serializer_class = PeticionSerializer
+    pagination_class = Paginacion
+    def get_queryset(self):
+        # Obtener el valor del rango de la url
+        tipo = self.kwargs['tipo']
+        # Filtramos las peticiones desde la fecha actual hasta el rango de dias y usuario
+        peticiones_tipo = Peticion_por_Tipo_Aten(self.request, tipo)
+        return peticiones_tipo
+
+## Busqueda de las peticiones pendiante por medio del tipo de petición
+def Peticion_por_Tipo_Aten(ob1, ob2):
+    try:
+        # Decodifica el token para obtener el usuario
+        token = ob1.headers.get('Authorization').split(" ")[1]
+        user = get_user_from_token_jwt(token)
+        # Encontrar al usuario relacionado al user de tipo tecnico
+        if is_tecnico(user):
+            # Obtener las peticiones por tipo y que no han sido revisadas
+            peticiones_tipo_a = Peticion.objects.filter(tipo_peticion=ob2, estado_revision=True)
+            return peticiones_tipo_a
+        else:
+            return []
+    except Peticion.DoesNotExist:
+        return []
+
+
+##### Lista de peticiones filtradas a traves de un rango de días específico
+# PROTECCION CON JWT
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class PeticionTipo_U_ListView(generics.ListAPIView):
+    serializer_class = PeticionSerializer
+    pagination_class = Paginacion
+    def get_queryset(self):
+        # Obtener el valor del rango de la url
+        tipo = self.kwargs['tipo']
+        # Obtener el id del usuario
+        id_usuario = self.kwargs['id']
+        # Filtramos las peticiones desde la fecha actual hasta el rango de dias y usuario
+        peticiones = Peticion_Usuario_tipo(id_usuario, tipo)
+        return peticiones
+
+def Peticion_Usuario_tipo(ob1, ob2):
+    try:
+        # Obtener el usuario comun
+        usuario = UsuarioComun.objects.get(id=ob1)
+        # Obtener las peticiones por tipo y que no han sido revisadas
+        peticiones_tipo = Peticion.objects.filter(tipo_peticion=ob2, usuario_comun=usuario, estado_revision=True)
+        return peticiones_tipo
+    except UsuarioComun.DoesNotExist:
+        return []
+    except Peticion.DoesNotExist:
+        return []

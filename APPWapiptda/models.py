@@ -45,8 +45,8 @@ class Usuario(models.Model):
     apellido_usuario = models.CharField(max_length=80, blank=False, null=True)
     email_usuario = models.EmailField(max_length=80, blank=False, null=True)
     username_usuario = models.CharField(unique=True, max_length=80, blank=False, null=True)
-    fecha_nacimiento = models.DateField(null=True, blank=True)
     celular = models.CharField(max_length=10, blank=False, null=True)
+    fecha_nacimiento = models.DateField(null=True, blank=True)
     dni = models.CharField(max_length=10, blank=False, null=True)
     estado_usuario = models.BooleanField(default=True)
     slug_usuario = models.SlugField(unique=True, blank=True)
@@ -54,8 +54,6 @@ class Usuario(models.Model):
     fecha_edi_usuario = models.DateField(auto_now=True)
     is_tecnico = models.BooleanField(default=True)
     is_activo = models.BooleanField(default=False)
-    # Correo
-    confirmation_token = models.CharField(max_length=40, blank=True)
     # Correo
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, blank=True, null=True)
@@ -90,14 +88,14 @@ class Paciente(models.Model):
     email_usuario = models.EmailField(max_length=80, blank=False, null=True)
     username_usuario = models.CharField(unique=True, max_length=80, blank=False, null=True)
     celular = models.CharField(max_length=10, blank=False, null=True)
-    contacto_emergencia = models.CharField(max_length=10, blank=False, null=True)
-    fecha_nacimiento = models.DateField()
-    direccion = models.CharField(max_length=100, blank=False, null=True)
+    fecha_nacimiento = models.DateField(null=True, blank=True)
     dni = models.CharField(max_length=10, blank=False, null=True)
     estado_usuario = models.BooleanField(default=True)
     slug_usuario = models.SlugField(unique=True, blank=True)
     fecha_registro_usuario = models.DateField(auto_now_add=False, blank=True, null=True)
     fecha_edi_usuario = models.DateField(auto_now=True)
+    contacto_emergencia = models.CharField(max_length=10, blank=False, null=True)
+    direccion = models.CharField(max_length=100, blank=False, null=True)
     is_paciente = models.BooleanField(default=True)
     is_activo = models.BooleanField(default=False)
     user = models.OneToOneField(
@@ -127,14 +125,14 @@ class UsuarioComun(models.Model):
     email_usuario = models.EmailField(max_length=80, blank=False, null=True)
     username_usuario = models.CharField(unique=True, max_length=80, blank=False, null=True)
     celular = models.CharField(max_length=10, blank=False, null=True)
-    fecha_nacimiento = models.DateField()
-    genero = models.CharField(max_length=100, blank=False, null=True)
-    area_estudio = models.CharField(max_length=100, blank=False, null=True)
+    fecha_nacimiento = models.DateField(null=True, blank=True)
     dni = models.CharField(max_length=10, blank=False, null=True)
     estado_usuario = models.BooleanField(default=True)
     slug_usuario = models.SlugField(unique=True, blank=True)
     fecha_registro_usuario = models.DateField(auto_now_add=False, blank=True, null=True)
     fecha_edi_usuario = models.DateField(auto_now=True)
+    genero = models.CharField(max_length=100, blank=False, null=True)
+    area_estudio = models.CharField(max_length=100, blank=False, null=True)
     is_comun = models.BooleanField(default=True)
     is_activo = models.BooleanField(default=False)
     user = models.OneToOneField(
@@ -237,7 +235,7 @@ class ContenidoIndividual(models.Model):
     fecha_registro_individual = models.DateField(auto_now_add=False, blank=True, null=True)
     fecha_edicion_individual = models.DateField(auto_now=True)
     nivel = models.CharField(max_length=80, blank=False, null=True)
-    estado_contenido_individual = models.BooleanField(default=True)
+    estado_contenido_i = models.BooleanField(default=True)
     slug_contenido_individual = models.SlugField(max_length=250, unique=True, blank=True)
     tipo_contenido = models.CharField(max_length=80, blank=False, null=True)
     contenido_individual = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
@@ -272,6 +270,18 @@ class ContenidoIndividual(models.Model):
     def __str__(self):
         return f"Descripción : {self.descripcion_individual}"
     
+
+class AlmacenActividad(models.Model):
+    # Para seleccion de con imagenes
+    contenido_individual = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
+    imagen1 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
+    imagen2 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
+    imagen3 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
+    imagen4 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
+    imagen5 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
+    # Foranea
+    actividad = models.ForeignKey(ContenidoIndividual, on_delete=models.CASCADE, blank=True, null=True)
+
 # MODELO DE RESULTADO
 class Resultado(models.Model):
     respuesta = models.TextField(blank=False, null=True)
