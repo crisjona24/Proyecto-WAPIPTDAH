@@ -584,12 +584,14 @@ export function FormularioPeticion() {
         //Flujo normal
         setHabilitado(true);
         try {
-            const formData = new FormData(); // Crear un objeto FormData
-            formData.append('motivo', motivo);
-            formData.append('peticion_cuerpo', peticion_cuerpo);
-            formData.append('tipo', tipo);
+            // Obtenemos los datos
+            const datos__post = {
+                motivo,
+                tipo,
+                peticion_cuerpo
+            };
             // Realizar la petición POST al servidor
-            await guardar(formData);
+            await guardar(datos__post);
         } catch (error) {
             if (error.message === "NOT_AUTHENTICATED") {
                 navigate('/login');
@@ -601,9 +603,9 @@ export function FormularioPeticion() {
     };
 
     // Funcion para guardar 
-    const guardar = async (formData) => {
+    const guardar = async (datos__post) => {
         try {
-            const response = await CrearPeticion(formData);
+            const response = await CrearPeticion(datos__post);
             if (response.data.success) {
                 // Redireccionar a la página principal si el inicio de sesión es exitoso
                 Swal.fire("Peticion registrada correctamente", "", "success");
@@ -954,7 +956,7 @@ export function FormularioPeticionRevision() {
             {error && <span>{error}</span>}
             <div className="form-group">
                 <label className='label' htmlFor="veredicto">Ingrese la decisión de la revisión :</label>
-                <textarea className='form-control w-100' placeholder="Ingrese la decisión**" id="veredicto"
+                <textarea className='form-control w-100 tamanio-text-area' placeholder="Ingrese la decisión**" id="veredicto"
                     name="veredicto" value={vereficto} onChange={e => setVeredicto(e.target.value)}
                     cols="30" rows="20" autoFocus>
 

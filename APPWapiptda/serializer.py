@@ -60,6 +60,14 @@ class ContenidIndividualSerializer(serializers.ModelSerializer):
                   'portada_individual', 'nivel', 'tipo_contenido', 'contenido_individual', 'imagen1', 'contenido',
                   'imagen2', 'imagen3', 'imagen4', 'imagen5', 'fecha_registro_individual')
 
+
+# Clase de serialización para las actividades registrados en el sistema
+class AlmacenActividadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AlmacenActividad
+        fields = ('id', 'contenido_individual', 'imagen1', 'imagen2', 'imagen3', 
+                  'imagen4', 'imagen5', 'actividad', 'fecha_registro', 'fecha_edicion')
+
 # Clase de serialización para los registros de resultados de las actividades
 # se añaden los datos del paciente y la actividad
 class ResultadoSerializer(serializers.ModelSerializer):

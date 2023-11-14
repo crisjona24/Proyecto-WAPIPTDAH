@@ -444,7 +444,41 @@ def numero_de_niveles():
     except GradoTDAH.DoesNotExist:
         return 0
 
+def numero_de_dominios():
+    try:
+        return Dominio.objects.all().count()
+    except Dominio.DoesNotExist:
+        return 0
+
+# METODO PARA DEVOLVER EL CONTADOR DE NIVELES
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def api_nivel_contador(request):
+    if request.user.is_authenticated:
+        try:
+            # Decodifica el token para obtener el usuario
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            # Validamos si el usuario es tecnico
+            if is_tecnico(user):
+                # Verificar si el usuario existe
+                if request.method == 'GET' and user:
+                    # Contamos el numero de niveles
+                    contador = numero_de_niveles()
+                    # Contamos el numero de dominios
+                    contador_dominios = numero_de_dominios()
+                    return JsonResponse({'success': True, 'contador': contador, 'dominioc': contador_dominios})
+                else:
+                    return JsonResponse({'error': 'No esta permitido'})
+            else:
+                return JsonResponse({'error': 'El usuario no esta autenticado'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)})
+    else:
+        return JsonResponse({'error': 'El usuario no esta autenticado'})
  
+
 # METODO DE REGISTRO DE DOMINIO
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
@@ -522,7 +556,9 @@ def control_categorias():
         # Buscamos el numero_categorias de los niveles
         numero_categorias_ = 0
         for grado in grado__ob:
-            numero_categorias_ = grado.numero_categorias
+            # Capturamos siempre el mayor numero de categorias
+            if grado.numero_categorias > numero_categorias_:
+                numero_categorias_ = grado.numero_categorias
         # Buscamos el numero de dominios registrados
         dominiio_ob = Dominio.objects.all()
         numero_dominios_ = dominiio_ob.count()
@@ -840,27 +876,30 @@ def nombreCurso_exist(ob1):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def api_curso_inscripcion(request, id):
-    try:
-         # Verificar existencia de token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        #user = get_user_from_token(token)
-        if is_paciente(user):
-            # Encontrar el paciente del user
-            paciente__ob = Paciente.objects.get(user=user)
-            # Encontrar el curso en base al id
-            curso__ob = Curso.objects.get(id=id)
-            # Verificar si el curso existe
-            if curso__ob:
-                # Creamos el detalle de inscripcion
-                if guardar_inscripcion(paciente__ob, curso__ob):
-                    return JsonResponse({'success': True})
-                else:
-                    return JsonResponse({'error': 'No pudo inscribirse'}, status=500)
-        else:
-            return JsonResponse({'errorSalida': 'El usuario no esta autenticado'}, status=401)
-    except Exception as e:
-        return JsonResponse({'errorSalida': str(e)}, status=500)
+    if request.user.is_authenticated:
+        try:
+            # Verificar existencia de token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            #user = get_user_from_token(token)
+            if is_paciente(user):
+                # Encontrar el paciente del user
+                paciente__ob = Paciente.objects.get(user=user)
+                # Encontrar el curso en base al id
+                curso__ob = Curso.objects.get(id=id)
+                # Verificar si el curso existe
+                if curso__ob:
+                    # Creamos el detalle de inscripcion
+                    if guardar_inscripcion(paciente__ob, curso__ob):
+                        return JsonResponse({'success': True})
+                    else:
+                        return JsonResponse({'error': 'No pudo inscribirse'}, status=500)
+            else:
+                return JsonResponse({'errorSalida': 'El usuario no esta autenticado'}, status=401)
+        except Exception as e:
+            return JsonResponse({'errorSalida': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
 def guardar_inscripcion(ob1, ob2):
     try:
@@ -893,9 +932,13 @@ def api_peticion_register(request):
                 usuario__ob = UsuarioComun.objects.get(user=user)
                 # Verificar si el usuario existe
                 if request.method == 'POST' and usuario__ob:
-                    motivo_peticion_ = request.POST.get('motivo')
-                    tipo_peticion_ = request.POST.get('tipo')
-                    peticion_cuerpo_ = request.POST.get('peticion_cuerpo')
+                    data = json.loads(request.body)
+                    motivo_peticion_ = data.get('motivo')
+                    tipo_peticion_ = data.get('tipo')
+                    peticion_cuerpo_ = data.get('peticion_cuerpo')
+                    # Verificar envios de correo
+                    if not enviar_correo_peticion(usuario__ob):
+                        return JsonResponse({'error': 'No se pudo notificar adecuadamente a los técnicos. Vuelve a intentarlo.'})
                     # Creamos el contenido
                     if guardar_peticion(motivo_peticion_, tipo_peticion_, peticion_cuerpo_, usuario__ob):
                     # Actualizamos el contador
@@ -932,7 +975,35 @@ def guardar_peticion(ob1, ob2, ob3, ob4):
     except Exception as e:
         return False
 
-
+def enviar_correo_peticion(ob1):
+    try:
+        # Obtenemos el nombre de usuario y appellido del usuario comun
+        nombre_u = ob1.nombre_usuario
+        apellido_u = ob1.apellido_usuario
+        # Obtener los correos de usuarios tecnico
+        tecnico__ob = Usuario.objects.all()
+        for tecnico in tecnico__ob:
+            correo = tecnico.user.email
+            # Email
+            subject = 'Registro de peticiones en WAPIPTDAH'
+            message = f'Reciba un cordial saludo de los administradores de WAPIPTDAH. ' \
+                f'\nRecibimos el registro de nuevas peticiones por parte del usuario: {nombre_u} {apellido_u}. ' \
+                f'\nEste es un mensaje para notificar la existencia de nuevas actividades. ' \
+                f'\n\n' \
+                f'\nSe recomeinda de la manera mas comedida atender a las peticiones existenes.'\
+                f'\n\n' \
+                f'\nGracias por preferirnos como su sitio de trabajo. !Hasta pronto¡ ' \
+                f'\n' \
+                f'\nAtentamente: WAPIPTDAH.'
+            from_email = settings.EMAIL_HOST_USER
+            receiver_email = [correo]
+            # Envio del correo
+            send_mail(subject, message, from_email, receiver_email, fail_silently=False)
+        # Enviamos una respuesta al front
+        return True
+    except Exception as e:
+        print(f"Error enviando el correo: {e}")
+        return False
 
 
 # METODO DE REGISTRO DE RESULTADO
@@ -1297,27 +1368,30 @@ def nombresala_exist_edicion(ob1, ob2):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def generar_reporte_resultado(request, id):
-    try: 
-        # Decodifica el token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        # Verificar existencia del usuario
-        if user and token:
-            if request.method == 'GET':
-                id_resultado_ = id
-                # Guardar Reporte
-                if guardar_reporte(id_resultado_, user):
-                    return JsonResponse({'success': True})
+    if request.user.is_authenticated:
+        try: 
+            # Decodifica el token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            # Verificar existencia del usuario
+            if user and token:
+                if request.method == 'GET':
+                    id_resultado_ = id
+                    # Guardar Reporte
+                    if guardar_reporte(id_resultado_, user):
+                        return JsonResponse({'success': True})
+                    else:
+                        error_message = "Error al generar el reporte...."
+                        context = {'error': error_message}
+                        return JsonResponse(context)
                 else:
-                    error_message = "Error al generar el reporte...."
-                    context = {'error': error_message}
-                    return JsonResponse(context)
+                    return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
             else:
-                return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
-        else:
-            return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
-    except Exception as e:
-        return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+                return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
+        except Exception as e:
+            return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+    else:
+        return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
 
 def guardar_reporte(ob1, ob2):
     try:
@@ -1355,80 +1429,83 @@ def guardar_reporte(ob1, ob2):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def generar_reporte_all(request):
-    try: 
-        # Decodifica el token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        # Verificar existencia del usuario
-        if user and token:
-            # Verificar que sea usuario comun
-            if (is_comun(user)):
-                if request.method == 'POST':
-                    # Obtener el valor del nombre del paciente
-                    data = json.loads(request.body)
-                    nombre_paciente_ = data.get('nombre')
-                    cedula_ = data.get('cedula')
-                    # Verificar si es por nombre o cedula
-                    if nombre_paciente_:
-                        # Obtener el nombre y apellido del paciente de nombre_paciente
-                        nombres_apellido = nombre_paciente_.split(' ')
-                        # Verificar cuantos valores existen separados por un espacio
-                        # Mayor o igual a 1
-                        if len(nombres_apellido) <= 3:
-                            error_message = "El nombre del paciente no es válido."
-                            print("Mequede aqui")
-                            context = {'error': error_message}
-                            return JsonResponse(context)
-                        elif len(nombres_apellido) == 4:
-                            nombre = nombres_apellido[0] + " " + nombres_apellido[1]
-                            apellido = nombres_apellido[2] + " " + nombres_apellido[3]
+    if request.user.is_authenticated:
+        try: 
+            # Decodifica el token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            # Verificar existencia del usuario
+            if user and token:
+                # Verificar que sea usuario comun
+                if (is_comun(user)):
+                    if request.method == 'POST':
+                        # Obtener el valor del nombre del paciente
+                        data = json.loads(request.body)
+                        nombre_paciente_ = data.get('nombre')
+                        cedula_ = data.get('cedula')
+                        # Verificar si es por nombre o cedula
+                        if nombre_paciente_:
+                            # Obtener el nombre y apellido del paciente de nombre_paciente
+                            nombres_apellido = nombre_paciente_.split(' ')
+                            # Verificar cuantos valores existen separados por un espacio
+                            # Mayor o igual a 1
+                            if len(nombres_apellido) <= 3:
+                                error_message = "El nombre del paciente no es válido."
+                                print("Mequede aqui")
+                                context = {'error': error_message}
+                                return JsonResponse(context)
+                            elif len(nombres_apellido) == 4:
+                                nombre = nombres_apellido[0] + " " + nombres_apellido[1]
+                                apellido = nombres_apellido[2] + " " + nombres_apellido[3]
+                            else:
+                                error_message = "El nombre del paciente no es válido."
+                                print("Mequede aqui x2")
+                                context = {'error': error_message}
+                                return JsonResponse(context)
+                            # Validar entradas validas
+                            if not validar_nombres(nombre, apellido):
+                                error_message = "El nombre del paciente no es válido."
+                                context = {'error': error_message}
+                                return JsonResponse(context)
                         else:
-                            error_message = "El nombre del paciente no es válido."
-                            print("Mequede aqui x2")
+                            # Obtener el usuario paciente por medio de la cédula
+                            if Paciente.objects.filter(dni=cedula_).exists():
+                                ob_paciente = Paciente.objects.get(dni=cedula_)
+                                # Obtenemos el nombre y apellido
+                                nombre = ob_paciente.nombre_usuario
+                                apellido = ob_paciente.apellido_usuario
+                            else:
+                                error_message = "El paciente no existe con esa cédula. No se puede generar reportes."
+                                context = {'error': error_message}
+                                return JsonResponse(context)
+                        # Ejecutamos
+                        if not verificar_paciente_curso(nombre, apellido, user):
+                            error_message = "El estudiante no se encuentra inscrito en un curso o no existe."
                             context = {'error': error_message}
                             return JsonResponse(context)
-                        # Validar entradas validas
-                        if not validar_nombres(nombre, apellido):
-                            error_message = "El nombre del paciente no es válido."
-                            context = {'error': error_message}
+        
+                        if not verificar_resultado_estado(nombre, apellido):
+                            error_message = "El estudiante no tiene resultados con observación registrada. Verifica."
+                            context = {'resultado': error_message}
                             return JsonResponse(context)
-                    else:
-                        # Obtener el usuario paciente por medio de la cédula
-                        if Paciente.objects.filter(dni=cedula_).exists():
-                            ob_paciente = Paciente.objects.get(dni=cedula_)
-                            # Obtenemos el nombre y apellido
-                            nombre = ob_paciente.nombre_usuario
-                            apellido = ob_paciente.apellido_usuario
+                        # Guardar Reporte
+                        if Reporte_general_Nombre(nombre, apellido, user):
+                            return JsonResponse({'success': True})
                         else:
-                            error_message = "El paciente no existe con esa cédula. No se puede generar reportes."
+                            error_message = "No es posibles generar el reporte...."
                             context = {'error': error_message}
                             return JsonResponse(context)
-                    # Ejecutamos
-                    if not verificar_paciente_curso(nombre, apellido, user):
-                        error_message = "El estudiante no se encuentra inscrito en un curso o no existe."
-                        context = {'error': error_message}
-                        return JsonResponse(context)
-    
-                    if not verificar_resultado_estado(nombre, apellido):
-                        error_message = "El estudiante no tiene resultados con observación registrada. Verifica."
-                        context = {'resultado': error_message}
-                        return JsonResponse(context)
-                    # Guardar Reporte
-                    if Reporte_general_Nombre(nombre, apellido, user):
-                        return JsonResponse({'success': True})
+                    
                     else:
-                        error_message = "No es posibles generar el reporte...."
-                        context = {'error': error_message}
-                        return JsonResponse(context)
-                
+                        return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
                 else:
-                    return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
+                    return JsonResponse({'error': 'El usuario no ha autenticado'})
             else:
-                return JsonResponse({'error': 'El usuario no ha autenticado'})
-        else:
-            return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
-    except Exception as e:
-        return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+                return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
+        except Exception as e:
+            return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+    else:
+        return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
 
 
 def verificar_paciente_curso(ob1, ob2, ob3):
@@ -1487,101 +1564,104 @@ def Reporte_general_Nombre(ob1, ob2, ob3):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def contenido_individual(request, slug):
-    try:
-        # Decodifica el token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        #user = get_user_from_token(token)
-        if (user and token):
-            # Obtenemos los objetos de Contenido
-            contenidoI__ob = ContenidoIndividual.objects.get(
-                slug_contenido_individual=slug)
-            contenido__ob = contenidoI__ob.contenido
-            # obtenemos la url de contenido
-            if contenidoI__ob.contenido_individual:
-                # Variable contenedor
-                contenedor = ""
-                url__contenido = cloudinary.CloudinaryImage(
-                    contenidoI__ob.contenido_individual.name).build_url()
-                # Obtener los valores requeridos
-                nombre__contenido = contenido__ob.nombre
-                descripcion__contenido = contenidoI__ob.descripcion_individual
-                identificador = contenidoI__ob.identificador_individual
-                valor_respuesta = contenidoI__ob.respuesta
-                # Obtener el tipo de contenido
-                tipo__contenido = contenido__ob.dominio_tipo
-                # Comprobar si existe una sola descripcion o varias
-                if comprobar_separacion_coma(descripcion__contenido):
-                    descripcion_separada = descripcion__contenido.split(', ')
-                    descripcion__contenido = descripcion_separada
-                else:
-                    descripcion__contenido = descripcion__contenido
-                # Comprobar si existe una sola respuesta o varias
-                if comprobar_separacion_coma(valor_respuesta):
-                    valores_separados = valor_respuesta.split(', ')
-                    valores_separados = [valor.capitalize()
-                                         for valor in valores_separados]
-                    contenedor = valores_separados
-                    context = {'url__contenido': url__contenido, 'contenedor': contenedor,
-                               'nombre__contenido': nombre__contenido, 'descripcion__contenido': descripcion__contenido, 'identificador': identificador,
-                               'tipo__contenido': tipo__contenido, 'slug': slug}
-                else:
-                    contenedor = valor_respuesta
-                    context = {'url__contenido': url__contenido, 'contenedor': contenedor,
-                               'nombre__contenido': nombre__contenido, 'descripcion__contenido': descripcion__contenido, 'identificador': identificador,
-                               'tipo__contenido': tipo__contenido, 'slug': slug}
+    if request.user.is_authenticated:
+        try:
+            # Decodifica el token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            #user = get_user_from_token(token)
+            if (user and token):
+                # Obtenemos los objetos de Contenido
+                contenidoI__ob = ContenidoIndividual.objects.get(
+                    slug_contenido_individual=slug)
+                contenido__ob = contenidoI__ob.contenido
+                # obtenemos la url de contenido
+                if contenidoI__ob.contenido_individual:
+                    # Variable contenedor
+                    contenedor = ""
+                    url__contenido = cloudinary.CloudinaryImage(
+                        contenidoI__ob.contenido_individual.name).build_url()
+                    # Obtener los valores requeridos
+                    nombre__contenido = contenido__ob.nombre
+                    descripcion__contenido = contenidoI__ob.descripcion_individual
+                    identificador = contenidoI__ob.identificador_individual
+                    valor_respuesta = contenidoI__ob.respuesta
+                    # Obtener el tipo de contenido
+                    tipo__contenido = contenido__ob.dominio_tipo
+                    # Comprobar si existe una sola descripcion o varias
+                    if comprobar_separacion_coma(descripcion__contenido):
+                        descripcion_separada = descripcion__contenido.split(', ')
+                        descripcion__contenido = descripcion_separada
+                    else:
+                        descripcion__contenido = descripcion__contenido
+                    # Comprobar si existe una sola respuesta o varias
+                    if comprobar_separacion_coma(valor_respuesta):
+                        valores_separados = valor_respuesta.split(', ')
+                        valores_separados = [valor.capitalize()
+                                            for valor in valores_separados]
+                        contenedor = valores_separados
+                        context = {'url__contenido': url__contenido, 'contenedor': contenedor,
+                                'nombre__contenido': nombre__contenido, 'descripcion__contenido': descripcion__contenido, 'identificador': identificador,
+                                'tipo__contenido': tipo__contenido, 'slug': slug}
+                    else:
+                        contenedor = valor_respuesta
+                        context = {'url__contenido': url__contenido, 'contenedor': contenedor,
+                                'nombre__contenido': nombre__contenido, 'descripcion__contenido': descripcion__contenido, 'identificador': identificador,
+                                'tipo__contenido': tipo__contenido, 'slug': slug}
 
-                # Determinar el tipo de contenido y renderizar la plantilla adeacuada al tipo
-                if (contenidoI__ob.tipo_contenido == 'selecion_individual'):
-                    context.update({'tipo': 'selecion_individual'})
-                    return JsonResponse(context)
-                elif (contenidoI__ob.tipo_contenido == 'verdadero_falso'):
-                    context.update({'tipo': 'verdadero_falso'})
-                    return JsonResponse(context)
-                elif (contenidoI__ob.tipo_contenido == 'selecion_multiple'):
-                    context.update({'tipo': 'selecion_multiple'})
-                    return JsonResponse(context)
-                elif (contenidoI__ob.tipo_contenido == 'seleccionar_imagen'):
-                    url_c1 = cloudinary.CloudinaryImage(contenidoI__ob.imagen1.name).build_url()
-                    url_c2 = cloudinary.CloudinaryImage(contenidoI__ob.imagen2.name).build_url()
-                    url_c3 = cloudinary.CloudinaryImage(contenidoI__ob.imagen3.name).build_url()
-                    url_c4 = cloudinary.CloudinaryImage(contenidoI__ob.imagen4.name).build_url()
-                    url_c5 = cloudinary.CloudinaryImage(contenidoI__ob.imagen5.name).build_url()
-                    context.update({'tipo': 'seleccionar_imagen', 'url_c1': url_c1, 
-                                    'url_c2': url_c2, 'url_c3': url_c3, 'url_c4': url_c4, 'url_c5': url_c5})
-                    return JsonResponse(context)
-                elif (contenidoI__ob.tipo_contenido == 'responder_preguntas'):
-                    context.update({'tipo': 'responder_preguntas'})
-                    return JsonResponse(context)
-                elif (contenidoI__ob.tipo_contenido == 'pintar_imagen'):
-                    url_c1 = cloudinary.CloudinaryImage(contenidoI__ob.imagen1.name).build_url()
-                    context.update({'tipo': 'pintar_imagen', 'url_c1': url_c1})
-                    return JsonResponse(context)
-                elif (contenidoI__ob.tipo_contenido == 'cuento'):
-                    context.update({'tipo': 'cuento'})
-                    return JsonResponse(context)
-                elif (contenidoI__ob.tipo_contenido == 'selecion_multiple_img'):
-                    url_c1 = cloudinary.CloudinaryImage(contenidoI__ob.imagen1.name).build_url()
-                    url_c2 = cloudinary.CloudinaryImage(contenidoI__ob.imagen2.name).build_url()
-                    url_c3 = cloudinary.CloudinaryImage(contenidoI__ob.imagen3.name).build_url()
-                    context.update({'tipo': 'selecion_multiple_img', 'url_c1': url_c1, 'url_c2': url_c2, 'url_c3': url_c3})
-                    return JsonResponse(context)
+                    # Determinar el tipo de contenido y renderizar la plantilla adeacuada al tipo
+                    if (contenidoI__ob.tipo_contenido == 'selecion_individual'):
+                        context.update({'tipo': 'selecion_individual'})
+                        return JsonResponse(context)
+                    elif (contenidoI__ob.tipo_contenido == 'verdadero_falso'):
+                        context.update({'tipo': 'verdadero_falso'})
+                        return JsonResponse(context)
+                    elif (contenidoI__ob.tipo_contenido == 'selecion_multiple'):
+                        context.update({'tipo': 'selecion_multiple'})
+                        return JsonResponse(context)
+                    elif (contenidoI__ob.tipo_contenido == 'seleccionar_imagen'):
+                        url_c1 = cloudinary.CloudinaryImage(contenidoI__ob.imagen1.name).build_url()
+                        url_c2 = cloudinary.CloudinaryImage(contenidoI__ob.imagen2.name).build_url()
+                        url_c3 = cloudinary.CloudinaryImage(contenidoI__ob.imagen3.name).build_url()
+                        url_c4 = cloudinary.CloudinaryImage(contenidoI__ob.imagen4.name).build_url()
+                        url_c5 = cloudinary.CloudinaryImage(contenidoI__ob.imagen5.name).build_url()
+                        context.update({'tipo': 'seleccionar_imagen', 'url_c1': url_c1, 
+                                        'url_c2': url_c2, 'url_c3': url_c3, 'url_c4': url_c4, 'url_c5': url_c5})
+                        return JsonResponse(context)
+                    elif (contenidoI__ob.tipo_contenido == 'responder_preguntas'):
+                        context.update({'tipo': 'responder_preguntas'})
+                        return JsonResponse(context)
+                    elif (contenidoI__ob.tipo_contenido == 'pintar_imagen'):
+                        url_c1 = cloudinary.CloudinaryImage(contenidoI__ob.imagen1.name).build_url()
+                        context.update({'tipo': 'pintar_imagen', 'url_c1': url_c1})
+                        return JsonResponse(context)
+                    elif (contenidoI__ob.tipo_contenido == 'cuento'):
+                        context.update({'tipo': 'cuento'})
+                        return JsonResponse(context)
+                    elif (contenidoI__ob.tipo_contenido == 'selecion_multiple_img'):
+                        url_c1 = cloudinary.CloudinaryImage(contenidoI__ob.imagen1.name).build_url()
+                        url_c2 = cloudinary.CloudinaryImage(contenidoI__ob.imagen2.name).build_url()
+                        url_c3 = cloudinary.CloudinaryImage(contenidoI__ob.imagen3.name).build_url()
+                        context.update({'tipo': 'selecion_multiple_img', 'url_c1': url_c1, 'url_c2': url_c2, 'url_c3': url_c3})
+                        return JsonResponse(context)
 
+                else:
+                    error_message = "No existe contenido"
+                    context = {
+                        'errorNormal': error_message, 'slug': slug
+                    }
+                    return JsonResponse(context, status=404)
             else:
-                error_message = "No existe contenido"
-                context = {
-                    'errorNormal': error_message, 'slug': slug
-                }
-                return JsonResponse(context, status=404)
-        else:
-            return JsonResponse({'errorSalida': 'El usuario no esta autenticado'}, status=401)
-    except ContenidoIndividual.DoesNotExist:
-        error = "No existe contenido"
-        contexto_dos = {'errorNormal': error, 'slug': slug}
-        return JsonResponse(contexto_dos, status=404)
+                return JsonResponse({'errorSalida': 'El usuario no esta autenticado'}, status=401)
+        except ContenidoIndividual.DoesNotExist:
+            error = "No existe contenido"
+            contexto_dos = {'errorNormal': error, 'slug': slug}
+            return JsonResponse(contexto_dos, status=404)
 
-    except Exception as e:
-        return JsonResponse({'errorSalida':'Ups, Algo salió mal'}, status=500)
+        except Exception as e:
+            return JsonResponse({'errorSalida':'Ups, Algo salió mal'}, status=500)
+    else:
+        return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
 
 

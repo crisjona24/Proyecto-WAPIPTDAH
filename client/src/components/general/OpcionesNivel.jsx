@@ -5,14 +5,42 @@ import { Button } from 'react-bootstrap';
 // Componentes
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faPencil, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 // Metodos
-import { NivelEliminar } from "../../api/grado.api";
+import { NivelEliminar, VerificarNumeronivel, NivelListado } from "../../api/grado.api";
 
 
 export function OpcionesTecnico({ nivel }) {
+    const navigate = useNavigate();
+    // Controlamos el numero de niveles para la operacion de eliminación
+    const [nmrNivel, setNmrNivel] = useState([]);
+    // Método de ejecución
+    const obtenerContador = async () => {
+        try {
+            // Obtenemos la respuesta
+            const respuesta = await VerificarNumeronivel();
+            // Actualizamos el estado
+            if (respuesta.data.success) {
+                setNmrNivel(respuesta);
+            } else {
+                Swal.fire("Error", respuesta.data.error, "error");
+            }
+        } catch (err) {
+            if (err.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
+            } else {
+                navigate('/login');
+            }
+        }
+    }
+
+    useEffect(() => {
+        obtenerContador();
+    }, [nivel]);
+
     return (
         <div className="contenedor-opciones__nivel d-flex flex-column justify-content-between">
             <ul>
@@ -37,9 +65,15 @@ export function OpcionesTecnico({ nivel }) {
                                     confirmButtonText: 'Sí, eliminar',
                                 }).then(async (result) => {
                                     if (result.isConfirmed) {
-                                        await NivelEliminar(nivel.id);
-                                        Swal.fire("Eliminación exitosa", "", "success");
-                                        navigate('/nivel/all');
+                                        // Verificamos el número de niveles y dominios
+                                        if (nmrNivel.data.contador >= 1 && nmrNivel.data.dominioc > 0) {
+                                            Swal.fire("Error", "No se puede eliminar el nivel, por las restriciones del usuario.", "error");
+                                            return;
+                                        } else if (nmrNivel.data.dominioc === 0) {
+                                            await NivelEliminar(nivel.id);
+                                            Swal.fire("Eliminación exitosa", "", "success");
+                                            navigate('/nivel/all');
+                                        }
                                     }
                                 })
                             }}

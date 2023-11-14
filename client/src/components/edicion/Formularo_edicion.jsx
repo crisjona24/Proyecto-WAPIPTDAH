@@ -25,6 +25,7 @@ export function FormularioEdicionNivel() {
     let { slug } = useParams();
     const token = localStorage.getItem('token');
     const [datos, setDatos] = useState([]);
+    const [niveles, setNiveles] = useState([]);
     const [nombre_nivel, setNombre] = useState("");
     const [descripcion_grado, setDescripcion] = useState("");
     const [numero_categorias, setNumeroCategorias] = useState(0);
@@ -59,6 +60,17 @@ export function FormularioEdicionNivel() {
                 navigate('/login');
             } else {
                 mostrarError('Error al mostrar datos de nivel');
+            }
+        }
+    }
+
+    const obtenerNiveles = async () => {
+        try {
+            const niveles = await NivelListado();
+            setNiveles(niveles.data);
+        } catch (error) {
+            if (error.message === "NOT_AUTHENTICATED") {
+                navigate('/login');
             }
         }
     }

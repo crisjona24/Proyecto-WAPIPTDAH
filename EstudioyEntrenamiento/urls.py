@@ -67,6 +67,7 @@ urlpatterns = [
 
     ########### Verificaciones
     path('verificar/nivel/<str:slug>/', verificar_nivel, name='verificar_nivel'),
+    path('verificar/numero/niveles/', api_nivel_contador, name='verificar-contador'),
     path('verificar/dominio/<str:slug>/', verificar_dominio, name='verificar_dominio'),
     path('verificar/contenido/<str:slug>/', verificar_contenido, name='verificar_contenido'),
     path('verificar/curso/<str:slug>/', verificar_curso, name='verificar-curso'),

@@ -85,6 +85,13 @@ class ContenidoIndividualView(viewsets.ModelViewSet):
     pagination_class = Paginacion2
 
 
+# PROTECCION CON JWT
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+class AlmacenActividadView(viewsets.ModelViewSet):
+    queryset = AlmacenActividad.objects.all().order_by('id')
+    serializer_class = AlmacenActividadSerializer
+
 ##### Lista de contenido individual registrado en el sistema
 ##### sin paginacion
 # PROTECCION CON JWT
@@ -94,7 +101,7 @@ class ContenidoIndividualTodoView(viewsets.ModelViewSet):
     queryset = ContenidoIndividual.objects.all().order_by('-id')
     serializer_class = ContenidIndividualSerializer
 
-##### Lista de contenido individual registrado en el sistema
+##### Lista de resultados registrado en el sistema
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -104,7 +111,7 @@ class ResultadoView(viewsets.ModelViewSet):
     pagination_class = Paginacion
 
 
-##### Lista de contenido individual registrado en el sistema
+##### Lista de resultados registrado en el sistema
 # PROTECCION CON JWT
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])

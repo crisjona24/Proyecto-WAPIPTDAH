@@ -159,3 +159,21 @@ export const EnviarCorreo = async (datos__post) => {
         throw new Error("No se pudo enviar el correo: " + error.message);
     }
 }
+
+
+// Verificación de la existencia de un registro de nivel
+export const VerificarNumeronivel= async () => {
+    const tokenLocal = localStorage.getItem('token');
+    if (!tokenLocal) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.get('wapiptdah/estudio/verificar/numero/niveles/', {
+            headers: {
+                'Authorization': `Bearer ${tokenLocal}`
+            }
+        });
+    } catch (error) {
+        throw new Error("No se puede verificar el nivel: " + error.message);
+    }
+}

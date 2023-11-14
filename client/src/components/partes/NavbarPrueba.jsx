@@ -380,6 +380,7 @@ export function Navbar_C() {
                         <FontAwesomeIcon icon={faPenNib} style={{ marginRight: '4%' }} />
                         Peticiones
                     </Link>
+                    
                 </li>
                 <li>
                     <a href="#salas" data-toggle="collapse" aria-expanded={expandedMenu === 'salas'}

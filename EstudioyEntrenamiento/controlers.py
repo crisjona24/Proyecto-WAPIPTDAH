@@ -174,7 +174,7 @@ class PeticionUCListView(generics.ListAPIView):
     serializer_class = PeticionSerializer
     pagination_class = Paginacion
     def get_queryset(self):
-        return Peticion.objects.filter(usuario_comun=self.kwargs['id'], estado_revision=True)
+        return Peticion.objects.filter(usuario_comun=self.kwargs['id'])
 
 
 ##### Listado de pacientes pertenecientes a un curso especifio mediante

@@ -279,6 +279,8 @@ class AlmacenActividad(models.Model):
     imagen3 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
     imagen4 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
     imagen5 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
+    fecha_registro = models.DateField(auto_now_add=False, blank=True, null=True)
+    fecha_edicion = models.DateField(auto_now=True)
     # Foranea
     actividad = models.ForeignKey(ContenidoIndividual, on_delete=models.CASCADE, blank=True, null=True)
 

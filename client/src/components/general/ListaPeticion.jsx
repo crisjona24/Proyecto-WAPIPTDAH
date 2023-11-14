@@ -326,10 +326,31 @@ export function ListaPeticionesUsuario({ peticiones, page, setPage, numeroPag })
                                                 <tr key={peticion.id}>
                                                     <td>
                                                         <ul className="action-list">
-                                                            <Link to={`/ver/peticion/${peticion.id}/`} className="btn btn-success h" title="Ver petición"
-                                                                style={{ marginLeft: '10%' }}>
+                                                            <Link to={`/ver/peticion/${peticion.id}/`} className="btn btn-success separacion--boton h" title="Ver petición"
+                                                                >
                                                                 <FontAwesomeIcon icon={faEye} />
                                                             </Link>
+                                                            <Button title="Eliminar petición" className="btn btn-danger separacion--boton h"
+                                                                onClick={() => {
+                                                                    Swal.fire({
+                                                                        title: '¿Está seguro que desea eliminar la petición?',
+                                                                        text: "Eliminación de petición",
+                                                                        icon: 'warning',
+                                                                        showCancelButton: true,
+                                                                        confirmButtonColor: '#3085d6',
+                                                                        cancelButtonColor: '#d33',
+                                                                        confirmButtonText: 'Sí, eliminar'
+                                                                    }).then(async (result) => {
+                                                                        if (result.isConfirmed) {
+                                                                            await PeticionEliminar(peticion.id);
+                                                                            Swal.fire("Eliminación exitosa", "", "success");
+                                                                            window.location.reload();
+                                                                        }
+                                                                    })
+                                                                }}
+                                                            >
+                                                                <FontAwesomeIcon icon={faTrash} />
+                                                            </Button>
                                                         </ul>
                                                     </td>
                                                     <td>
