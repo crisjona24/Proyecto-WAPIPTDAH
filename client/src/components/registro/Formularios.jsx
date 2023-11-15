@@ -77,9 +77,9 @@ export function Actividad() {
     return (
         <form onSubmit={handleSubmit}>
             {error && <span>{error}</span>}
-            <div className="form-group">
+            <div className="form-group h-100">
                 <label className='label' htmlFor="actividad">Selecciona su actividad:</label>
-                <select className="form-control w-100" id="actividad"
+                <select className="form-control w-100 h-100" id="actividad"
                     name="actividad" value={actividad} onChange={e => setActividad(e.target.value)}>
                     <option value="none">----</option>
                     <option value="Tecnico">Técnico</option>

@@ -42,12 +42,12 @@ export function OpcionesTecnico({ nivel }) {
     }, [nivel]);
 
     return (
-        <div className="contenedor-opciones__nivel d-flex flex-column justify-content-between">
+        <div className="contenedor-opciones__nivel alineacion_opn">
             <ul>
                 <li>
                     <h3 className="titulo__dato"> Opciones </h3>
                 </li>
-                <div className="LL d-flex flex-row justify-content-between">
+                <div className="LL alineacion_iopn">
                     <li>
                         <Link to={`/nivel/editar/${nivel.slug_grado}/`} className="btn btn-primary"
                             title="Editar nivel"><FontAwesomeIcon icon={faPencil} /></Link>
@@ -94,7 +94,7 @@ export function OpcionesTecnico({ nivel }) {
 export function OpcionesComun({ nivel }) {
     const navigate = useNavigate();
     return (
-        <div className="contenedor-opciones__nivel d-flex flex-column justify-content-between">
+        <div className="contenedor-opciones__nivel alineacion_opn">
             <ul>
                 <li>
                     <h3 className="titulo__dato"> Opciones </h3>
@@ -133,7 +133,7 @@ export function OpcionesComun({ nivel }) {
 
 export function OpcionesPaciente({ nivel }) {
     return (
-        <div className="contenedor-opciones__nivel d-flex flex-column justify-content-between h-100">
+        <div className="contenedor-opciones__nivel alineacion_opn h-100">
             <ul>
                 <li>
                     <h3 className="titulo__dato"> Opciones </h3>

@@ -10,9 +10,9 @@ import { Actividad } from '../../components/registro/Formularios';
 
 export function SeleccionActividad() {
     return (
-        <div style={{ width: '100%', height: '100%' }}>
+        <div style={{ width: '100%' }}>
             <CabeceraRegister />
-            <Container style={{ width: '35%', marginTop: '90px', marginBottom: '90px' }}>
+            <Container style={{ width: '35%', marginTop: '110px', marginBottom: '110px' }}>
                 <Container className='barraSup mt-5' >
                     <Row className='col-md-12'>
                         <div className="card-body col-md-9">

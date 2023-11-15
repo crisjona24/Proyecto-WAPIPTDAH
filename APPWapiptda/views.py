@@ -188,6 +188,16 @@ def validar_nombres(ob1, ob2):
         return False
 
 
+## Validacion del formato del correo en el registro
+def validar_formato_email(ob1):
+    # Expresión regular para verificar que el correo cumpla con el formato deseado
+    # para correos de gmail y del dominio de la UNL
+    formato_valido = re.compile(r'^[a-zA-Z0-9._%+-]+@(gmail\.com|unl\.edu\.ec)$')
+    if formato_valido.match(ob1):
+        return True
+    else:
+        return False
+
 
 ###### METODOS PARA VALIDACIONES DE ROL DE USUARIO #####
 
@@ -964,6 +974,9 @@ def api_user_register(request):
             # Veriicar correo valido
             if not es_correo_valido(email_):
                 return JsonResponse({'correo': 'Correo invalido'})
+            # Verificar formato especificado
+            if not validar_formato_email(email_):
+                return JsonResponse({'correo': 'El formato del correo electrónico no es válido. Debe ser @gmail.com o @unl.edu.ec.'})
             # Validar correo único
             if not correo_unico(email_):
                 return JsonResponse({'correo': 'Correo ya registrado'})
@@ -1050,6 +1063,9 @@ def api_paciente_register(request):
             # Veriicar correo valido
             if not es_correo_valido(email_):
                 return JsonResponse({'correo': 'Correo invalido'})
+            # Verificar formato especificado
+            if not validar_formato_email(email_):
+                return JsonResponse({'correo': 'El formato del correo electrónico no es válido. Debe ser @gmail.com o @unl.edu.ec.'})
             # Validar correo único
             if not correo_unico(email_):
                 return JsonResponse({'correo': 'Correo ya registrado'})
@@ -1138,6 +1154,9 @@ def api_comun_register(request):
             # Veriicar correo valido
             if not es_correo_valido(email_):
                 return JsonResponse({'correo': 'Correo invalido'})
+            # Verificar formato especificado
+            if not validar_formato_email(email_):
+                return JsonResponse({'correo': 'El formato del correo electrónico no es válido. Debe ser @gmail.com o @unl.edu.ec.'})
             # Validar correo único
             if not correo_unico(email_):
                 return JsonResponse({'correo': 'Correo ya registrado'})
