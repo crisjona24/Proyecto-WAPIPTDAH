@@ -540,12 +540,12 @@ def generar_token_unico(longitud=50):
 
 ## Metodo de generacion de token con tiempo de expiracion
 ## El tiempo y el token son controlados por medio de una entidad de 
-#3 recuperacion que avala la validez
+## recuperacion que avala la validez
 def generar_token_tiempo(ob1, tiempo_Exp=60):
     # Calcula la fecha y hora de expiración para ser registrada en el objeto de Recuperación
     expiracion_tiempo = datetime.utcnow() + timedelta(minutes=tiempo_Exp)
     # Crea una instancia de la entidad Recuperacion
-    recuperacion = Recuperacion(usuario=ob1, fecha_creacion=datetime.utcnow(), fecha_limite=expiracion_tiempo)
+    recuperacion = Recuperacion(usuario=ob1, fecha_creacion=datetime.utcnow(), fecha_limite=expiracion_tiempo, tipo='recuperar')
     recuperacion.save()
     # Crea un token único
     token = generar_token_unico()  
@@ -560,6 +560,27 @@ def generar_token_tiempo(ob1, tiempo_Exp=60):
     }
     # Genera el token firmado por medio del tipo de algoritmo HS256
     token = jwt.encode(datos, settings.SECRET_KEY, algorithm='HS256')
+    # Devolvemos el token
+    return token
+
+def generar_token_verificacion(email_, tiempo_Exp=60):
+    # Calcula la fecha y hora de expiración para ser registrada en el objeto de Recuperación
+    expiracion_tiempo = datetime.utcnow() + timedelta(minutes=tiempo_Exp)
+    # Crea una instancia de la entidad Recuperacion
+    verificacion = Verificacion(fecha_creacion=datetime.utcnow(), fecha_limite=expiracion_tiempo, tipo='verificar', correo= email_)
+    verificacion.save()
+    # Crea un token único
+    token = generar_token_unico()  
+    # Asocia el token único con la instancia de Verificacion
+    verificacion.token = token
+    verificacion.save()  # Actualiza el registro con el token
+    # Crea los datos que se incluirán en el token y seran enviado por medio del correo
+    datos = {
+        'token': token,
+        'exp': expiracion_tiempo
+    }
+    # Genera el token firmado por medio del tipo de algoritmo HS256
+    token = jwt.encode(datos, settings.NEW_SECRET_KEY, algorithm='HS256')
     # Devolvemos el token
     return token
 
@@ -605,6 +626,46 @@ def verificar_token_tiempo(token):
         # Token inválido
         return None
 
+## Metodo que permite la verificación de la validez del token enviado al usuario cuando
+## durante el proceso de verificacion de cuenta de usuario
+def verificar_token_verificacion(token):
+    try:
+        # Formateo de tipo de servidor para comparar fechas de limite y registro
+        utc = pytz.timezone('UTC')
+        # Decodifica el token y verifica la firma
+        datos_obtenidos = jwt.decode(token, settings.NEW_SECRET_KEY, algorithms=['HS256'])
+        # Recupera la instancia Verificacion
+        token = datos_obtenidos['token']
+        # Verificar si existe el objeto de Verificacion
+        if not entidad_V_existe(token):
+            return None
+        # Obtenemos los datos del objeto Recuperacion asociado
+        ob_verificacion = Verificacion.objects.filter(token=token).first()
+        fecha_obtenida = ob_verificacion.fecha_limite
+        # Parseamos
+        fecha_obtenida = fecha_obtenida.replace(microsecond=0, tzinfo=utc)
+        # Comprueba si el token ha expirado
+        fecha_actual = datetime.utcnow()
+        fecha_actual = datetime.utcnow().replace(tzinfo=utc, microsecond=0)
+        # Comparamos
+        if fecha_actual > fecha_obtenida:
+            return None
+        if ob_verificacion.esta_vencido():
+            return None
+        
+        # Devuelve el usuario y la instancia de Verificacion
+        if ob_verificacion:
+            return ob_verificacion
+        else:
+            return None
+    except jwt.ExpiredSignatureError:
+        # Token expirado
+        return None
+    except jwt.DecodeError:
+        # Token inválido
+        return None
+
+
 ## Método para verificar que el objeto de Recuperacion exista o no
 ## caso contrario se evitara cualquier acción
 def entidad_R_existe(ob1, ob2):
@@ -614,19 +675,27 @@ def entidad_R_existe(ob1, ob2):
     except Recuperacion.DoesNotExist:
         return False
 
+
+def entidad_V_existe(ob1):
+    try:
+        if Verificacion.objects.filter(token=ob1).exists():
+            return True
+    except Verificacion.DoesNotExist:
+        return False
+
 ## Envio de correo de recuperacion de cuenta de usuario
 ## se envia un correo con un token firmado con un limite de tiempo
 ## Envio de correo para verifiacion de cuenta
-def validar_correo_recuperacion(_email):
+def validar_correo_verificacion(_email):
     try:
-        signer = Signer()
-        token_firmado = signer.sign(_email)
+        # Llamamos al metodo generador de token
+        token_firmado = generar_token_verificacion(_email)
         # Email
-        subject = 'Recuperación de cuenta'
+        subject = 'Verificación de cuenta'
         message = f'Reciba un cordial saludo de los administradores de WAPIPTDAH. ' \
-            f'\nRecibimos una solicitud de recuperación de cuenta para el correo: {_email}. ' \
-            f'\nEste es un mensaje para recuperar su cuenta por lo tanto debe seguir las instrucciones: ' \
-            f'\n\n1. Copia y pega el siguiente código especial para recuperar tu cuenta: ' \
+            f'\nRecibimos una solicitud de verificación de cuenta para el correo: {_email}. ' \
+            f'\nEste es un mensaje para verificar su cuenta por lo tanto debe seguir las instrucciones: ' \
+            f'\n\n1. Copia y pega el siguiente código especial para verificar tu cuenta: ' \
             f'\n{token_firmado}'\
             f'\n\n2. Ingresa los datos solicitados en la ventana que aparecerá. ' \
             f'\n' \
@@ -699,7 +768,7 @@ def recuperar_cuenta(request):
                 # Obtenemos el user asociado al email
                 user_ = User.objects.get(email=email_)
                 # Veriicar correo valido
-                if validar_correo_recuperacion_2(user_, email_) == False:
+                if not validar_correo_recuperacion_2(user_, email_):
                     return JsonResponse({'error': 'No existe una cuenta con ese correo'})
                 else:
                     return JsonResponse({'success': True})
@@ -730,8 +799,10 @@ def verificar_email_recuperacion(request):
             if usuario_ is not None:
                 # Obtener el usuario e instancia de Recuperacion
                 usuario, recuperacion = usuario_
-                # Eliminamos el registro de la entidd Recuperacion
-                recuperacion.delete()
+                # Modificamos el estado de atencion de Recuperacion
+                recuperacion.atendido = True
+                recuperacion.save()
+                # Verificar el tipo de usuario
                 if is_tecnico(usuario):
                     return JsonResponse({'success': True})
                 elif is_paciente(usuario):
@@ -800,32 +871,37 @@ def verificar_email_firmado(request):
         if request.method == 'POST':
             data = json.loads(request.body)
             token = data.get('tokenVerificacion')
-            signer = Signer()
-            email_original = signer.unsign(token)
-            user_ob = User.objects.get(email=email_original)
-            if not user_ob:
-                return JsonResponse({'error': 'Código de verificación inválido o ha expirado'})
-            if is_tecnico(user_ob):
-                usuario__ob = Usuario.objects.get(user=user_ob)
-                if verificado_correo(usuario__ob):
-                    return JsonResponse({'error': 'El usuario ya esta activo'})
-                usuario__ob.is_activo = True
-                usuario__ob.save()
-                return JsonResponse({'success': True})
-            elif is_paciente(user_ob):
-                paciente__ob = Paciente.objects.get(user=user_ob)
-                if verificado_correo(paciente__ob):
-                    return JsonResponse({'error': 'El usuario ya esta activo'})
-                paciente__ob.is_activo = True
-                paciente__ob.save()
-                return JsonResponse({'success': True})
-            elif is_comun(user_ob):
-                comun__ob = UsuarioComun.objects.get(user=user_ob)
-                if verificado_correo(comun__ob):
-                    return JsonResponse({'error': 'El usuario ya esta activo'})
-                comun__ob.is_activo = True
-                comun__ob.save()
-                return JsonResponse({'success': True})
+            #signer = Signer()
+            #email_original = signer.unsign(token)
+            usuario__ = verificar_token_verificacion(token)
+            if usuario__ is not None:
+                # LLamamos la verificacion
+                user_ob = verificacion_correo_V(usuario__)
+                if not user_ob:
+                    return JsonResponse({'error': 'Código de verificación inválido o ha expirado'})
+                if is_tecnico(user_ob):
+                    usuario__ob = Usuario.objects.get(user=user_ob)
+                    if verificado_correo(usuario__ob):
+                        return JsonResponse({'error': 'El usuario ya esta activo'})
+                    usuario__ob.is_activo = True
+                    usuario__ob.save()
+                    return JsonResponse({'success': True})
+                elif is_paciente(user_ob):
+                    paciente__ob = Paciente.objects.get(user=user_ob)
+                    if verificado_correo(paciente__ob):
+                        return JsonResponse({'error': 'El usuario ya esta activo'})
+                    paciente__ob.is_activo = True
+                    paciente__ob.save()
+                    return JsonResponse({'success': True})
+                elif is_comun(user_ob):
+                    comun__ob = UsuarioComun.objects.get(user=user_ob)
+                    if verificado_correo(comun__ob):
+                        return JsonResponse({'error': 'El usuario ya esta activo'})
+                    comun__ob.is_activo = True
+                    comun__ob.save()
+                    return JsonResponse({'success': True})
+                else:
+                    return JsonResponse({'error': 'Código de verificación inválido o ha expirado'})
             else:
                 return JsonResponse({'error': 'Código de verificación inválido o ha expirado'})
         else: 
@@ -839,6 +915,24 @@ def verificado_correo(ob1):
     if ob1.is_activo:
         return True
     else:
+        return False
+
+# METODO DE VERIFICACION DE CORREO
+def verificacion_correo_V(ob1):
+    try:
+        # Obtener la instancia de Verificacion
+        verificacion = ob1
+        # Modificamos el estado de atencion de Verificacion
+        verificacion.atendido = True
+        verificacion.token = "0000"
+        verificacion.save()
+        # Obtener el correo de Verificacion
+        email_ = verificacion.correo
+        # Obtener el usuario asociado al correo
+        user_ob = User.objects.get(email=email_)
+        # Retornamos el usuario
+        return user_ob
+    except User.DoesNotExist:
         return False
 
 
@@ -881,7 +975,7 @@ def api_user_register(request):
                     return JsonResponse({'error': 'El nombre de usuario ya existe'})
                 else:
                     # Verificar confirmacion de cuenta
-                    if not validar_correo_link(email_):
+                    if not validar_correo_verificacion(email_):
                         return JsonResponse({'error': 'El correo es invalido o no existe'})
                     # Creamos el usuario
                     user = User.objects.create(
@@ -894,6 +988,12 @@ def api_user_register(request):
                     # Añadimos a usuario
                     user.save()
                     crear_usuario_normal(first_name_, last_name_, email_, username_, fecha_, celular_, user, cedula_)
+                    # Objeto Verificacion
+                    verificacion = Verificacion.objects.get(correo=email_)
+                    # Agregar el usuario
+                    verificacion.usuario = user
+                    # Guardar cambios
+                    verificacion.save()
                     return JsonResponse({'success': True})
         else:
             return JsonResponse({'error': 'Método no permitido'})
@@ -917,6 +1017,7 @@ def crear_usuario_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8):
     )
     # Añadimos a usuario
     usuario__model.save()
+
 
 
 # METODO DE REGISTRO DE PACIENTE
@@ -960,7 +1061,7 @@ def api_paciente_register(request):
                     return JsonResponse({'error': 'El nombre de usuario ya existe'})
                 else:
                     # Verificar confirmacion de cuenta
-                    if not validar_correo_link(email_):
+                    if not validar_correo_verificacion(email_):
                         return JsonResponse({'error': 'El correo es invalido o no existe'})
                     # Creamos el usuario
                     user_new = User.objects.create(
@@ -973,6 +1074,12 @@ def api_paciente_register(request):
                     # Añadimos a usuario
                     user_new.save()
                     crear_paciente_normal(first_name_, last_name_, email_, username_, celular_, contacto_emergencia_, fecha_, direccion_, user_new, cedula_)
+                    # Objeto Verificacion
+                    verificacion = Verificacion.objects.get(correo=email_)
+                    # Agregar el usuario
+                    verificacion.usuario = user_new
+                    # Guardar cambios
+                    verificacion.save()
                     return JsonResponse({'success': True})
         else:
             return JsonResponse({'error': 'Método no permitido'})
@@ -998,6 +1105,7 @@ def crear_paciente_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, ob10):
     )
     # Añadimos a usuario
     usuario__model.save()
+
 
 
 # METODO DE REGISTRO DE USUARIO COMUN
@@ -1041,7 +1149,7 @@ def api_comun_register(request):
                     return JsonResponse({'error': 'El nombre de usuario ya existe'})
                 else:
                     # Verificar confirmacion de cuenta
-                    if not validar_correo_link(email_):
+                    if not validar_correo_verificacion(email_):
                         return JsonResponse({'error': 'El correo es invalido o no existe'})
                     # Creamos el usuario
                     user = User.objects.create(
@@ -1054,6 +1162,12 @@ def api_comun_register(request):
                     # Añadimos a usuario
                     user.save()
                     crear_comun_normal(first_name_, last_name_, email_, username_, celular_, fecha_, genero_, area_, user, cedula_)
+                    # Objeto Verificacion
+                    verificacion = Verificacion.objects.get(correo=email_)
+                    # Agregar el usuario
+                    verificacion.usuario = user
+                    # Guardar cambios
+                    verificacion.save()
                     return JsonResponse({'success': True})
         else:
             return JsonResponse({'error': 'Método no permitido'})

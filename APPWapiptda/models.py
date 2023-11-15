@@ -25,8 +25,10 @@ from django.utils.crypto import get_random_string
 class Recuperacion(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     token = models.CharField(max_length=255)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=False, blank=True, null=True)
     fecha_limite = models.DateTimeField(auto_now_add=False, blank=True, null=True)
+    tipo = models.CharField(max_length=60, blank=True, null=True)
+    atendido = models.BooleanField(default=False)
 
     def esta_vencido(self):
         utc = pytz.timezone('UTC')
@@ -38,6 +40,26 @@ class Recuperacion(models.Model):
         return fecha_actual > fecha_creacion
     def __str__(self):
         return f"Usuario : {self.usuario}"
+
+class Verificacion(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    correo = models.CharField(max_length=100, blank=False, null=True)
+    token = models.CharField(max_length=255)
+    fecha_creacion = models.DateTimeField(auto_now_add=False, blank=True, null=True)
+    fecha_limite = models.DateTimeField(auto_now_add=False, blank=True, null=True)
+    tipo = models.CharField(max_length=60, blank=True, null=True)
+    atendido = models.BooleanField(default=False)
+
+    def esta_vencido(self):
+        utc = pytz.timezone('UTC')
+        # Controlamos la fecha limite de valides del token
+        fecha_creacion = self.fecha_creacion + timedelta(hours=1)
+        fecha_creacion = fecha_creacion.replace(tzinfo=utc, microsecond=0)
+        fecha_actual = datetime.utcnow()
+        fecha_actual = datetime.utcnow().replace(tzinfo=utc, microsecond=0)
+        return fecha_actual > fecha_creacion
+    def __str__(self):
+        return f"Usuario creado en : {self.fecha_creacion}"
 
 # MODELO USUARIO
 class Usuario(models.Model):

@@ -4,6 +4,8 @@ from .models import *
 # Register your models here.
 admin.site.register(Recuperacion)
 
+admin.site.register(Verificacion)
+
 admin.site.register(Usuario)
 
 admin.site.register(UsuarioComun)
