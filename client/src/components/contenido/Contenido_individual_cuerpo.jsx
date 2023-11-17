@@ -29,7 +29,7 @@ export function ContenidoCuerpo({ context, slugContenido, tipoUsuarioP }) {
     const {
         nombre__contenido,
     } = context;
-
+    console.log(context)
     // Verificacion de usuario
     const [tipoUsuario, setTipo] = useState([]);
     const navigate = useNavigate();

@@ -27,7 +27,43 @@ export function FormularioTres({ context, usuario, slugContenido }) {
         url__contenido, contenedor, descripcion__contenido,
         identificador, tipo__contenido, slug
     } = context;
+    const tipo_c = context.tipo
     const tipo = usuario.tipo;
+    // Tipo de datos json
+    const [datos, setDatos] = useState([]);
+    // Lectura de datos desde json en la carpeta public
+    const obtenerDatosJson = async () => {
+        try {
+            if (tipo_c === "selecion_multiple") {
+                const respuesta = await fetch('/archivos/datos.json');
+                const datosJson = await respuesta.json();
+                // Obtener la lista de figuras desde el JSON
+                const figuras = datosJson.figuras[0].nombre.map(item => item.identificador);
+
+                // Verificar cuántos elementos hay en la variable contenedor
+                const numElementosContenedor = Array.isArray(contenedor) ? contenedor.length : 1;
+
+                // Elegir aleatoriamente elementos hasta que listaFinal tenga 4 elementos
+                const listaFinal = [];
+                while (listaFinal.length < 4 - numElementosContenedor) {
+                    const figuraAleatoria = figuras[Math.floor(Math.random() * figuras.length)];
+                    if (!listaFinal.includes(figuraAleatoria) && !contenedor.includes(figuraAleatoria)) {
+                        listaFinal.push(figuraAleatoria);
+                    }
+                }
+                // Añadir los elementos de la variable contenedor a la lista
+                const listaFinalCompleta = [...listaFinal, ...contenedor];
+                setDatos(listaFinalCompleta);
+                console.log(listaFinalCompleta);
+            }
+        } catch (error) {
+            console.error('Error al obtener datos:', error);
+        }
+    };
+    // Ejecutar la función
+    useEffect(() => {
+        obtenerDatosJson();
+    }, []);
 
     // Control de minutos
     const [startTime, setStartTime] = useState(null);
@@ -51,13 +87,14 @@ export function FormularioTres({ context, usuario, slugContenido }) {
     const [slug__, setSlug] = useState(slug);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const [selecciones, setSelecciones] = useState([]);
 
     // Captura de valores para la respuesta
     useEffect(() => {
         // Controlar el botón "Empezar"
         setupEmpezarButton();
         // Controlar los input checkbox
-        const checkboxes = document.querySelectorAll('input[name="gridCheck"]');
+        /*const checkboxes = document.querySelectorAll('input[name="gridCheck"]');
         checkboxes.forEach((checkbox) => {
             checkbox.addEventListener("click", () => {
                 // Verificar si al menos uno de los checkboxes está seleccionado
@@ -72,17 +109,19 @@ export function FormularioTres({ context, usuario, slugContenido }) {
                     setVerificarBtnD(true);
                 }
             });
-        });
+        });*/
+        // Habilitar o deshabilitar el botón "Verificar" según las selecciones
+        setVerificarBtnD(selecciones.length === 0);
         return () => {
             if (empezarBtnRef.current) {
                 empezarBtnRef.current.removeEventListener("click", botonEmpezar);
             };
-            checkboxes.forEach((checkbox) => {
-                checkbox.removeEventListener("change", obtenerRespuestaSeleccionada);
-            });
+            /*checkboxes.forEach((checkbox) => {
+                checkbox.removeEventListener("click", obtenerRespuestaSeleccionada);
+            });*/
         };
 
-    }, [usuario]);
+    }, [usuario, selecciones]);
 
     // Controlar el botón "Empezar"
     const setupEmpezarButton = () => {
@@ -184,6 +223,7 @@ export function FormularioTres({ context, usuario, slugContenido }) {
                 tiempoTranscurrido__segundos
             };
             setVerificarBtnD(true);
+            console.log(datos__post);
             // Realizar la petición POST al servidor
             const response = await CrearResultadoNew(datos__post);
             if (response.data.success) {
@@ -212,6 +252,45 @@ export function FormularioTres({ context, usuario, slugContenido }) {
         setTimeout(() => {
             setError("");
         }, 5000);
+    };
+
+    const generdorCheckbox = () => {
+        return datos.map((valor, index) => (
+            <div className="form-check pt-1 pb-1" key={index}>
+                <div className="container">
+                    <input
+                        className="form-check-input mt-3 border border-dark"
+                        type="checkbox"
+                        name="gridCheck"
+                        id={`gridCheck${index + 1}`}
+                        value={valor}
+                        checked={selecciones.includes(valor)}  // Permite marcar el checkbox si hay una selección
+                        onChange={() => controlarSeleccion(valor)}  // Maneja el cambio de selección en los checkbox
+                    />
+                </div>
+                <div className="estilo__ container">
+                    <label className="form-check-label pt-2" htmlFor={`gridCheck${index + 1}`}>
+                        {valor}
+                    </label>
+                </div>
+            </div>
+        ));
+    };
+
+    // Controlar la selección de los checkbox y manejar el estado 
+    const controlarSeleccion = (valor) => {
+        const nuevasSelect = [...selecciones];
+        if (nuevasSelect.includes(valor)) {
+            // Si ya estaba seleccionado, quitarlo
+            nuevasSelect.splice(nuevasSelect.indexOf(valor), 1);
+        } else {
+            // Si no estaba seleccionado, agregarlo
+            nuevasSelect.push(valor);
+        }
+        // Actualizar el estado
+        setSelecciones(nuevasSelect);
+        // Actualizar la respuesta para enviarse al form
+        setRespuesta(nuevasSelect.join(", "));
     };
 
     return (
@@ -268,25 +347,7 @@ export function FormularioTres({ context, usuario, slugContenido }) {
                                 <fieldset>
                                     {/*<!-- Se visualiza las opciones de la evaluación-->*/}
                                     <div className="row col-sm-10 d-flex flex-column justify-content-between">
-                                        {
-                                            contenedor && contenedor.length > 0 &&
-                                            contenedor.map((valor, index) => (
-                                                <div className="form-check pt-1 pb-1" key={index}>
-                                                    <div className="container">
-                                                        <input className="form-check-input mt-3 border border-dark" type="checkbox" name="gridCheck"
-                                                            id={`gridCheck${index + 1}`} value={valor}
-                                                            onChange={e => setRespuesta(e.target.value)} />
-                                                    </div>
-                                                    <div className="estilo__ container">
-                                                        <label className="form-check-label pt-2" htmlFor={`gridCheck${index + 1}`}>
-                                                            {valor}
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            ))
-                                        }
-                                        {/* Renderizar checkboxes adicionales si elementos es menor a 4 */}
-                                        {contenedor.length < 4 && renderExtraCheckboxes(contenedor.length)}
+                                        {generdorCheckbox()}
                                     </div>
                                 </fieldset>
                             </div>

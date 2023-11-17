@@ -28,7 +28,7 @@ export function FormularioDos({ context, usuario, slugContenido }) {
         identificador, tipo__contenido, slug
     } = context;
     const tipo = usuario.tipo;
-
+    
     // Control de minutos
     const [startTime, setStartTime] = useState(null);
     const [tiempoDuracion, setTiempoDuracion] = useState(0);

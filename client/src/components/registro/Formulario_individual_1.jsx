@@ -26,9 +26,41 @@ export function FormularioUno({ context, usuario, slugContenido }) {
     /* *** Valores recuperados */
     const {
         url__contenido, contenedor, descripcion__contenido,
-        identificador, tipo__contenido, slug
+        identificador, tipo__contenido, slug, nombre__contenido
     } = context;
+    const tipo_c = context.tipo
     const tipo = usuario.tipo;
+    // Tipo de datos json
+    const [datos, setDatos] = useState([]);
+    // Lectura de datos desde json en la carpeta public
+    const obtenerDatosJson = async () => {
+        try {
+            if (tipo_c === "selecion_individual") {
+                const respuesta = await fetch('/archivos/datos.json');
+                const datosJson = await respuesta.json();
+                // Obtener la lista de figuras desde el JSON
+                const figuras = datosJson.figuras[0].nombre.map(item => item.identificador);
+                // Elegir aleatoriamente 3 figuras del JSON
+                const figurasSeleccionadas = [];
+                while (figurasSeleccionadas.length < 3) {
+                    const figuraAleatoria = figuras[Math.floor(Math.random() * figuras.length)];
+                    if (!figurasSeleccionadas.includes(figuraAleatoria) && figuraAleatoria !== contenedor) {
+                        figurasSeleccionadas.push(figuraAleatoria);
+                    }
+                }
+                // Añadir la variable contenedor a la lista
+                const listaFinal = [...figurasSeleccionadas, contenedor];
+                setDatos(listaFinal);
+                console.log(listaFinal);
+            }
+        } catch (error) {
+            console.error('Error al obtener datos:', error);
+        }
+    };
+    // Ejecutar la función
+    useEffect(() => {
+        obtenerDatosJson();
+    }, []);
 
     // Control de minutos
     const [startTime, setStartTime] = useState(null);
@@ -58,7 +90,7 @@ export function FormularioUno({ context, usuario, slugContenido }) {
         // Controlar el botón "Empezar"
         setupEmpezarButton();
         // Controlar los input checkbox
-        const checkboxes = document.querySelectorAll('input[type="radio"]');
+        /*const checkboxes = document.querySelectorAll('input[type="radio"]');
         checkboxes.forEach((checkbox) => {
             checkbox.addEventListener("click", () => {
                 // Verificar si al menos uno de los checkboxes está seleccionado
@@ -81,9 +113,18 @@ export function FormularioUno({ context, usuario, slugContenido }) {
             checkboxes.forEach((checkbox) => {
                 checkbox.removeEventListener("change", obtenerRespuestaSeleccionada);
             });
+        };*/
+        // Verificar si al menos uno de los checkboxes está seleccionado
+        const isChecked = datos.some((valor) => respuesta === valor);
+        // Habilitar o deshabilitar el botón "Verificar" según el resultado
+        setVerificarBtnD(!isChecked);
+        return () => {
+            if (empezarBtnRef.current) {
+                empezarBtnRef.current.removeEventListener("click", botnEmpezar);
+            };
         };
 
-    }, [usuario]);
+    }, [usuario, respuesta]);
 
     // Controlar el botón "Empezar"
     const setupEmpezarButton = () => {
@@ -104,14 +145,15 @@ export function FormularioUno({ context, usuario, slugContenido }) {
     };
 
     // Capturar la respuesta seleccionada
-    const obtenerRespuestaSeleccionada = () => {
-        const radios = document.getElementsByName('gridRadios');
+    const obtenerRespuestaSeleccionada = (event) => {
+        /*const radios = document.getElementsByName('gridRadios');
         for (let i = 0; i < radios.length; i++) {
             if (radios[i].checked) {
                 setRespuesta(radios[i].value);
                 break;
             }
-        }
+        }*/
+        setRespuesta(event.target.value);
     };
 
     // Cptura de tiempo
@@ -151,7 +193,6 @@ export function FormularioUno({ context, usuario, slugContenido }) {
             clearInterval(intervalRef.current);
         }
     }, [tiempoDuracion]);
-
 
     // Enviar los datos del formulario
     const enviarForm = async (e) => {
@@ -197,6 +238,31 @@ export function FormularioUno({ context, usuario, slugContenido }) {
         }, 5000);
     };
 
+    const generdorSelects = () => {
+        return datos.map((valor, index) => (
+            <div className="form-check pt-1 pb-1" key={index}>
+                <div className="container">
+                    <input
+                        className="form-check-input mt-3 border border-dark"
+                        type="radio"
+                        name="gridRadios"
+                        id={`gridRadios${index + 1}`}
+                        value={valor}
+                        onChange={() => setRespuesta(valor)}
+                    />
+                </div>
+                <div className="estilo__ container">
+                    <label
+                        className="form-check-label pt-2"
+                        htmlFor={`gridRadios${index + 1}`}
+                    >
+                        {valor}
+                    </label>
+                </div>
+            </div>
+        ));
+    };
+
     return (
         <div style={{ margin: '0', padding: '0' }}>
             <div className="container row col-md-12">
@@ -236,7 +302,7 @@ export function FormularioUno({ context, usuario, slugContenido }) {
             }
             <div className="container row col-md-12 mt-4">
                 <div className="contenedor__cuerpo" id="miContainer" ref={miContainerRef}
-                    
+
                     style={{
                         pointerEvents: contenidoHabilitado ? 'auto' : 'none',
                         opacity: contenidoHabilitado ? 1 : 0.5
@@ -250,50 +316,7 @@ export function FormularioUno({ context, usuario, slugContenido }) {
                             <div className="ml-3 pl-3">
                                 <fieldset className="form-group">
                                     <div className="row col-sm-11 d-flex flex-column justify-content-between">
-                                        <div className="form-check pt-1 pb-1">
-                                            <div className="container">
-                                                <input className="form-check-input mt-3 border border-dark" type="radio" name="gridRadios" id="gridRadios1" value="Rombo"
-                                                    onChange={e => setRespuesta(e.target.value)} />
-                                            </div>
-                                            <div className="estilo__ container">
-                                                <label className="form-check-label pt-2" htmlFor="gridRadios1">
-                                                    Rombo
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div className="form-check pt-1 pb-1">
-                                            <div className="container">
-                                                <input className="form-check-input mt-3 border border-dark" type="radio" name="gridRadios"
-                                                    id="gridRadios2" value={contenedor} onChange={e => setRespuesta(e.target.value)} />
-                                            </div>
-                                            <div className="estilo__ container">
-                                                <label className="form-check-label pt-2" htmlFor="gridRadios2">
-                                                    {contenedor}
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div className="form-check pt-1 pb-1">
-                                            <div className="container">
-                                                <input className="form-check-input mt-3 border border-dark" type="radio" name="gridRadios"
-                                                    id="gridRadios3" value="Circunferencia" onChange={e => setRespuesta(e.target.value)} />
-                                            </div>
-                                            <div className="estilo__ container">
-                                                <label className="form-check-label pt-2" htmlFor="gridRadios3">
-                                                    Circunferencia
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div className="form-check pt-1 pb-1">
-                                            <div className="container">
-                                                <input className="form-check-input mt-3 border border-dark" type="radio" name="gridRadios"
-                                                    id="gridRadios4" value="Triangulo" onChange={e => setRespuesta(e.target.value)} />
-                                            </div>
-                                            <div className="estilo__ container">
-                                                <label className="form-check-label pt-2" htmlFor="gridRadios4">
-                                                    Triángulo
-                                                </label>
-                                            </div>
-                                        </div>
+                                        {generdorSelects()}
                                     </div>
                                 </fieldset>
                             </div>
