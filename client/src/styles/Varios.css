@@ -11,6 +11,12 @@
     justify-content: center;
 }
 
+.orden_lista_contenido a:hover {
+    /*transicion de color*/
+    transition: 0.5s;
+    background-color: #303440;
+}
+
 /* ALINEACION DE LISTADO DE CONTENIDO */
 .alineacion-RS {
     width: 100%;

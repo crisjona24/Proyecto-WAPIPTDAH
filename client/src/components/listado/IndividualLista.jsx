@@ -254,13 +254,23 @@ export function IndividualLista({ usuario }) {
                                         <div className="textos__ pt-1">
                                             <h3></h3>
                                             <div className="orden_lista_contenido">
-                                                <div className="col-md-6 align-self-end">
-                                                    <Link to={`/individual/detalle/${contenido.slug_contenido_individual}/${slug}/`} className="btn btn-success">
-                                                        Detalle
-                                                    </Link>
-                                                </div>
-                                                <div className="col-md-6 align-self-center">
-                                                    <Link to={`/individual/${contenido.slug_contenido_individual}/${slug}/`} className="btn btn-success">
+                                                {
+                                                    usuario.tipo !== 'paciente' &&
+                                                    <div className="col-md-6 align-self-end">
+                                                        <Link to={`/individual/detalle/${contenido.slug_contenido_individual}/${slug}/`}
+                                                            className="btn btn-success" title="Detalle de actividad">
+                                                            Detalle
+                                                        </Link>
+                                                    </div>
+                                                }
+                                                <div
+                                                    className={
+                                                        usuario.tipo === 'paciente' ?
+                                                            "col-md-6 justify-content-center" :
+                                                            "col-md-6 align-self-end"
+                                                    }>
+                                                    <Link to={`/individual/${contenido.slug_contenido_individual}/${slug}/`}
+                                                        className="btn btn-success" title="Resolver actividad">
                                                         Aprendamos
                                                     </Link>
                                                 </div>

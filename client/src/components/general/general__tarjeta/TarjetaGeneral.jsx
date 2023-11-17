@@ -17,7 +17,7 @@ import { VerificarUsuario } from "../../../api/usuario.api";
 import { RevisorPeticion } from "../../../api/peticion.api"
 import { ObtenerSlugCurso } from "../../../api/curso.api"
 import { ReporteEliminar, ModificarEstadoResultado, CrearReporteNuevo } from "../../../api/reporte.api"
-
+import { CarruselIndividual } from './Carrusel';
 
 // Dominio
 export function Dominio({ datos }) {
@@ -457,7 +457,7 @@ export function Individual({ datos, slug }) {
             <div className="align-items-center contenedor_actividad">
                 <Card className="tarjeta__reporte" >
                     <Row >
-                        <Col md={4}>
+                        <Col md={3}>
                             <Image
                                 className="img-fluid img-ref-tarjeta"
                                 src="/img/tarjeta-datos.png"
@@ -472,7 +472,7 @@ export function Individual({ datos, slug }) {
                                 </Card.Text>
                             </Row>
                         </Col>
-                        <Col md={8}>
+                        <Col md={9}>
                             <Card.Body>
                                 <Card.Title className="titulo-peticion mb-3">Actividad</Card.Title>
                                 <Row className="mb-3">
@@ -513,13 +513,8 @@ export function Individual({ datos, slug }) {
                                 </Row>
                                 <hr />
                                 <Row className="mb-3">
-                                    <Card.Title style={{ fontSize: '1rem' }}>Imagen de portada</Card.Title>
-                                    <Image
-                                        className="img-fluid img-tarjeta-2"
-                                        src={datos.portada_individual}
-                                        alt="Sample"
-                                        fluid
-                                    />
+                                    <Card.Title style={{ fontSize: '1rem' }}>Imagen de portada / actividad</Card.Title>
+                                        <CarruselIndividual imagenes={images} />
                                 </Row>
                                 <Card.Text>
                                     <small className="text-muted" style={{ fontFamily: 'Roboto' }}>Acciones</small>
