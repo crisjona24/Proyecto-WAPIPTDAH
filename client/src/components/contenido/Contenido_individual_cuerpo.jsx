@@ -19,6 +19,7 @@ import { FormularioCinco } from '../registro/Formulario_individual_5';
 import { FormularioSeis } from '../registro/Formulario_individual_6';
 import { FormularioSiete } from '../registro/Formulario_individual_7';
 import { FormularioNueve } from '../registro/Formulario_individual_9';
+import { FormularioDiez } from '../registro/Formulario_individual_10';
 import { FormularioDefault } from '../registro/Formulario_default';
 import { VerificarUsuario } from "../../api/usuario.api";
 import { ContenidoIndividualTodo } from "../../api/contenidoindividual.api";
@@ -91,6 +92,9 @@ export function ContenidoCuerpo({ context, slugContenido, tipoUsuarioP }) {
                 break;
             case 'selecion_multiple_img':
                 tipoFormulario = <FormularioNueve context={context} usuario={tipoUsuario} slugContenido={slugContenido} />;
+                break;
+            case 'pictograma':
+                tipoFormulario = <FormularioDiez context={context} usuario={tipoUsuario} slugContenido={slugContenido} />;
                 break;
             default:
                 tipoFormulario = <FormularioDefault />;

@@ -50,7 +50,7 @@ export function ListadodeSala({ salas, usuario, page, setPage, numeroPag }) {
                                 <thead>
                                     <tr>
 
-                                        <th>Nombre</th>
+                                        <th className="text-center">Nombre</th>
                                         <th className="text-center">
                                             {
                                                 usuario.tipo === "comun" ?
@@ -69,7 +69,7 @@ export function ListadodeSala({ salas, usuario, page, setPage, numeroPag }) {
                                         {
                                             salas.map((sala) => (
                                                 <tr key={sala.id}>
-                                                    <td>{sala.nombre_sala}</td>
+                                                    <td className="text-center">{sala.nombre_sala}</td>
                                                     <td className="text-center">
                                                         {
                                                             usuario.tipo === "comun" ?

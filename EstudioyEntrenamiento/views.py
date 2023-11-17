@@ -268,35 +268,39 @@ def verificar_peticion(request, slug):
     else:
         return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
+
 ## VERIFICAR CONTENIDO ###
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def verificar_resultado(request, slug):
-    try:
-        # Verificar existencia de token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        #user = get_user_from_token(token)
-        if user and token:
-            # Encontrar el resultado en base al slug
-            resultado__ob = Resultado.objects.get(slug_resultado=slug)
-            # Verificar si el dominio existe
-            if resultado__ob:
-                context = {
-                    'identificador': resultado__ob.id,
-                    'slug': slug
-                }
-                return JsonResponse(context)
+    if request.user.is_authenticated:
+        try:
+            # Verificar existencia de token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            #user = get_user_from_token(token)
+            if user and token:
+                # Encontrar el resultado en base al slug
+                resultado__ob = Resultado.objects.get(slug_resultado=slug)
+                # Verificar si el dominio existe
+                if resultado__ob:
+                    context = {
+                        'identificador': resultado__ob.id,
+                        'slug': slug
+                    }
+                    return JsonResponse(context)
+                else:
+                    context = {'error': 'Error al mostrar datos de resultado'}
+                    return JsonResponse(context)
             else:
-                context = {'error': 'Error al mostrar datos de resultado'}
-                return JsonResponse(context)
-        else:
+                context = {'errorSalida': 'El usuario no esta autenticado'}
+                return JsonResponse(context, status=401)
+        except Exception as e:
             context = {'errorSalida': 'El usuario no esta autenticado'}
-            return JsonResponse(context, status=401)
-    except Exception as e:
-        context = {'errorSalida': 'El usuario no esta autenticado'}
-        return JsonResponse(context, status=500)
+            return JsonResponse(context, status=500)
+    else:
+        return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
 
 ## VERIFICAR SALA ###
@@ -304,30 +308,33 @@ def verificar_resultado(request, slug):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def verificar_sala(request, slug):
-    try:
-        # Verificar existencia de token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        #user = get_user_from_token(token)
-        if user and token:
-            # Encontrar el resultado en base al slug
-            sala__ob = Sala.objects.get(slug_sala=slug)
-            # Verificar si el dominio existe
-            if sala__ob:
-                context = {
-                    'identificador': sala__ob.id,
-                    'slug': slug
-                }
-                return JsonResponse(context)
+    if request.user.is_authenticated:
+        try:
+            # Verificar existencia de token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            #user = get_user_from_token(token)
+            if user and token:
+                # Encontrar el resultado en base al slug
+                sala__ob = Sala.objects.get(slug_sala=slug)
+                # Verificar si el dominio existe
+                if sala__ob:
+                    context = {
+                        'identificador': sala__ob.id,
+                        'slug': slug
+                    }
+                    return JsonResponse(context)
+                else:
+                    context = {'error': 'Error al mostrar datos de sala'}
+                    return JsonResponse(context)
             else:
-                context = {'error': 'Error al mostrar datos de sala'}
-                return JsonResponse(context)
-        else:
+                context = {'errorSalida': 'El usuario no esta autenticado'}
+                return JsonResponse(context, status=401)
+        except Exception as e:
             context = {'errorSalida': 'El usuario no esta autenticado'}
-            return JsonResponse(context, status=401)
-    except Exception as e:
-        context = {'errorSalida': 'El usuario no esta autenticado'}
-        return JsonResponse(context, status=500)
+            return JsonResponse(context, status=500)
+    else:
+        return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
 
 ## VERIFICAR REPORTE ###
@@ -335,31 +342,33 @@ def verificar_sala(request, slug):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def verificar_reporte(request, slug):
-    try:
-        # Verificar existencia de token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        #user = get_user_from_token(token)
-        if user and token:
-            # Encontrar el resultado en base al slug
-            reporte_ob = Reporte.objects.get(slug_reporte=slug)
-            # Verificar si el dominio existe
-            if reporte_ob:
-                context = {
-                    'identificador': reporte_ob.id,
-                    'slug': slug
-                }
-                return JsonResponse(context)
+    if request.user.is_authenticated:
+        try:
+            # Verificar existencia de token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            #user = get_user_from_token(token)
+            if user and token:
+                # Encontrar el resultado en base al slug
+                reporte_ob = Reporte.objects.get(slug_reporte=slug)
+                # Verificar si el dominio existe
+                if reporte_ob:
+                    context = {
+                        'identificador': reporte_ob.id,
+                        'slug': slug
+                    }
+                    return JsonResponse(context)
+                else:
+                    context = {'error': 'Error al mostrar datos de reporte'}
+                    return JsonResponse(context)
             else:
-                context = {'error': 'Error al mostrar datos de reporte'}
-                return JsonResponse(context)
-        else:
+                context = {'errorSalida': 'El usuario no esta autenticado'}
+                return JsonResponse(context, status=401)
+        except Exception as e:
             context = {'errorSalida': 'El usuario no esta autenticado'}
-            return JsonResponse(context, status=401)
-    except Exception as e:
-        context = {'errorSalida': 'El usuario no esta autenticado'}
-        return JsonResponse(context, status=500)
-
+            return JsonResponse(context, status=500)
+    else:
+        return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
 
 
@@ -411,6 +420,7 @@ def api_nivel_register(request):
     else:
         return JsonResponse({'error': 'El usuario no esta autenticado'})
 
+# Método para guardar el registro de nivel 
 def guardar_nivel(ob1, ob2, ob3, ob4, ob5):
     try:
         # Capturamos la fecha de registro del nivel
@@ -430,6 +440,7 @@ def guardar_nivel(ob1, ob2, ob3, ob4, ob5):
     except Exception as e:
         return False
 
+# Verificar la existencia del nombre de un registro de nivel
 def nombre_nivel_exist(ob1):
     try:
         if GradoTDAH.objects.filter(nombre_nivel__iexact=ob1).exists():
@@ -438,6 +449,7 @@ def nombre_nivel_exist(ob1):
         return False
     return False
 
+# Verificar el número de niveles y dominios registrados en el sistema
 def numero_de_niveles():
     try:
         return GradoTDAH.objects.all().count()
@@ -449,6 +461,7 @@ def numero_de_dominios():
         return Dominio.objects.all().count()
     except Dominio.DoesNotExist:
         return 0
+
 
 # METODO PARA DEVOLVER EL CONTADOR DE NIVELES
 @api_view(['GET'])
@@ -523,6 +536,7 @@ def api_dominio_register(request):
     else:
         return JsonResponse({'error': 'El usuario no esta autenticado'})
 
+# Métdo para guardar el registro de dominio en el sistema
 def guardar_dominio(ob1, ob2, ob3, ob4, ob5):
     try:
         # Capturamos la fecha del registro de dominio
@@ -541,6 +555,7 @@ def guardar_dominio(ob1, ob2, ob3, ob4, ob5):
     except Exception as e:
         return False
 
+# Verificar la existencia del nombre de un registro de dominio
 def nombre_dominio_exist(ob1):
     try:
         if Dominio.objects.filter(nombre__iexact=ob1).exists():
@@ -549,6 +564,7 @@ def nombre_dominio_exist(ob1):
         return False
     return False
 
+# Verificar el numero de categorias permitidad en el sistema
 def control_categorias():
     try:
         # Obtenemos los registros de nivel
@@ -612,6 +628,7 @@ def api_contenido_register(request):
     else:
         return JsonResponse({'error': 'El usuario no esta autenticado'})
 
+# Métdo para guardar el registro de contenido en el sistema
 def guardar_contenido(ob1, ob2, ob3, ob4, ob5):
     try:
         # Capturamos la fecha de registro del contenido
@@ -631,6 +648,7 @@ def guardar_contenido(ob1, ob2, ob3, ob4, ob5):
     except Exception as e:
         return False
 
+# Verificar la existencia del nombre de un registro de contenido
 def nombre_contenido_exist(ob1):
     try:
         if Contenido.objects.filter(nombre__iexact=ob1).exists():
@@ -679,7 +697,7 @@ def api_contenido_individual_register(request):
                             return JsonResponse({'success': True})
                         else:
                             return JsonResponse({'error': 'Error al guardar el contenido individual'})
-                    elif tipocontenido_ == 'seleccionar_imagen':
+                    elif tipocontenido_ == 'seleccionar_imagen' or tipocontenido_ == 'selecion_multiple_img' or tipocontenido_ == 'pictograma':
                         # Para imagen 1, 2 y 3 y que no exista imagen 4 y 5
                         if img1_ and img2_ and img3_ and not img4_ and not img5_:
                             if guardar_contenido_individual_2(descripcion_, identificador_, tipocontenido_, contenido_, 
@@ -710,6 +728,8 @@ def api_contenido_individual_register(request):
     else:
         return JsonResponse({'error': 'El usuario no esta autenticado'})
 
+# Métodos para guardar el registro de actividad en el sistema dependiendo del tipo de contenido que
+# se desea ingresar. Se controla segun el numero de imagenes que se ingresa 
 def guardar_contenido_individual(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8):
     try:
         # Obtenemos la fecha actual de registro de la actividad
@@ -844,6 +864,7 @@ def api_curso_register(request):
     else:
         return JsonResponse({'error': 'El usuario no esta autenticado'})
 
+# Registro de curso en el sistema
 def guardar_curso(ob1, ob2, ob3, ob4):
     try:
         # Obtenemos la fecha actual de registro
@@ -861,6 +882,7 @@ def guardar_curso(ob1, ob2, ob3, ob4):
     except Exception as e:
         return False
 
+# Verificación de existencia de registro de curso por medio del nombre del mismo
 def nombreCurso_exist(ob1):
     try:
         if Curso.objects.filter(nombre_curso__iexact=ob1).exists():
@@ -901,6 +923,7 @@ def api_curso_inscripcion(request, id):
     else:
         return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
+# Guardar el registro de inscripción de un estudiante en un curso específico
 def guardar_inscripcion(ob1, ob2):
     try:
         detalle_inscripcion = DetalleInscripcionCurso.objects.create(
@@ -958,6 +981,7 @@ def api_peticion_register(request):
     else:
         return JsonResponse({'error': 'El usuario no esta autenticado'})
 
+# Método para guardar el registro de petición en el sistema
 def guardar_peticion(ob1, ob2, ob3, ob4):
     try:
         # Capturamos la fecha actual de registro de petición
@@ -975,6 +999,7 @@ def guardar_peticion(ob1, ob2, ob3, ob4):
     except Exception as e:
         return False
 
+# Método para enviar correo de notificación de petición existentes a los usuarios tecnicos registrados en el sistema
 def enviar_correo_peticion(ob1):
     try:
         # Obtenemos el nombre de usuario y appellido del usuario comun
@@ -1011,68 +1036,72 @@ def enviar_correo_peticion(ob1):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def save_resultado(request):
-    try:
-        # Decodifica el token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        #user = get_user_from_token(token)
-        if (is_paciente(user)):
-            if request.method == 'POST':
-                data = json.loads(request.body)
-                tiempo_transcurrido_m = data.get('tiempoTranscurrido__minutos')
-                tiempo_transcurrido_s = data.get('tiempoTranscurrido__segundos')
-                respuesta__contenido = data.get('respuesta')
-                slug__con = data.get('slug__')
-                # Obtenemos el objeto contenido
-                contenido__ob = ContenidoIndividual.objects.get(slug_contenido_individual=slug__con)
-                # Obtenemos el objeto paciente
-                paciente__ob = Paciente.objects.get(user=user)
-                # Capturamos la fecha actual o del momento de registro
-                # Obtiene la fecha actual sin la hora
-                fecha_registro_resultado_ = datetime.now().date()
-                # Captura de respuesta
-                if tiempo_transcurrido_m == 0 and tiempo_transcurrido_s == 0:
-                    tiempo_transcurrido_m_ = 40
-                    tiempo_transcurrido_s_ = 1
-                    respuesta__contenido_ = "No resuelto"
-                    observacion = "No resuelto"
-                    # Guardamos el resultado
-                    if guardar_resultado_no(
-                        tiempo_transcurrido_m_, tiempo_transcurrido_s_, respuesta__contenido_,
-                        observacion, contenido__ob, paciente__ob, fecha_registro_resultado_):
-                        # Enviamos una respuesta al front
-                        return JsonResponse({'success': True})
-                    else:
-                        error_message = "Error al agregar resultado."
-                        context = {'error': error_message, 'success': False}
-                        return JsonResponse(context)
-
-                else:
-                    if tiempo_transcurrido_m or tiempo_transcurrido_s:
+    if request.user.is_authenticated:
+        try:
+            # Decodifica el token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            #user = get_user_from_token(token)
+            if (is_paciente(user)):
+                if request.method == 'POST':
+                    data = json.loads(request.body)
+                    tiempo_transcurrido_m = data.get('tiempoTranscurrido__minutos')
+                    tiempo_transcurrido_s = data.get('tiempoTranscurrido__segundos')
+                    respuesta__contenido = data.get('respuesta')
+                    slug__con = data.get('slug__')
+                    # Obtenemos el objeto contenido
+                    contenido__ob = ContenidoIndividual.objects.get(slug_contenido_individual=slug__con)
+                    # Obtenemos el objeto paciente
+                    paciente__ob = Paciente.objects.get(user=user)
+                    # Capturamos la fecha actual o del momento de registro
+                    # Obtiene la fecha actual sin la hora
+                    fecha_registro_resultado_ = datetime.now().date()
+                    # Captura de respuesta
+                    if tiempo_transcurrido_m == 0 and tiempo_transcurrido_s == 0:
+                        tiempo_transcurrido_m_ = 40
+                        tiempo_transcurrido_s_ = 1
+                        respuesta__contenido_ = "No resuelto"
+                        observacion = "No resuelto"
                         # Guardamos el resultado
-                        if guardar_resultado(tiempo_transcurrido_m, tiempo_transcurrido_s, 
-                                          respuesta__contenido, contenido__ob, paciente__ob, fecha_registro_resultado_):
+                        if guardar_resultado_no(
+                            tiempo_transcurrido_m_, tiempo_transcurrido_s_, respuesta__contenido_,
+                            observacion, contenido__ob, paciente__ob, fecha_registro_resultado_):
                             # Enviamos una respuesta al front
                             return JsonResponse({'success': True})
                         else:
                             error_message = "Error al agregar resultado."
                             context = {'error': error_message, 'success': False}
                             return JsonResponse(context)
-                    else:
-                        error_message = "Tiempo transcurrido no proporcionado."
-                        context = {'error': error_message, 'success': False}
-                        return JsonResponse(context)
-            else:
-                error_message = "Error al agregar resultado."
-                context = {'error': error_message, 'success': False}
-                return JsonResponse(context)
-        else:
-            return JsonResponse({'error': 'El usuario no esta autenticado'})
-    except IntegrityError:
-        error_message = "Error al agregar."
-        context = {'error': error_message, 'success': False}
-        return JsonResponse(context)
 
+                    else:
+                        if tiempo_transcurrido_m or tiempo_transcurrido_s:
+                            # Guardamos el resultado
+                            if guardar_resultado(tiempo_transcurrido_m, tiempo_transcurrido_s, 
+                                            respuesta__contenido, contenido__ob, paciente__ob, fecha_registro_resultado_):
+                                # Enviamos una respuesta al front
+                                return JsonResponse({'success': True})
+                            else:
+                                error_message = "Error al agregar resultado."
+                                context = {'error': error_message, 'success': False}
+                                return JsonResponse(context)
+                        else:
+                            error_message = "Tiempo transcurrido no proporcionado."
+                            context = {'error': error_message, 'success': False}
+                            return JsonResponse(context)
+                else:
+                    error_message = "Error al agregar resultado."
+                    context = {'error': error_message, 'success': False}
+                    return JsonResponse(context)
+            else:
+                return JsonResponse({'error': 'El usuario no esta autenticado'})
+        except IntegrityError:
+            error_message = "Error al agregar."
+            context = {'error': error_message, 'success': False}
+            return JsonResponse(context)
+    else:
+        return JsonResponse({'error': 'El usuario no esta autenticado'})
+
+# Métodos para guardar el registro de resultado en el sistema asociado a un estudiante en específico
 def guardar_resultado(ob1, ob2, ob3, ob4, ob5, ob6):
     try:
         resultado_obj = Resultado.objects.create(
@@ -1188,7 +1217,8 @@ def api_sala_register(request):
     else:
         return JsonResponse({'error': 'El usuario no está autenticado'})
 
-
+# Método para guardar el registro de sala en el sistema. La sala es creada por un usuario común
+# es asociada a un estudiante específico, por tanto solo el puede acceder a sus salas
 def guardar_sala (ob1, ob2, ob3, ob4, ob5):
     try:
         print("Entre al guardar")
@@ -1216,7 +1246,7 @@ def guardar_sala (ob1, ob2, ob3, ob4, ob5):
     except Exception as e:
         return False
 
-
+# Verificar la existencia del nombre de un registro de sala
 def paciente_existe_curso(paciente_ob, usuario_ob):
     try:
         # validamos la existencia
@@ -1226,7 +1256,7 @@ def paciente_existe_curso(paciente_ob, usuario_ob):
         return False
     return False
     
-
+# Verificar la existencia de un registro de curso dentro del sistema para dar paso a la creación de salas
 def curso_existe(usuario_ob):
     try:
         cursos = Curso.objects.filter(usuario_comun=usuario_ob)
@@ -1240,7 +1270,7 @@ def curso_existe(usuario_ob):
     except Exception as e:
         return False
     
-
+# Verificar la existencia de un estudiante registrado en un curso de aquellos que se encuentran inscritos
 def paciente_existe(nombre, apellido):
     try:
         # buscamos al paciente mediante el nombre y apellido proporcionado
@@ -1250,7 +1280,7 @@ def paciente_existe(nombre, apellido):
         return False
     return False
 
-
+# Verificar que el identificador de actividad proporcionado para la sala sea existente
 def identificador_existe(ob1):
     try:
         # buscamos al paciente mediante el nombre y apellido proporcionado
@@ -1260,7 +1290,7 @@ def identificador_existe(ob1):
         return False
     return False
 
-
+# Verificar la existencia de una sala ya registrada
 def nombresala_exist(ob1):
     try:
         if Sala.objects.filter(nombre_sala__iexact=ob1).exists():
@@ -1336,6 +1366,8 @@ def api_sala_edicion(request):
     else:
         return JsonResponse({'error': 'El usuario no está autenticado'})
 
+
+# Método para realizar la actualización de un registro de sala en el sistema
 def actualizar_sala(ob1, ob2, ob3, ob4):
     try:
         sala_obj = Sala.objects.get(id=ob4)
@@ -1347,6 +1379,7 @@ def actualizar_sala(ob1, ob2, ob3, ob4):
     except Exception as e:
         return False
 
+# Verificar la existencia de un registro de sala
 def nombresala_exist_edicion(ob1, ob2):
     try:
         # Buscamos el objeto sala
@@ -1393,6 +1426,8 @@ def generar_reporte_resultado(request, id):
     else:
         return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
 
+# Método para guardar el registro de reporte en el sistema. El reporte es asociado a los registro de resultados
+# siempre y cuando estos deben tener registrada una observación
 def guardar_reporte(ob1, ob2):
     try:
         #Obtenemos el objeto resultado
@@ -1421,7 +1456,6 @@ def guardar_reporte(ob1, ob2):
     except Exception as e:
         return False
     
-
 
 
 ## GENERAR REPORTE POR NOMBRE DE PACIENTE ##
@@ -1507,7 +1541,8 @@ def generar_reporte_all(request):
     else:
         return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
 
-
+# Verificación de existencia de un estudiante en un curso. Permite dar paso a la generación del 
+# registro de los reportes generales
 def verificar_paciente_curso(ob1, ob2, ob3):
     try:
         # Obtenemos el paciente
@@ -1530,7 +1565,8 @@ def verificar_paciente_curso(ob1, ob2, ob3):
     except DetalleInscripcionCurso.DoesNotExist:
         return False
 
-
+# Verifica elestado de los resultados para evitar leer resultados cuyos reportes ya existan o en su defecto
+# no tengan cargado una observación
 def verificar_resultado_estado(ob1, ob2):
     try:
         # Obtenemos el paciente
@@ -1546,7 +1582,7 @@ def verificar_resultado_estado(ob1, ob2):
     except Resultado.DoesNotExist:
         return False
 
-
+# Generar reportes de los resultados por nombre del estudiante
 def Reporte_general_Nombre(ob1, ob2, ob3):               
     # Obtener el paciente
     paciente_ob = Paciente.objects.get(nombre_usuario__iexact=ob1, apellido_usuario__iexact=ob2)                    
@@ -1644,6 +1680,12 @@ def contenido_individual(request, slug):
                         url_c3 = cloudinary.CloudinaryImage(contenidoI__ob.imagen3.name).build_url()
                         context.update({'tipo': 'selecion_multiple_img', 'url_c1': url_c1, 'url_c2': url_c2, 'url_c3': url_c3})
                         return JsonResponse(context)
+                    elif (contenidoI__ob.tipo_contenido == 'pictograma'):
+                        url_c1 = cloudinary.CloudinaryImage(contenidoI__ob.imagen1.name).build_url()
+                        url_c2 = cloudinary.CloudinaryImage(contenidoI__ob.imagen2.name).build_url()
+                        url_c3 = cloudinary.CloudinaryImage(contenidoI__ob.imagen3.name).build_url()
+                        context.update({'tipo': 'pictograma', 'url_c1': url_c1, 'url_c2': url_c2, 'url_c3': url_c3})
+                        return JsonResponse(context)
 
                 else:
                     error_message = "No existe contenido"
@@ -1716,6 +1758,7 @@ def obtener_contenido_individual(request, codigo):
     except Exception as e:
         return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
 
+# Método para obtener el slug de un contenido individual
 def obtener_slug_CI(codigo):
     try:
         # Obtenemos el objeto contenido individual

@@ -275,7 +275,6 @@ export function PacienteListado() {
     const navigate = useNavigate();
     // Manejo del estado de los datos
     const [pacientes, setPacientes] = useState([]);
-    const token = localStorage.getItem('token');
     const [numeroPag, setNumeropag] = useState(1);
     const elementosPorPagina = 8;
     // Busqueda
@@ -283,6 +282,7 @@ export function PacienteListado() {
     const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
     const [isTamanio, setIstamanio] = useState(false);
     const [entradaValida, setEntradavaldia] = useState(true);
+    const [generalPa, setGeneralPa] = useState(false);
     // Escoger busqueda
     const [busquedaPaci, setBusquedaPaci] = useState("0");
     const [escogido, setEscogido] = useState(false);
@@ -317,15 +317,6 @@ export function PacienteListado() {
         }
     }
 
-    // Manejo del estado de los datos
-    useEffect(() => {
-        if (token && !mostrarBusqueda) {
-            cargarPacientes();
-        } else if (token && mostrarBusqueda) {
-            busquedaPaciente();
-        }
-    }, [slug, page, mostrarBusqueda]);
-
     // Busqueda
     const busquedaPaciente = async () => {
         // Verificar campos vacíos
@@ -350,11 +341,26 @@ export function PacienteListado() {
                 setPacientes(busqueda_paciente.data.results);
                 setNumeropag(Math.ceil(busqueda_paciente.data.count / elementosPorPagina));
                 setMostrarBusqueda(true);
+                setGeneralPa(true);
             }
         } catch (error) {
             Swal.fire("No existe un paciente con ese nombre. Ingresa un nombre válido", "", "warning");
         }
     }
+
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (generalPa && mostrarBusqueda && nombrebuscarP !== "") {
+            busquedaPaciente();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (generalPa && mostrarBusqueda && nombrebuscarP !== "") {
+                busquedaPaciente();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+    }, [slug, mostrarBusqueda, generalPa, nombrebuscarP, page]);
 
     // BUSCAR POR CEDULA
     // Metodo de busqueda por cédula
@@ -364,15 +370,15 @@ export function PacienteListado() {
             Swal.fire("Por favor ingrese el campo de cédula", "", "warning");
             return;
         }
+        // Validar tamaño de cédula
+        if (cedula.length < 10) {
+            Swal.fire("La cédula debe tener al menos 10 dígitos", "", "warning");
+            resetearBusqueda();
+            return;
+        }
         // Verificar cédula ingresada
         try {
             if (cedula !== "") {
-                // Validar tamaño de cédula
-                if (cedula.length < 10) {
-                    Swal.fire("La cédula debe tener al menos 10 dígitos", "", "warning");
-                    resetearBusqueda();
-                    return;
-                }
                 const resultadoPCedula = await EstudianteporCedula(cedula, slug, page);
                 if (resultadoPCedula.data.results.length === 0) {
                     Swal.fire("No existe un estudiante con esa cédula en el curso. Ingrese una válida.", "", "warning");
@@ -382,6 +388,7 @@ export function PacienteListado() {
                     setPacientes(resultadoPCedula.data.results);
                     setNumeropag(Math.ceil(resultadoPCedula.data.count / elementosPorPagina));
                     setEstadoBusquedaCR(true);
+                    setGeneralPa(true);
                 }
             } else {
                 cargarPacientes();
@@ -397,24 +404,33 @@ export function PacienteListado() {
 
     // Manejo del estado de los datos
     useEffect(() => {
-        if (!estadoBusquedaCR) {
-            resetearBusqueda();
-            cargarPacientes();
-        } else {
+        if (generalPa && estadoBusquedaCR && cedula !== "") {
             buscarEstudianteCedula();
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (!estadoBusquedaCR) {
-                resetearBusqueda();
-                cargarPacientes();
-            } else {
+            if (generalPa && estadoBusquedaCR && cedula !== "") {
                 buscarEstudianteCedula();
             }
         }, 1200000); // 20 minutos
         return () => clearInterval(interval);
 
-    }, [slug, estadoBusquedaCR, page]);
+    }, [slug, estadoBusquedaCR, generalPa, cedula, page]);
+
+    // Listado general 
+    useEffect(() => {
+        if (!generalPa && !mostrarBusqueda && !estadoBusquedaCR && nombrebuscarP === "" && cedula === "") {
+            cargarPacientes();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (!generalPa && !mostrarBusqueda && !estadoBusquedaCR && nombrebuscarP === "" && cedula === "") {
+                cargarPacientes();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+
+    }, [slug, generalPa, mostrarBusqueda, estadoBusquedaCR, page]);
 
     // VALIDACIONES DE ENTRADA Y SALIDA
     // Funcion para mostrar errores
@@ -426,14 +442,14 @@ export function PacienteListado() {
     };
     // Resetear busqueda
     const resetearBusqueda = () => {
+        setGeneralPa(false);
+        setEscogido2(false);
+        setEstadoBusquedaCR(false);
         setMostrarBusqueda(false);
+        setEscogido(false);
         setNombreBuscarP("");
         setBusquedaPaci("0");
-        setEscogido(false);
-        // Paciente
-        setEstadoBusquedaCR(false);
         setCedula("");
-        setEscogido2(false);
     }
     // Control de entrada de datos
     const isEmptyField = (...fields) => {
@@ -503,11 +519,11 @@ export function PacienteListado() {
                             <option value="2">Cédula de identidad</option>
                         </select>
                         {escogido && (
-                            <form style={{width: '400px'}}>
+                            <form style={{ width: '400px' }}>
                                 <div className="row form-group">
                                     <div className="col-2 d-flex justify-content-center mt-2">
                                         <label htmlFor="nombre" style={{ fontFamily: 'Pacifico' }}
-                                        >Nombre</label>
+                                        >Nombre:</label>
                                     </div>
                                     <div className="col-10 d-flex flex-row">
                                         <input type="text" className="form-control" id="nombre"
@@ -529,10 +545,10 @@ export function PacienteListado() {
                         )}
                         {
                             escogido2 && (
-                                <form style={{width: '400px'}}>
+                                <form style={{ width: '400px' }}>
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
-                                            <label htmlFor="cedula" style={{ fontFamily: 'Pacifico' }}>Cédula</label>
+                                            <label htmlFor="cedula" style={{ fontFamily: 'Pacifico' }}>Cédula:</label>
                                         </div>
                                         <div className="col-10 d-flex flex-row">
                                             <input type="text" className="form-control" id="cedula"
@@ -579,6 +595,8 @@ export function ResultadoLista({ usuario }) {
     const navigate = useNavigate();
     // Manejo del estado de los datos
     const [resultados, setResultados] = useState([]);
+    // Por nombre
+    const [resultadosBusqueda, setResultadosBusqueda] = useState([]);
     const [nombrebuscar, setNombreBuscar] = useState("");
     // Validaciones
     const [mostrarBusqueda, setMostrarBusqueda] = useState(false);
@@ -593,12 +611,12 @@ export function ResultadoLista({ usuario }) {
     const [estadoBusqueda, setEstadoBusqueda] = useState(false);
     const [estadoBusquedaSel, setEstadoBusquedaSel] = useState(false);
     const [estadoBusquedaCR, setEstadoBusquedaCR] = useState(false);
+    const [general, setGeneral] = useState(false);
     // Escoger busqueda
     const [busqueda, setBusqueda] = useState("0");
     const [escogido, setEscogido] = useState(false);
     const [escogido2, setEscogido2] = useState(false);
     const [escogido3, setEscogido3] = useState(false);
-
     // Obtener resultados
     const cargarResultados = async () => {
         try {
@@ -607,21 +625,21 @@ export function ResultadoLista({ usuario }) {
             if (usuario_dat.data.success) {
                 if (usuario_dat.data.tipo === "comun") {
                     let resultado = await ResultadosListaUsuario(usuario_dat.data.identificador, page);
-                    setResultados(resultado.data.results);
                     if (resultado.data.results.length === 0) {
                         setIstamanio(true);
                         setNumeropag(1);
                     } else {
+                        setResultados(resultado.data.results);
                         setNumeropag(Math.ceil(resultado.data.count / elementosPorPagina));
                     }
                 } else {
                     // Cargar datos de resultados
                     let resultado_n = await ResultadosListado(page);
-                    setResultados(resultado_n.data.results);
                     if (resultado_n.data.results.length === 0) {
                         setIstamanio(true);
                         setNumeropag(1);
                     } else {
+                        setResultados(resultado_n.data.results);
                         setNumeropag(Math.ceil(resultado_n.data.count / elementosPorPagina));
                     }
                 }
@@ -639,25 +657,6 @@ export function ResultadoLista({ usuario }) {
             }
         }
     }
-
-    // Manejo del estado de los datos
-    useEffect(() => {
-        if (!mostrarBusqueda) {
-            cargarResultados();
-        } else {
-            busquedaResultado();
-        }
-        //Controla el tiempo de actualizacion de la pagina
-        const interval = setInterval(() => {
-            if (!mostrarBusqueda) {
-                cargarResultados();
-            } else {
-                busquedaResultado();
-            }
-        }, 1200000); // 20 minutos
-        return () => clearInterval(interval);
-
-    }, [mostrarBusqueda, page]);
 
     // Busqueda
     const busquedaResultado = async () => {
@@ -682,12 +681,28 @@ export function ResultadoLista({ usuario }) {
                 setResultados(datos_obtenidos.data.results);
                 setNumeropag(Math.ceil(datos_obtenidos.data.count / elementosPorPagina));
                 setMostrarBusqueda(true);
+                setGeneral(true);
             }
         } catch (error) {
             resetearBusqueda();
             Swal.fire("No existen resultados con ese nombre de paciente. Ingresa un nombre válido", "", "warning");
         }
     }
+
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (general && mostrarBusqueda && nombrebuscar !== "") {
+            busquedaResultado();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (general && mostrarBusqueda && nombrebuscar !== "") {
+                busquedaResultado();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+
+    }, [mostrarBusqueda, general, nombrebuscar, page]);
 
     // Metodo de busqueda
     const buscarResultadosFecha = async () => {
@@ -713,6 +728,7 @@ export function ResultadoLista({ usuario }) {
                             setResultados(resultadoTecnico.data.results);
                             setNumeropag(Math.ceil(resultadoTecnico.data.count / elementosPorPagina));
                             setEstadoBusqueda(true);
+                            setGeneral(true);
                         }
                     } else {
                         // cargar datos de cursos
@@ -725,6 +741,7 @@ export function ResultadoLista({ usuario }) {
                             setResultados(resultado.data.results);
                             setNumeropag(Math.ceil(resultado.data.count / elementosPorPagina));
                             setEstadoBusqueda(true);
+                            setGeneral(true);
                         }
                     }
                 } else {
@@ -744,22 +761,18 @@ export function ResultadoLista({ usuario }) {
 
     // Manejo del estado de los datos
     useEffect(() => {
-        if (!estadoBusqueda) {
-            cargarResultados();
-        } else {
+        if (estadoBusqueda && general && fecha !== "") {
             buscarResultadosFecha();
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (!estadoBusqueda) {
-                cargarResultados();
-            } else {
+            if (estadoBusqueda && general && fecha !== "") {
                 buscarResultadosFecha();
             }
         }, 1200000); // 20 minutos
         return () => clearInterval(interval);
 
-    }, [estadoBusqueda, page]);
+    }, [estadoBusqueda, general, fecha, page]);
 
     // Metodo de busqueda
     const buscarResultadosRango = async () => {
@@ -780,6 +793,7 @@ export function ResultadoLista({ usuario }) {
                             setResultados(resultadoTecnicoRango.data.results);
                             setNumeropag(Math.ceil(resultadoTecnicoRango.data.count / elementosPorPagina));
                             setEstadoBusquedaSel(true);
+                            setGeneral(true);
                         }
                     } else {
                         // cargar datos de cursos
@@ -792,6 +806,7 @@ export function ResultadoLista({ usuario }) {
                             setResultados(resultadoRango.data.results);
                             setNumeropag(Math.ceil(resultadoRango.data.count / elementosPorPagina));
                             setEstadoBusquedaSel(true);
+                            setGeneral(true);
                         }
                     }
                 } else {
@@ -811,17 +826,12 @@ export function ResultadoLista({ usuario }) {
 
     // Manejo del estado de los datos
     useEffect(() => {
-        if (limite === "0") {
-            resetearBusqueda();
-            cargarResultados();
-        } else {
+        if (limite !== "0" && limite !== "" && estadoBusquedaSel && general) {
             buscarResultadosRango();
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (limite === "0") {
-                cargarResultados();
-            } else {
+            if (limite !== "0" && limite !== "" && estadoBusquedaSel && general) {
                 buscarResultadosRango();
             }
         }, 1200000); // 20 minutos
@@ -836,24 +846,25 @@ export function ResultadoLista({ usuario }) {
             Swal.fire("Por favor ingrese el campo de cédula", "", "warning");
             return;
         }
+        // Validar tamaño de cédula
+        if (cedula.length < 10) {
+            Swal.fire("La cédula debe tener al menos 10 dígitos", "", "warning");
+            resetearBusquedaCedula();
+            return;
+        }
         // Verificar cédula ingresada
         try {
             if (cedula !== "") {
-                // Validar tamaño de cédula
-                if (cedula.length < 10) {
-                    Swal.fire("La cédula debe tener al menos 10 dígitos", "", "warning");
-                    resetearBusquedaCedula();
-                    return;
-                }
                 const resultadoCedula = await ResultadoporCedula(cedula, page);
                 if (resultadoCedula.data.results.length === 0) {
                     Swal.fire("No existen resultados de estudiante con esa cédula. Ingrese una válida.", "", "warning");
                     resetearBusquedaCedula();
                     return;
                 } else {
-                    setResultados(resultadoCedula.data.results);
+                    setResultadosBusqueda(resultadoCedula.data.results);
                     setNumeropag(Math.ceil(resultadoCedula.data.count / elementosPorPagina));
                     setEstadoBusquedaCR(true);
+                    setGeneral(true);
                 }
             } else {
                 cargarResultados();
@@ -869,24 +880,18 @@ export function ResultadoLista({ usuario }) {
 
     // Manejo del estado de los datos
     useEffect(() => {
-        if (!estadoBusquedaCR) {
-            resetearBusqueda();
-            cargarResultados();
-        } else {
-            buscarResultadoCedula();
+        if (estadoBusquedaCR && general && cedula !== "") {
+            setResultados(resultadosBusqueda);
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (!estadoBusquedaCR) {
-                resetearBusqueda();
-                cargarResultados();
-            } else {
-                buscarResultadoCedula();
+            if (estadoBusquedaCR && general && cedula !== "") {
+                setResultados(resultadosBusqueda);
             }
         }, 1200000); // 20 minutos
         return () => clearInterval(interval);
 
-    }, [estadoBusquedaCR, page]);
+    }, [estadoBusquedaCR, cedula, general, page]);
 
     // CONTROLES DE ENTRADA Y SALIDA
 
@@ -901,25 +906,33 @@ export function ResultadoLista({ usuario }) {
     const isEmptyField = (...fields) => {
         return fields.some(field => field.trim() === "");
     }
-    // Reseteo de cédula
-    const resetearBusquedaCedula = () => {
-        setEscogido3(false);
-        setEstadoBusquedaCR(false);
-        setCedula("");
-        setBusqueda("0");
-    }
+
     // Resetear busqueda
     const resetearBusqueda = () => {
+        // Modificación de estados
         setMostrarBusqueda(false);
-        setNombreBuscar("");
         setEstadoBusqueda(false);
-        setFecha("");
         setEstadoBusquedaSel(false);
-        setLimite("");
-        setBusqueda("0");
+        setEstadoBusquedaCR(false);
         setEscogido(false);
         setEscogido2(false);
+        setEscogido3(false);
+        setGeneral(false);
+        // Modificación de variables de entrada
+        setNombreBuscar("");
+        setFecha("");
+        setLimite("");
+        setBusqueda("0");
+        setCedula("");
     }
+
+    // Cuando ninguna condición o estado este activo
+    useEffect(() => {
+        if (!general && !mostrarBusqueda && !estadoBusqueda && !estadoBusquedaSel && !estadoBusquedaCR
+            && nombrebuscar === "" && fecha === "" && limite === "" && cedula === "") {
+            cargarResultados();
+        }
+    }, [page, general, mostrarBusqueda, estadoBusqueda, estadoBusquedaSel, estadoBusquedaCR]);
 
     // Funcion para validar la entreada
     const cambioEntrada = (e) => {
@@ -996,11 +1009,11 @@ export function ResultadoLista({ usuario }) {
                             <option value="3">Cédula de identidad</option>
                         </select>
                         {escogido && (
-                            <form style={{width: '380px'}}>
+                            <form style={{ width: '380px' }}>
                                 <div className="row form-group">
                                     <div className="col-2 d-flex justify-content-center mt-2">
                                         <label htmlFor="nombre" style={{ fontFamily: 'Pacifico' }}
-                                        >Nombre</label>
+                                        >Nombre:</label>
                                     </div>
                                     <div className="col-10 d-flex flex-row">
                                         <input type="text" className="form-control" id="nombre"
@@ -1022,10 +1035,10 @@ export function ResultadoLista({ usuario }) {
                         )}
                         {
                             escogido2 && (
-                                <form style={{width: '380px'}}>
+                                <form style={{ width: '380px' }}>
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
-                                            <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                            <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha:</label>
                                         </div>
                                         <div className="col-9 d-flex flex-row">
                                             <input type="date" className="form-control" id="fecha"
@@ -1047,10 +1060,10 @@ export function ResultadoLista({ usuario }) {
                             )}
                         {
                             escogido3 && (
-                                <form style={{width: '380px'}}>
+                                <form style={{ width: '380px' }}>
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
-                                            <label htmlFor="cedula" style={{ fontFamily: 'Pacifico' }}>Cédula</label>
+                                            <label htmlFor="cedula" style={{ fontFamily: 'Pacifico' }}>Cédula:</label>
                                         </div>
                                         <div className="col-10 d-flex flex-row">
                                             <input type="text" className="form-control" id="cedula"
@@ -1065,7 +1078,7 @@ export function ResultadoLista({ usuario }) {
                                             <>
                                                 {
                                                     estadoBusquedaCR
-                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusquedaCedula}>
+                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
                                                             X
                                                         </Button>
                                                         : <Button variant="success" className="my-2 my-sm-0" onClick={buscarResultadoCedula} disabled={isTamanio}>
@@ -1085,7 +1098,7 @@ export function ResultadoLista({ usuario }) {
                         <form>
                             <div className="row form-group">
                                 <div className="col-2 d-flex justify-content-center mt-2">
-                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Rango</label>
+                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Rango:</label>
                                 </div>
                                 <div className="col-9 d-flex flex-row">
                                     <select name="fecha" id="fecha"
@@ -1140,6 +1153,7 @@ export function CursoLista() {
     // Filtro de fecha
     const [fecha, setFecha] = useState("");
     const [estadoBusqueda, setEstadoBusqueda] = useState(false);
+    const [generalC, setGeneralC] = useState(false);
 
     // Datos de curso
     const cargarCursos = async () => {
@@ -1183,24 +1197,6 @@ export function CursoLista() {
         }
     }
 
-    // Estado de los datos
-    useEffect(() => {
-        if (token && !mostrarBusqueda) {
-            cargarCursos();
-        } else if (token && mostrarBusqueda) {
-            busquedaCurso();
-        }
-        //Controla el tiempo de actualizacion de la pagina
-        const interval = setInterval(() => {
-            if (token && !mostrarBusqueda) {
-                cargarCursos();
-            } else if (token && mostrarBusqueda) {
-                busquedaCurso();
-            }
-        }, 300000); // 5 minutos
-        return () => clearInterval(interval);
-    }, [mostrarBusqueda, page]);
-
     // Funcion para mostrar errores
     const mostrarError = (message) => {
         setError(message);
@@ -1227,24 +1223,26 @@ export function CursoLista() {
                 setCursos(datos_obtenidos.data.results);
                 setNumeropag(Math.ceil(datos_obtenidos.data.count / elementosPorPagina));
                 setMostrarBusqueda(true);
+                setGeneralC(true);
             }
         } catch (error) {
             Swal.fire("No existen cursos con ese nombre. Ingresa un nombre válido", "", "warning");
         }
     }
 
-    // Control de entrada de datos
-    const isEmptyField = (...fields) => {
-        return fields.some(field => field.trim() === "");
-    }
-
-    // Resetear busqueda
-    const resetearBusqueda = () => {
-        setMostrarBusqueda(false);
-        setNombreBuscar("");
-        setEstadoBusqueda(false);
-        setFecha("");
-    }
+    // Estado de los datos
+    useEffect(() => {
+        if (generalC && mostrarBusqueda && nombrebuscar !== "") {
+            busquedaCurso();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (generalC && mostrarBusqueda && nombrebuscar !== "") {
+                busquedaCurso();
+            }
+        }, 12000000); // 20 minutos
+        return () => clearInterval(interval);
+    }, [mostrarBusqueda, generalC, nombrebuscar, page]);
 
     // Metodo de busqueda
     const buscarCursosFecha = async () => {
@@ -1271,6 +1269,7 @@ export function CursoLista() {
                             setCursos(cursoTecnico.data.results);
                             setNumeropag(Math.ceil(cursoTecnico.data.count / elementosPorPagina));
                             setEstadoBusqueda(true);
+                            setGeneralC(true);
                         }
                     } else {
                         // cargar datos de cursos
@@ -1283,6 +1282,7 @@ export function CursoLista() {
                             setCursos(curso.data.results);
                             setNumeropag(Math.ceil(curso.data.count / elementosPorPagina));
                             setEstadoBusqueda(true);
+                            setGeneralC(true);
                         }
                     }
                 } else {
@@ -1302,22 +1302,50 @@ export function CursoLista() {
 
     // Manejo del estado de los datos
     useEffect(() => {
-        if (!estadoBusqueda) {
-            cargarCursos();
-        } else {
+        if (generalC && estadoBusqueda && fecha !== "") {
             buscarCursosFecha();
+
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (!estadoBusqueda) {
-                cargarCursos();
-            } else {
+            if (generalC && estadoBusqueda && fecha !== "") {
                 buscarCursosFecha();
             }
         }, 1200000); // 20 minutos
         return () => clearInterval(interval);
 
-    }, [estadoBusqueda, page]);
+    }, [estadoBusqueda, generalC, fecha, page]);
+
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (!generalC && !estadoBusqueda && !mostrarBusqueda && nombrebuscar === "" && fecha === "") {
+            cargarCursos();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (!generalC && !estadoBusqueda && !mostrarBusqueda && nombrebuscar === "" && fecha === "") {
+                cargarCursos();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+
+    }, [generalC, estadoBusqueda, mostrarBusqueda, page]);
+
+    // CONTROLES DE ENTRADA Y SALIDA
+
+    // Control de entrada de datos
+    const isEmptyField = (...fields) => {
+        return fields.some(field => field.trim() === "");
+    }
+
+    // Resetear busqueda
+    const resetearBusqueda = () => {
+        setGeneralC(false);
+        setMostrarBusqueda(false);
+        setNombreBuscar("");
+        setEstadoBusqueda(false);
+        setFecha("");
+    }
 
     return (
         <div>
@@ -1340,7 +1368,7 @@ export function CursoLista() {
             }
             <div className="mt-2 container alineacion-triple" style={{ height: '50px', borderRadius: '10px' }}>
                 <div className="d-flex flex-row justify-content-left w-100" style={{ alignItems: 'center', marginLeft: '1px' }}>
-                    <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar</a>
+                    <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar:</a>
                     <form className="d-flex flex-row justify-content-between w-50">
                         <input className="form-control mr-sm-2 w-100" type="search" name="nombre" id="nombre"
                             placeholder="Nombre del curso.." aria-label="Search" value={nombrebuscar}
@@ -1358,14 +1386,14 @@ export function CursoLista() {
                         </>
                     </form>
                 </div>
-                <div className="alineacion-lista-busqueda" style={{ marginTop: '5%' }}>
+                <div style={{ marginTop: '5%' }}>
                     <div className="col-md-12">
                         <form>
-                            <div className="row form-group">
-                                <div className="col-2 d-flex justify-content-center mt-2">
-                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                            <div className="form-group d-flex justify-content-between">
+                                <div className="mt-2 text-right">
+                                    <a style={{ fontFamily: 'Pacifico' }}> Fecha:</a>
                                 </div>
-                                <div className="col-9 d-flex flex-row">
+                                <div className="d-flex flex-row">
                                     <input type="date" className="form-control" id="fecha"
                                         value={fecha} onChange={(e) => setFecha(e.target.value)} />
                                     <>
@@ -1412,6 +1440,7 @@ export function SalaLista({ usuario }) {
     // Filtro de fecha
     const [fecha, setFecha] = useState("");
     const [estadoBusqueda, setEstadoBusqueda] = useState(false);
+    const [salasAA, setSalasAA] = useState(false);
 
     // Obtener resultados
     const cargarSala = async () => {
@@ -1453,35 +1482,8 @@ export function SalaLista({ usuario }) {
         }
     }
 
-    // Manejo del estado de los datos
-    useEffect(() => {
-        if (!mostrarBusqueda) {
-            cargarSala();
-        } else {
-            busquedaClick();
-        }
-        //Controla el tiempo de actualizacion de la pagina
-        const interval = setInterval(() => {
-            if (!mostrarBusqueda) {
-                cargarSala();
-            } else {
-                busquedaClick();
-            }
-        }, 1200000); // 20 minutos
-        return () => clearInterval(interval);
-
-    }, [mostrarBusqueda, page]);
-
-    // Funcion para mostrar errores
-    const mostrarError = (message) => {
-        setError(message);
-        setTimeout(() => {
-            setError("");
-        }, 5000);
-    };
-
     // Busqueda
-    const busquedaClick = async () => {
+    const busquedaSalaNombre = async () => {
         // Verificar campos vacíos
         if (isEmptyField(nombrebuscar)) {
             Swal.fire("Por favor ingrese todos los campos", "", "warning");
@@ -1498,24 +1500,27 @@ export function SalaLista({ usuario }) {
                 setSalas(busqueda_sala.data.results);
                 setNumeropag(Math.ceil(busqueda_sala.data.count / elementosPorPagina));
                 setMostrarBusqueda(true);
+                setSalasAA(true);
             }
         } catch (error) {
             Swal.fire("No existe una sala con ese nombre. Ingresa un nombre válido", "", "warning");
         }
     }
 
-    // Resetear busqueda
-    const resetearBusqueda = () => {
-        setMostrarBusqueda(false);
-        setNombreBuscar("");
-        setFecha("");
-        setEstadoBusqueda(false);
-    }
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (salasAA && mostrarBusqueda && nombrebuscar !== "") {
+            busquedaSalaNombre();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (salasAA && mostrarBusqueda && nombrebuscar !== "") {
+                busquedaSalaNombre();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
 
-    // Control de entrada de datos
-    const isEmptyField = (...fields) => {
-        return fields.some(field => field.trim() === "");
-    }
+    }, [mostrarBusqueda, salasAA, nombrebuscar, page]);
 
     // Metodo de busqueda
     const buscarSalasFecha = async () => {
@@ -1541,6 +1546,7 @@ export function SalaLista({ usuario }) {
                             setSalas(salaTecnico.data.results);
                             setNumeropag(Math.ceil(salaTecnico.data.count / elementosPorPagina));
                             setEstadoBusqueda(true);
+                            setSalasAA(true);
                         }
                     } else {
                         // cargar datos de cursos
@@ -1553,6 +1559,7 @@ export function SalaLista({ usuario }) {
                             setSalas(sala.data.results);
                             setNumeropag(Math.ceil(sala.data.count / elementosPorPagina));
                             setEstadoBusqueda(true);
+                            setSalasAA(true);
                         }
                     }
                 } else {
@@ -1572,22 +1579,56 @@ export function SalaLista({ usuario }) {
 
     // Manejo del estado de los datos
     useEffect(() => {
-        if (!estadoBusqueda) {
-            cargarSala();
-        } else {
-            buscarSalasFecha();
+        if (salasAA && estadoBusqueda && fecha !== "") {
+            buscarSalasFecha(); // Busqueda por fecha
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (!estadoBusqueda) {
-                cargarSala();
-            } else {
-                buscarSalasFecha();
+            if (salasAA && estadoBusqueda && fecha !== "") {
+                buscarSalasFecha(); // Busqueda por fecha
             }
         }, 1200000); // 20 minutos
         return () => clearInterval(interval);
 
-    }, [estadoBusqueda, page]);
+    }, [estadoBusqueda, salasAA, fecha, page]);
+
+    // Listado principal
+    useEffect(() => {
+        if (!salasAA && !estadoBusqueda && !mostrarBusqueda && nombrebuscar === "" && fecha === "") {
+            cargarSala();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (!salasAA && !estadoBusqueda && !mostrarBusqueda && nombrebuscar === "" && fecha === "") {
+                cargarSala();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+
+    }, [salasAA, estadoBusqueda, mostrarBusqueda, page]);
+
+    // CONTROLES DE ENTRADA Y SALIDA 
+    // Funcion para mostrar errores
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
+    // Resetear busqueda
+    const resetearBusqueda = () => {
+        // Control de estados
+        setMostrarBusqueda(false);
+        setEstadoBusqueda(false);
+        setSalasAA(false);
+        // Control de variables
+        setNombreBuscar("");
+        setFecha("");
+    }
+    // Control de entrada de datos
+    const isEmptyField = (...fields) => {
+        return fields.some(field => field.trim() === "");
+    }
 
     return (
         <div>
@@ -1610,7 +1651,7 @@ export function SalaLista({ usuario }) {
             }
             <div className="mt-2 container alineacion-triple" style={{ height: '50px', borderRadius: '10px' }}>
                 <div className="d-flex flex-row justify-content-left w-100" style={{ alignItems: 'center', marginLeft: '1px' }}>
-                    <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar</a>
+                    <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar:</a>
                     <form className="d-flex flex-row justify-content-between w-50">
                         <input className="form-control mr-sm-2 w-100" type="search" name="nombre" id="nombre"
                             placeholder="Nombre de sala.. Ejm: Sala 1" aria-label="Search" value={nombrebuscar}
@@ -1621,7 +1662,7 @@ export function SalaLista({ usuario }) {
                                     ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
                                         X
                                     </Button>
-                                    : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaClick} disabled={isTamanio}>
+                                    : <Button variant="success" className="my-2 my-sm-0" onClick={busquedaSalaNombre} disabled={isTamanio}>
                                         Vamos
                                     </Button>
                             }
@@ -1633,7 +1674,7 @@ export function SalaLista({ usuario }) {
                         <form>
                             <div className="row form-group">
                                 <div className="col-2 d-flex justify-content-center mt-2">
-                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha:</label>
                                 </div>
                                 <div className="col-9 d-flex flex-row">
                                     <input type="date" className="form-control" id="fecha"
@@ -1857,6 +1898,7 @@ export function SalaListaAtendidas({ usuario }) {
     // Filtro de fecha
     const [fecha, setFecha] = useState("");
     const [estadoBusqueda, setEstadoBusqueda] = useState(false);
+    const [salasAA, setSalasAA] = useState(false);
 
     // Obtener resultados
     const cargarSalaAtendi = async () => {
@@ -1888,33 +1930,6 @@ export function SalaListaAtendidas({ usuario }) {
         }
     }
 
-    // Manejo del estado de los datos
-    useEffect(() => {
-        if (!mostrarBusqueda) {
-            cargarSalaAtendi();
-        } else {
-            busquedaDeSala();
-        }
-        //Controla el tiempo de actualizacion de la pagina
-        const interval = setInterval(() => {
-            if (!mostrarBusqueda) {
-                cargarSalaAtendi();
-            } else {
-                busquedaDeSala();
-            }
-        }, 1200000); // 20 minutos
-        return () => clearInterval(interval);
-
-    }, [mostrarBusqueda, page]);
-
-    // Funcion para mostrar errores
-    const mostrarError = (message) => {
-        setError(message);
-        setTimeout(() => {
-            setError("");
-        }, 5000);
-    };
-
     // Busqueda
     const busquedaDeSala = async () => {
         // Verificar campos vacíos
@@ -1933,24 +1948,27 @@ export function SalaListaAtendidas({ usuario }) {
                 setSalas(busqueda_sala.data.results);
                 setNumeropag(Math.ceil(busqueda_sala.data.count / elementosPorPagina));
                 setMostrarBusqueda(true);
+                setSalasAA(true);
             }
         } catch (error) {
             Swal.fire("No existe una sala con ese nombre. Ingresa un nombre válido", "", "warning");
         }
     }
 
-    // Resetear busqueda
-    const resetearBusqueda = () => {
-        setMostrarBusqueda(false);
-        setNombreBuscar("");
-        setEstadoBusqueda(false);
-        setFecha("");
-    }
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (salasAA && mostrarBusqueda && nombrebuscar !== "") {
+            busquedaDeSala();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (salasAA && mostrarBusqueda && nombrebuscar !== "") {
+                busquedaDeSala();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
 
-    // Control de entrada de datos
-    const isEmptyField = (...fields) => {
-        return fields.some(field => field.trim() === "");
-    }
+    }, [mostrarBusqueda, salasAA, nombrebuscar, page]);
 
     // Metodo de busqueda
     const buscarSalasFechaAtendidas = async () => {
@@ -1975,6 +1993,7 @@ export function SalaListaAtendidas({ usuario }) {
                         setSalas(salatendias.data.results);
                         setNumeropag(Math.ceil(salatendias.data.count / elementosPorPagina));
                         setEstadoBusqueda(true);
+                        setSalasAA(true);
                     }
                 } else {
                     navigate('/login');
@@ -1993,22 +2012,55 @@ export function SalaListaAtendidas({ usuario }) {
 
     // Manejo del estado de los datos
     useEffect(() => {
-        if (!estadoBusqueda) {
-            cargarSalaAtendi();
-        } else {
+        if (salasAA && estadoBusqueda && fecha !== "") {
             buscarSalasFechaAtendidas();
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (!estadoBusqueda) {
-                cargarSalaAtendi();
-            } else {
+            if (salasAA && estadoBusqueda && fecha !== "") {
                 buscarSalasFechaAtendidas();
             }
         }, 1200000); // 20 minutos
         return () => clearInterval(interval);
 
-    }, [estadoBusqueda, page]);
+    }, [estadoBusqueda, salasAA, fecha, page]);
+
+    // Listado principal
+    useEffect(() => {
+        if (!salasAA && !estadoBusqueda && !mostrarBusqueda && nombrebuscar === "" && fecha === "") {
+            cargarSalaAtendi();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (!salasAA && !estadoBusqueda && !mostrarBusqueda && nombrebuscar === "" && fecha === "") {
+                cargarSalaAtendi();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+    }, [salasAA, estadoBusqueda, mostrarBusqueda, page]);
+
+    // CONTROLES DE ENTRADA Y SALIDA
+    // Funcion para mostrar errores
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
+    // Resetear busqueda
+    const resetearBusqueda = () => {
+        // Control de estados
+        setSalasAA(false);
+        setMostrarBusqueda(false);
+        setEstadoBusqueda(false);
+        // Control de variable
+        setNombreBuscar("");
+        setFecha("");
+    }
+    // Control de entrada de datos
+    const isEmptyField = (...fields) => {
+        return fields.some(field => field.trim() === "");
+    }
 
     return (
         <div>
@@ -2031,7 +2083,7 @@ export function SalaListaAtendidas({ usuario }) {
             }
             <div className="mt-2 container alineacion-triple" style={{ height: '50px', borderRadius: '10px' }}>
                 <div className="d-flex flex-row justify-content-left w-100" style={{ alignItems: 'center', marginLeft: '1px' }}>
-                    <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar</a>
+                    <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar:</a>
                     <form className="d-flex flex-row justify-content-between w-50">
                         <input className="form-control mr-sm-2 w-100" type="search" name="nombre" id="nombre"
                             placeholder="Nombre de sala.. Ejm: Sala 1" aria-label="Search" value={nombrebuscar}
@@ -2054,7 +2106,7 @@ export function SalaListaAtendidas({ usuario }) {
                         <form>
                             <div className="row form-group">
                                 <div className="col-2 d-flex justify-content-center mt-2">
-                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha:</label>
                                 </div>
                                 <div className="col-9 d-flex flex-row">
                                     <input type="date" className="form-control" id="fecha"
@@ -2108,6 +2160,7 @@ export function ReporteLista({ usuario }) {
     const [estadoBusqueda, setEstadoBusqueda] = useState(false);
     const [estadoBusquedaSel, setEstadoBusquedaSel] = useState(false);
     const [estadoBusquedaCedu, setEstadoBusquedaCedu] = useState(false);
+    const [generalR, setGeneralR] = useState(false);
     // Escoger busqueda
     const [busqueda, setBusqueda] = useState("0");
     const [escogido, setEscogido] = useState(false);
@@ -2121,21 +2174,20 @@ export function ReporteLista({ usuario }) {
             const usuario_dat = await VerificarUsuario();
             if (usuario_dat.data.tipo === "tecnico") {
                 const reporte_tecnico = await ReporteListado(page);
-                setReportes(reporte_tecnico.data.results);
                 if (reporte_tecnico.data.results.length === 0) {
                     setIstamanio(true);
                     setNumeropag(1);
                 } else {
+                    setReportes(reporte_tecnico.data.results);
                     setNumeropag(Math.ceil(reporte_tecnico.data.count / elementosPorPagina));
                 }
             } else {
                 const reporte = await ReporteListadoUsuarioComun(usuario_dat.data.identificador, page);
-                setReportes(reporte.data.results);
-                console.log("Son los reportes especificos")
                 if (reporte.data.results.length === 0) {
-                    //setIstamanio(true);
+                    setIstamanio(true);
                     setNumeropag(1);
                 } else {
+                    setReportes(reporte.data.results);
                     setNumeropag(Math.ceil(reporte.data.count / elementosPorPagina));
                 }
             }
@@ -2147,25 +2199,6 @@ export function ReporteLista({ usuario }) {
             }
         }
     }
-
-    // Manejo del estado de los datos
-    useEffect(() => {
-        if (!mostrarBusqueda) {
-            cargarReporte();
-        } else {
-            busquedaReporte();
-        }
-        //Controla el tiempo de actualizacion de la pagina
-        const interval = setInterval(() => {
-            if (!mostrarBusqueda) {
-                cargarReporte();
-            } else {
-                busquedaReporte();
-            }
-        }, 1200000); // 20 minutos
-        return () => clearInterval(interval);
-
-    }, [mostrarBusqueda, page]);
 
     // BUSQUEDA
     // Metodo de busqueda
@@ -2191,11 +2224,27 @@ export function ReporteLista({ usuario }) {
                 setReportes(datos_obtenidos_repor.data.results);
                 setNumeropag(Math.ceil(datos_obtenidos_repor.data.count / elementosPorPagina));
                 setMostrarBusqueda(true);
+                setGeneralR(true);
             }
         } catch (error) {
             Swal.fire("No existen reportes con ese nombre de paciente. Ingresa un nombre válido", "", "warning");
         }
     }
+
+    // Manejo del estado de los datos
+    useEffect(() => {
+        if (generalR && mostrarBusqueda && nombrebuscar !== "") {
+            busquedaReporte();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (generalR && mostrarBusqueda && nombrebuscar !== "") {
+                busquedaReporte();
+            }
+        }, 1200000); // 20 minutos
+        return () => clearInterval(interval);
+
+    }, [mostrarBusqueda, generalR, nombrebuscar, page]);
 
     // Metodo de busqueda
     const buscarReportesFecha = async () => {
@@ -2221,6 +2270,7 @@ export function ReporteLista({ usuario }) {
                             setReportes(reporteTecnico.data.results);
                             setNumeropag(Math.ceil(reporteTecnico.data.count / elementosPorPagina));
                             setEstadoBusqueda(true);
+                            setGeneralR(true);
                         }
                     } else {
                         // cargar datos de cursos
@@ -2233,6 +2283,7 @@ export function ReporteLista({ usuario }) {
                             setReportes(reporte.data.results);
                             setNumeropag(Math.ceil(reporte.data.count / elementosPorPagina));
                             setEstadoBusqueda(true);
+                            setGeneralR(true);
                         }
                     }
                 } else {
@@ -2252,34 +2303,32 @@ export function ReporteLista({ usuario }) {
 
     // Manejo del estado de los datos
     useEffect(() => {
-        if (!estadoBusqueda) {
-            cargarReporte();
-        } else {
+        if (generalR && estadoBusqueda && fecha !== "") {
             buscarReportesFecha();
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (!estadoBusqueda) {
-                cargarReporte();
-            } else {
+            if (generalR && estadoBusqueda && fecha !== "") {
                 buscarReportesFecha();
             }
         }, 1200000); // 20 minutos
         return () => clearInterval(interval);
 
-    }, [estadoBusqueda, page]);
+    }, [estadoBusqueda, generalR, fecha, page]);
 
     // Metodo de busqueda
     const buscarReporteRango = async () => {
         // Verificar fecha
         try {
             if (limite !== "") {
+                console.log(limite);
                 // Verificar usuario
                 const usuarioC = await VerificarUsuario();
                 if (usuarioC.data.success) {
                     // Verificar tipo de usuario
                     if (usuarioC.data.tipo === "tecnico") {
                         const reporTecnicoRango = await ReporteporRangoTecnico(limite, page);
+                        console.log(reporTecnicoRango.data.results);
                         if (reporTecnicoRango.data.results.length === 0) {
                             Swal.fire("No existen reportes de ese rango de días. Escoja otro", "", "warning");
                             resetearBusqueda();
@@ -2288,6 +2337,7 @@ export function ReporteLista({ usuario }) {
                             setReportes(reporTecnicoRango.data.results);
                             setNumeropag(Math.ceil(reporTecnicoRango.data.count / elementosPorPagina));
                             setEstadoBusquedaSel(true);
+                            setGeneralR(true);
                         }
                     } else {
                         // cargar datos de cursos
@@ -2300,6 +2350,7 @@ export function ReporteLista({ usuario }) {
                             setReportes(reporteRango.data.results);
                             setNumeropag(Math.ceil(reporteRango.data.count / elementosPorPagina));
                             setEstadoBusquedaSel(true);
+                            setGeneralR(true);
                         }
                     }
                 } else {
@@ -2319,17 +2370,12 @@ export function ReporteLista({ usuario }) {
 
     // Manejo del estado de los datos
     useEffect(() => {
-        if (limite === "0") {
-            resetearBusqueda();
-            cargarReporte();
-        } else {
+        if (limite !== "0" && limite !== "" && estadoBusquedaSel) {
             buscarReporteRango();
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (limite === "0") {
-                cargarReporte();
-            } else {
+            if (limite !== "0" && limite !== "" && estadoBusquedaSel) {
                 buscarReporteRango();
             }
         }, 1200000); // 20 minutos
@@ -2344,15 +2390,15 @@ export function ReporteLista({ usuario }) {
             Swal.fire("Por favor ingrese el campo de cédula", "", "warning");
             return;
         }
+        // Validar tamaño de cédula
+        if (cedula.length < 10) {
+            Swal.fire("La cédula debe tener al menos 10 dígitos", "", "warning");
+            resetearBusqueda();
+            return;
+        }
         // Verificar fecha
         try {
             if (cedula !== "") {
-                // Validar tamaño de cédula
-                if (cedula.length < 10) {
-                    Swal.fire("La cédula debe tener al menos 10 dígitos", "", "warning");
-                    resetearBusqueda();
-                    return;
-                }
                 const reporTecnicoCedula = await ReporteporCedula(cedula, page);
                 if (reporTecnicoCedula.data.results.length === 0) {
                     Swal.fire("No existen reportes de estudiante con esa cédula. Ingrese uno válido.", "", "warning");
@@ -2362,6 +2408,7 @@ export function ReporteLista({ usuario }) {
                     setReportes(reporTecnicoCedula.data.results);
                     setNumeropag(Math.ceil(reporTecnicoCedula.data.count / elementosPorPagina));
                     setEstadoBusquedaCedu(true);
+                    setGeneralR(true);
                 }
             }
         } catch (error) {
@@ -2375,24 +2422,18 @@ export function ReporteLista({ usuario }) {
 
     // Manejo del estado de los datos
     useEffect(() => {
-        if (!estadoBusquedaCedu) {
-            resetearBusqueda();
-            cargarReporte();
-        } else {
+        if (generalR && estadoBusquedaCedu && cedula !== "") {
             buscarReporteCedula();
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (!estadoBusquedaCedu) {
-                resetearBusqueda();
-                cargarReporte();
-            } else {
+            if (generalR && estadoBusquedaCedu && cedula !== "") {
                 buscarReporteCedula();
             }
         }, 1200000); // 20 minutos
         return () => clearInterval(interval);
 
-    }, [estadoBusquedaCedu, page]);
+    }, [estadoBusquedaCedu, generalR, cedula, page]);
 
     // VALIDACIONES DE ENTRADA Y SALIDA DE DATOS
 
@@ -2419,19 +2460,31 @@ export function ReporteLista({ usuario }) {
     }
     // Resetear busqueda
     const resetearBusqueda = () => {
+        // Rectificar estados
+        setGeneralR(false);
         setMostrarBusqueda(false);
-        setNombreBuscar("");
         setEstadoBusqueda(false);
-        setFecha("");
         setEstadoBusquedaSel(false);
-        setLimite("");
-        setBusqueda("0");
+        setEstadoBusquedaCedu(false);
         setEscogido(false);
         setEscogido2(false);
         setEscogido3(false);
-        setEstadoBusquedaCedu(false);
+        // Rectificar campos
+        setNombreBuscar("");
+        setFecha("");
+        setLimite("");
+        setBusqueda("0");
         setCedula("");
     }
+
+    // Cuando ninguna condición o estado este activo
+    useEffect(() => {
+        if (!generalR && !mostrarBusqueda && !estadoBusqueda && !estadoBusquedaSel && !estadoBusquedaCedu
+            && nombrebuscar === "" && fecha === "" && limite === "" && cedula === "") {
+            cargarReporte();
+        }
+    }, [generalR, mostrarBusqueda, estadoBusqueda, estadoBusquedaSel, estadoBusquedaCedu, page]);
+
     // Funcion para mostrar errores
     const mostrarError = (message) => {
         setError(message);
@@ -2498,11 +2551,11 @@ export function ReporteLista({ usuario }) {
                             <option value="3">Número de cédula</option>
                         </select>
                         {escogido && (
-                            <form style={{width: '380px'}}>
+                            <form style={{ width: '380px' }}>
                                 <div className="row form-group">
                                     <div className="col-2 d-flex justify-content-center mt-2">
                                         <label htmlFor="nombre" style={{ fontFamily: 'Pacifico' }}
-                                        >Nombre</label>
+                                        >Nombre:</label>
                                     </div>
                                     <div className="col-10 d-flex flex-row">
                                         <input type="text" className="form-control" id="nombre"
@@ -2524,10 +2577,10 @@ export function ReporteLista({ usuario }) {
                         )}
                         {
                             escogido2 && (
-                                <form style={{width: '380px'}}>
+                                <form style={{ width: '380px' }}>
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
-                                            <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                            <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha:</label>
                                         </div>
                                         <div className="col-9 d-flex flex-row">
                                             <input type="date" className="form-control" id="fecha"
@@ -2551,10 +2604,10 @@ export function ReporteLista({ usuario }) {
                         }
                         {
                             escogido3 && (
-                                <form style={{width: '380px'}}>
+                                <form style={{ width: '380px' }}>
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
-                                            <label htmlFor="cedula" style={{ fontFamily: 'Pacifico' }}>Cédula</label>
+                                            <label htmlFor="cedula" style={{ fontFamily: 'Pacifico' }}>Cédula:</label>
                                         </div>
                                         <div className="col-10 d-flex flex-row">
                                             <input type="text" className="form-control" id="cedula"
@@ -2589,7 +2642,7 @@ export function ReporteLista({ usuario }) {
                         <form>
                             <div className="row form-group">
                                 <div className="col-2 d-flex justify-content-center mt-2">
-                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Rango</label>
+                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Rango:</label>
                                 </div>
                                 <div className="col-9 d-flex flex-row">
                                     <select name="fecha" id="fecha"

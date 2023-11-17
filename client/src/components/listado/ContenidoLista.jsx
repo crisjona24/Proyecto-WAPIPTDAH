@@ -173,7 +173,7 @@ export function ContenidoLista({ usuario }) {
             </div>
             <div className="mt-4 container" style={{ height: '50px', borderRadius: '10px' }}>
                 <div className="d-flex flex-row justify-content-left w-100" style={{ alignItems: 'center', marginLeft: '1px' }}>
-                    <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar</a>
+                    <a className="m-2" style={{ fontFamily: 'Pacifico' }}>Buscar :</a>
                     <form className="d-flex flex-row justify-content-between">
                         <input className="form-control mr-sm-2" type="search" name="nombre" id="nombre"
                             placeholder="Nombre de contenido.." aria-label="Search" value={nombrebuscar}
@@ -185,7 +185,7 @@ export function ContenidoLista({ usuario }) {
                                         X
                                     </Button>
                                     : <Button variant="success" className="my-2 my-sm-0" onClick={buscar} disabled={isTamanio}>
-                                        Ir
+                                        Vamos
                                     </Button>
                             }
                         </>

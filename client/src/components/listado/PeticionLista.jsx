@@ -37,6 +37,7 @@ export function PeticionLista() {
     const [tipoBusqueda, setTipoBusqueda] = useState("0");
     const [escogido1, setEscogido1] = useState(false);
     const [escogido2, setEscogido2] = useState(false);
+    const [generalP, setGeneralP] = useState(false);
 
     // Obtener datos
     const cargarPeticiones = async () => {
@@ -60,32 +61,6 @@ export function PeticionLista() {
         }
     }
 
-    // Estado de los datos
-    useEffect(() => {
-        if (!estadoBusqueda) {
-            cargarPeticiones();
-        } else {
-            buscarPeticionesTodas();
-        }
-        //Controla el tiempo de actualizacion de la pagina
-        const interval = setInterval(() => {
-            if (!estadoBusqueda) {
-                cargarPeticiones();
-            } else {
-                buscarPeticionesTodas();
-            }
-        }, 3600000); // 1 hora
-        return () => clearInterval(interval);
-    }, [estadoBusqueda, page]);
-
-    // Funcion para mostrar errores
-    const mostrarError = (message) => {
-        setError(message);
-        setTimeout(() => {
-            setError("");
-        }, 5000);
-    };
-
     // Metodo de busqueda
     const buscarPeticionesTodas = async () => {
         // Verificar campos vacíos
@@ -106,6 +81,7 @@ export function PeticionLista() {
                     setPeticiones(peticion.data.results);
                     setNumeropag(Math.ceil(peticion.data.count / elementosPorPagina));
                     setEstadoBusqueda(true);
+                    setGeneralP(true);
                 }
             } else {
                 cargarPeticiones();
@@ -118,6 +94,20 @@ export function PeticionLista() {
             }
         }
     }
+
+    // Estado de los datos
+    useEffect(() => {
+        if (generalP && estadoBusqueda && fecha !== "") {
+            buscarPeticionesTodas();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (generalP && estadoBusqueda && fecha !== "") {
+                buscarPeticionesTodas();
+            }
+        }, 3600000); // 1 hora
+        return () => clearInterval(interval);
+    }, [estadoBusqueda, generalP, fecha, page]);
 
     const buscarPeticionesRango = async () => {
         // Verificar fecha
@@ -133,6 +123,7 @@ export function PeticionLista() {
                     setPeticiones(peticion.data.results);
                     setNumeropag(Math.ceil(peticion.data.count / elementosPorPagina));
                     setEstadoBusquedaSel(true);
+                    setGeneralP(true);
                 }
             } else {
                 cargarPeticiones();
@@ -148,18 +139,12 @@ export function PeticionLista() {
 
     // Estado de los datos
     useEffect(() => {
-        if (limite === "0" || limite === "") {
-            resetearBusqueda();
-            cargarPeticiones();
-        } else {
+        if (limite !== "0" && limite !== "") {
             buscarPeticionesRango();
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (limite === "0" || limite === "") {
-                resetearBusqueda();
-                cargarPeticiones();
-            } else {
+            if (limite !== "0" && limite !== "") {
                 buscarPeticionesRango();
             }
         }, 3600000); // 1 hora
@@ -175,12 +160,13 @@ export function PeticionLista() {
                 const peticionTipo = await PeticionPendienteporTipo(tipo, page);
                 if (peticionTipo.data.results.length === 0) {
                     Swal.fire("No existen peticiones de ese tipo. Escoja otro", "", "warning");
-                    resetearBusquedaTipo();
+                    resetearBusqueda();
                     return;
                 } else {
                     setPeticiones(peticionTipo.data.results);
                     setNumeropag(Math.ceil(peticionTipo.data.count / elementosPorPagina));
                     setEstadoBusquedaTipo(true);
+                    setGeneralP(true);
                 }
             } else {
                 cargarPeticiones();
@@ -196,38 +182,43 @@ export function PeticionLista() {
 
     // Estado de los datos
     useEffect(() => {
-        if (tipo === "0" || tipo === "") {
-            resetearBusquedaTipo();
-            cargarPeticiones();
-        } else {
+        if (tipo !== "0" && tipo !== "") {
             buscarPeticionesTipo();
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (tipo === "0" || tipo === "") {
-                resetearBusquedaTipo();
-                cargarPeticiones();
-            } else {
+            if (tipo !== "0" && tipo !== "") {
                 buscarPeticionesTipo();
             }
         }, 3600000); // 1 hora
         return () => clearInterval(interval);
     }, [tipo, page]);
 
+    // Estado de los datos general
+    useEffect(() => {
+        if (!generalP && !estadoBusqueda && !estadoBusquedaSel && !estadoBusquedaTipo && fecha === "" && limite === "" && tipo === "") {
+            cargarPeticiones();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (!generalP && !estadoBusqueda && !estadoBusquedaSel && !estadoBusquedaTipo && fecha === "" && limite === "" && tipo === "") {
+                cargarPeticiones();
+            }
+        }, 3600000); // 1 hora
+        return () => clearInterval(interval);
+    }, [generalP, estadoBusqueda, estadoBusquedaSel, estadoBusquedaTipo, page]);
+
     // CONTROLES DE ENTRADA Y SALIDA
 
     // Resetear busqueda
     const resetearBusqueda = () => {
+        setGeneralP(false);
         setEstadoBusqueda(false);
         setEstadoBusquedaSel(false);
         setFecha("");
         setLimite("");
         // Escoger busqueda
         setEscogido1(false);
-        setTipoBusqueda("0");
-    }
-    const resetearBusquedaTipo = () => {
-        // Escoger busqueda
         setEstadoBusquedaTipo(false);
         setEscogido2(false);
         setTipoBusqueda("0");
@@ -237,6 +228,13 @@ export function PeticionLista() {
     const isEmptyField = (...fields) => {
         return fields.some(field => field.trim() === "");
     }
+    // Funcion para mostrar errores
+    const mostrarError = (message) => {
+        setError(message);
+        setTimeout(() => {
+            setError("");
+        }, 5000);
+    };
 
     return (
         <div>
@@ -289,7 +287,7 @@ export function PeticionLista() {
                                 <form className="w-100">
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
-                                            <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                            <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha: </label>
                                         </div>
                                         <div className="col-9 d-flex flex-row">
                                             <input type="date" className="form-control" id="fecha"
@@ -316,7 +314,7 @@ export function PeticionLista() {
                                 <form>
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
-                                            <label htmlFor="tipo" style={{ fontFamily: 'Pacifico' }}>Tipo</label>
+                                            <label htmlFor="tipo" style={{ fontFamily: 'Pacifico' }}>Tipo: </label>
                                         </div>
                                         <div className="col-10 d-flex flex-row">
                                             <select name="tipo" id="tipo"
@@ -330,7 +328,7 @@ export function PeticionLista() {
                                             <>
                                                 {
                                                     estadoBusquedaTipo
-                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusquedaTipo}>
+                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
                                                             X
                                                         </Button>
                                                         : <> </>
@@ -349,7 +347,7 @@ export function PeticionLista() {
                         <form>
                             <div className="row form-group">
                                 <div className="col-2 d-flex justify-content-center mt-2">
-                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Rango</label>
+                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Rango:</label>
                                 </div>
                                 <div className="col-9 d-flex flex-row">
                                     <select name="fecha" id="fecha"
@@ -403,6 +401,7 @@ export function PeticionListaAtendi() {
     const [estadoBusquedaSel, setEstadoBusquedaSel] = useState(false);
     const [estadoBusquedaTipo, setEstadoBusquedaTipo] = useState(false);
     const [isTamanio, setIstamanio] = useState(false);
+    const [generalP, setGeneralP] = useState(false);
     // Escoger busqueda
     const [tipoBusqueda, setTipoBusqueda] = useState("0");
     const [escogido1, setEscogido1] = useState(false);
@@ -430,23 +429,6 @@ export function PeticionListaAtendi() {
         }
     }
 
-    useEffect(() => {
-        if (!estadoBusqueda) {
-            cargarPeticiones();
-        } else {
-            buscarPeticionesTodasA();
-        }
-        //Controla el tiempo de actualizacion de la pagina
-        const interval = setInterval(() => {
-            if (!estadoBusqueda) {
-                cargarPeticiones();
-            } else {
-                buscarPeticionesTodasA();
-            }
-        }, 3600000); // 1 hora
-        return () => clearInterval(interval);
-    }, [estadoBusqueda, page]);
-
     // Metodo de busqueda
     const buscarPeticionesTodasA = async () => {
         // Verificar campos vacíos
@@ -467,6 +449,7 @@ export function PeticionListaAtendi() {
                     setPeticiones(peticion.data.results);
                     setNumeropag(Math.ceil(peticion.data.count / elementosPorPagina));
                     setEstadoBusqueda(true);
+                    setGeneralP(true);
                 }
             } else {
                 cargarPeticiones();
@@ -480,6 +463,21 @@ export function PeticionListaAtendi() {
         }
     }
 
+    // Cargado de datos
+    useEffect(() => {
+        if (generalP && estadoBusqueda && fecha !== "") {
+            buscarPeticionesTodasA();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (generalP && estadoBusqueda && fecha !== "") {
+                buscarPeticionesTodasA();
+            }
+        }, 3600000); // 1 hora
+        return () => clearInterval(interval);
+    }, [estadoBusqueda, generalP, fecha, page]);
+
+    // Peticiones por rango
     const buscarPeticionesRangoA = async () => {
         // Verificar fecha
         try {
@@ -494,6 +492,7 @@ export function PeticionListaAtendi() {
                     setPeticiones(peticion.data.results);
                     setNumeropag(Math.ceil(peticion.data.count / elementosPorPagina));
                     setEstadoBusquedaSel(true);
+                    setGeneralP(true);
                 }
             } else {
                 cargarPeticiones();
@@ -509,17 +508,12 @@ export function PeticionListaAtendi() {
 
     // Estado de los datos
     useEffect(() => {
-        if (limite === "0" || limite === "") {
-            resetearBusqueda();
-            cargarPeticiones();
-        } else {
+        if (limite !== "0" && limite !== "") {
             buscarPeticionesRangoA();
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (limite === "0" || limite === "") {
-                cargarPeticiones();
-            } else {
+            if (limite !== "0" && limite !== "") {
                 buscarPeticionesRangoA();
             }
         }, 3600000); // 1 hora
@@ -535,12 +529,13 @@ export function PeticionListaAtendi() {
                 const peticionTipoAA = await PeticionAtendidaporTipo(tipo, page);
                 if (peticionTipoAA.data.results.length === 0) {
                     Swal.fire("No existen peticiones de ese tipo. Escoja otro", "", "warning");
-                    resetearBusquedaTipo();
+                    resetearBusqueda();
                     return;
                 } else {
                     setPeticiones(peticionTipoAA.data.results);
                     setNumeropag(Math.ceil(peticionTipoAA.data.count / elementosPorPagina));
                     setEstadoBusquedaTipo(true);
+                    setGeneralP(true);
                 }
             } else {
                 cargarPeticiones();
@@ -556,23 +551,31 @@ export function PeticionListaAtendi() {
 
     // Estado de los datos
     useEffect(() => {
-        if (tipo === "0" || tipo === "") {
-            resetearBusquedaTipo();
-            cargarPeticiones();
-        } else {
+        if (tipo !== "0" && tipo !== "") {
             buscarPeticionesTipoAA();
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (tipo === "0" || tipo === "") {
-                resetearBusquedaTipo();
-                cargarPeticiones();
-            } else {
+            if (tipo !== "0" && tipo !== "") {
                 buscarPeticionesTipoAA();
             }
         }, 3600000); // 1 hora
         return () => clearInterval(interval);
     }, [tipo, page]);
+
+    // Listado de datos general
+    useEffect(() => {
+        if (!generalP && !estadoBusqueda && !estadoBusquedaSel && !estadoBusquedaTipo && fecha === "" && limite === "" && tipo === "") {
+            cargarPeticiones();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (!generalP && !estadoBusqueda && !estadoBusquedaSel && !estadoBusquedaSel && fecha === "" && limite === "" && tipo === "") {
+                cargarPeticiones();
+            }
+        }, 3600000); // 1 hora
+        return () => clearInterval(interval);
+    }, [generalP, estadoBusqueda, estadoBusquedaSel, estadoBusquedaSel, page]);
 
     // CONTROLES DE ENTRADA Y SALIDA 
 
@@ -585,19 +588,16 @@ export function PeticionListaAtendi() {
     };
     // Resetear busqueda
     const resetearBusqueda = () => {
+        setGeneralP(false);
         setEstadoBusqueda(false);
         setEstadoBusquedaSel(false);
+        setEscogido1(false);
         setFecha("");
         setLimite("");
         // Tipo de busqueda
-        setEscogido1(false);
         setTipoBusqueda("0");
-    }
-    const resetearBusquedaTipo = () => {
-        // Escoger busqueda
         setEstadoBusquedaTipo(false);
         setEscogido2(false);
-        setTipoBusqueda("0");
         setTipo("");
     }
     // Control de entrada de datos
@@ -656,7 +656,7 @@ export function PeticionListaAtendi() {
                                 <form className="w-100">
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
-                                            <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                            <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha:</label>
                                         </div>
                                         <div className="col-9 d-flex flex-row">
                                             <input type="date" className="form-control" id="fecha"
@@ -683,7 +683,7 @@ export function PeticionListaAtendi() {
                                 <form>
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
-                                            <label htmlFor="tipo" style={{ fontFamily: 'Pacifico' }}>Tipo</label>
+                                            <label htmlFor="tipo" style={{ fontFamily: 'Pacifico' }}>Tipo:</label>
                                         </div>
                                         <div className="col-10 d-flex flex-row">
                                             <select name="tipo" id="tipo"
@@ -697,7 +697,7 @@ export function PeticionListaAtendi() {
                                             <>
                                                 {
                                                     estadoBusquedaTipo
-                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusquedaTipo}>
+                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
                                                             X
                                                         </Button>
                                                         : <> </>
@@ -716,7 +716,7 @@ export function PeticionListaAtendi() {
                         <form>
                             <div className="row form-group">
                                 <div className="col-2 d-flex justify-content-center mt-2">
-                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Rango</label>
+                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Rango:</label>
                                 </div>
                                 <div className="col-9 d-flex flex-row">
                                     <select name="fecha" id="fecha"
@@ -770,6 +770,7 @@ export function PeticionListaUsuario() {
     const [estadoBusquedaSel, setEstadoBusquedaSel] = useState(false);
     const [estadoBusquedaTipo, setEstadoBusquedaTipo] = useState(false);
     const [isTamanio, setIstamanio] = useState(false);
+    const [generalP, setGeneralP] = useState(false);
     // Escoger busqueda
     const [tipoBusqueda, setTipoBusqueda] = useState("0");
     const [escogido1, setEscogido1] = useState(false);
@@ -783,11 +784,11 @@ export function PeticionListaUsuario() {
             if (usuarioC.data.success) {
                 // cargar datos de cursos
                 const peticion = await PeticionesUC(usuarioC.data.identificador, page);
-                setPeticiones(peticion.data.results);
                 if (peticion.data.results.length === 0) {
                     setNumeropag(1);
                     setIstamanio(true);
                 } else {
+                    setPeticiones(peticion.data.results);
                     setNumeropag(Math.ceil(peticion.data.count / elementosPorPagina));
                 }
                 console.log("Son peticiones de usuario")
@@ -802,24 +803,6 @@ export function PeticionListaUsuario() {
             }
         }
     }
-
-    // Estado de los datos
-    useEffect(() => {
-        if (!estadoBusqueda) {
-            cargarPeticiones();
-        } else {
-            buscarPeticiones();
-        }
-        //Controla el tiempo de actualizacion de la pagina
-        const interval = setInterval(() => {
-            if (!estadoBusqueda) {
-                cargarPeticiones();
-            } else {
-                buscarPeticiones();
-            }
-        }, 3600000); // 1 hora
-        return () => clearInterval(interval);
-    }, [estadoBusqueda, page]);
 
     // Metodo de busqueda
     const buscarPeticiones = async () => {
@@ -844,6 +827,7 @@ export function PeticionListaUsuario() {
                         setPeticiones(peticion.data.results);
                         setNumeropag(Math.ceil(peticion.data.count / elementosPorPagina));
                         setEstadoBusqueda(true);
+                        setGeneralP(true);
                     }
                 } else {
                     navigate('/login');
@@ -860,6 +844,21 @@ export function PeticionListaUsuario() {
         }
     }
 
+    // Estado de los datos
+    useEffect(() => {
+        if (generalP && estadoBusqueda && fecha !== "") {
+            buscarPeticiones();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (generalP && estadoBusqueda && fecha !== "") {
+                buscarPeticiones();
+            }
+        }, 3600000); // 1 hora
+        return () => clearInterval(interval);
+    }, [generalP, estadoBusqueda, fecha, page]);
+
+    // Buscar peticiones de usuario por rango
     const buscarPeticionesRango = async () => {
         // Verificar fecha
         try {
@@ -877,6 +876,7 @@ export function PeticionListaUsuario() {
                         setPeticiones(peticion.data.results);
                         setNumeropag(Math.ceil(peticion.data.count / elementosPorPagina));
                         setEstadoBusquedaSel(true);
+                        setGeneralP(true);
                     }
                 } else {
                     navigate('/login');
@@ -892,6 +892,20 @@ export function PeticionListaUsuario() {
             }
         }
     }
+
+    // Estado de los datos
+    useEffect(() => {
+        if (limite !== "0" && limite !== "") {
+            buscarPeticionesRango();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (limite !== "0" && limite !== "") {
+                buscarPeticionesRango();
+            }
+        }, 3600000); // 1 hora
+        return () => clearInterval(interval);
+    }, [limite, page]);
 
     // Busqueda de peticions por tipo de peticion
     const peticion_tipo_usuario = async () => {
@@ -910,6 +924,7 @@ export function PeticionListaUsuario() {
                         setPeticiones(peticionTipoU.data.results);
                         setNumeropag(Math.ceil(peticionTipoU.data.count / elementosPorPagina));
                         setEstadoBusquedaTipo(true);
+                        setGeneralP(true);
                     }
                 } else {
                     navigate('/login');
@@ -928,23 +943,31 @@ export function PeticionListaUsuario() {
 
     // Estado de los datos
     useEffect(() => {
-        if (tipo === "0" || tipo === "") {
-            resetearBusquedaTipo();
-            cargarPeticiones();
-        } else {
+        if (tipo !== "" && tipo !== "0") {
             peticion_tipo_usuario();
         }
         //Controla el tiempo de actualizacion de la pagina
         const interval = setInterval(() => {
-            if (tipo === "0" || tipo === "") {
-                resetearBusquedaTipo();
-                cargarPeticiones();
-            } else {
+            if (tipo !== "" && tipo !== "0") {
                 peticion_tipo_usuario();
             }
         }, 3600000); // 1 hora
         return () => clearInterval(interval);
     }, [tipo, page]);
+
+    // Control de listado de peticiones base
+    useEffect(() => {
+        if (!generalP && !estadoBusqueda && !estadoBusquedaSel && !estadoBusquedaTipo && fecha === "" && limite === "" && tipo === "") {
+            cargarPeticiones();
+        }
+        //Controla el tiempo de actualizacion de la pagina
+        const interval = setInterval(() => {
+            if (!generalP && !estadoBusqueda && !estadoBusquedaSel && !estadoBusquedaTipo && fecha === "" && limite === "" && tipo === "") {
+                cargarPeticiones();
+            }
+        }, 3600000); // 1 hora
+        return () => clearInterval(interval);
+    }, [generalP, estadoBusqueda, estadoBusquedaSel, estadoBusquedaTipo, page]);
 
     // CONTROLES DE ENTRADA Y SALIDA
 
@@ -957,17 +980,13 @@ export function PeticionListaUsuario() {
     };
     // Resetear busqueda
     const resetearBusqueda = () => {
+        setGeneralP(false);
         setEstadoBusqueda(false);
         setEstadoBusquedaSel(false);
         setFecha("");
         setLimite("");
         // Tipo de busqueda
         setEscogido1(false);
-        setTipoBusqueda("0");
-
-    };
-    const resetearBusquedaTipo = () => {
-        // Escoger busqueda
         setEstadoBusquedaTipo(false);
         setEscogido2(false);
         setTipoBusqueda("0");
@@ -978,25 +997,6 @@ export function PeticionListaUsuario() {
     const isEmptyField = (...fields) => {
         return fields.some(field => field.trim() === "");
     };
-
-    // Estado de los datos
-    useEffect(() => {
-        if (limite === "0") {
-            resetearBusqueda();
-            cargarPeticiones();
-        } else {
-            buscarPeticionesRango();
-        }
-        //Controla el tiempo de actualizacion de la pagina
-        const interval = setInterval(() => {
-            if (limite === "0") {
-                cargarPeticiones();
-            } else {
-                buscarPeticionesRango();
-            }
-        }, 3600000); // 1 hora
-        return () => clearInterval(interval);
-    }, [limite, page]);
 
     return (
         <div>
@@ -1049,7 +1049,7 @@ export function PeticionListaUsuario() {
                                 <form className="w-100">
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
-                                            <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha</label>
+                                            <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Fecha:</label>
                                         </div>
                                         <div className="col-9 d-flex flex-row">
                                             <input type="date" className="form-control" id="fecha"
@@ -1076,7 +1076,7 @@ export function PeticionListaUsuario() {
                                 <form>
                                     <div className="row form-group">
                                         <div className="col-2 d-flex justify-content-center mt-2">
-                                            <label htmlFor="tipo" style={{ fontFamily: 'Pacifico' }}>Tipo</label>
+                                            <label htmlFor="tipo" style={{ fontFamily: 'Pacifico' }}>Tipo:</label>
                                         </div>
                                         <div className="col-10 d-flex flex-row">
                                             <select name="tipo" id="tipo"
@@ -1090,7 +1090,7 @@ export function PeticionListaUsuario() {
                                             <>
                                                 {
                                                     estadoBusquedaTipo
-                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusquedaTipo}>
+                                                        ? <Button variant="danger" className="my-2 my-sm-0" onClick={resetearBusqueda}>
                                                             X
                                                         </Button>
                                                         : <> </>
@@ -1109,7 +1109,7 @@ export function PeticionListaUsuario() {
                         <form>
                             <div className="row form-group">
                                 <div className="col-2 d-flex justify-content-center mt-2">
-                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Rango</label>
+                                    <label htmlFor="fecha" style={{ fontFamily: 'Pacifico' }}>Rango:</label>
                                 </div>
                                 <div className="col-9 d-flex flex-row">
                                     <select name="fecha" id="fecha"

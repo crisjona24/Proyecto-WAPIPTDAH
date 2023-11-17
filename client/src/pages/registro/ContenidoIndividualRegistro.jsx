@@ -28,30 +28,30 @@ export function IndividualRegistro() {
                     </Modal.Header>
                     <Modal.Body>
                         <h6>Sección: Indicación</h6>
-                        <p style={{ color: '#333', textAlign: 'justify', fontSize: '1rem' }}>
+                        <p style={{ color: '#333', textAlign: 'justify', fontSize: '0.9rem' }}>
                             Ingresa la indicación para la actividad. Si son preguntas multiples
                             previo a una pregunta usa ',' para separarlas.
-                            Ejm: Responda, ¿P1?, ¿P2?
+                            Ejm: Responda, ¿P1?, ¿P2?, ...
                         </p>
                         <h6>Sección: Respuesta</h6>
-                        <p style={{ color: '#333', textAlign: 'justify', fontSize: '1rem' }}>
-                            Ingresa las respuestas para la actividad. Si son respuestas multiples
-                            previo a una usa ',' para separarlas.
+                        <p style={{ color: '#333', textAlign: 'justify', fontSize: '0.9rem' }}>
+                            Ingresa las respuestas para la actividad. Si son respuestas múltiples
+                            previo a una usa ',' para separarlas. Ejm: Respuesta 1, Respuesta 2 ...
                         </p>
                         <h6>Sección: Portada</h6>
-                        <p style={{ color: '#333', textAlign: 'justify', fontSize: '1rem' }}>
+                        <p style={{ color: '#333', textAlign: 'justify', fontSize: '0.9rem' }}>
                             Se debe elegir una imagen con el nombre plasmado en ella.
-                            Imagina que es un rotulador en ella que representa el nombre
-                            del Contenido.</p>
+                            Imagina que es un rotulador que representa el nombre
+                            del contenido.</p>
                         <h6>Sección: Contenido</h6>
-                        <p style={{ color: '#333', textAlign: 'justify', fontSize: '1rem' }}>
+                        <p style={{ color: '#333', textAlign: 'justify', fontSize: '0.9rem' }}>
                             Se debe elegir una imagen o imágenes que representen la actividad a resolver
                             según la indicación plasmada.</p>
                         <h6>Sección: Tipo de contenido</h6>
-                        <p style={{ color: '#333', textAlign: 'justify', fontSize: '1rem' }}>
-                            Si escoge "Selección de Imágenes" está hablando de rompecabezas y pueden ser 
-                            4 o 6. Si escoge "Colorear" debe ajuntar una imagen con el color real y una sin
-                            color.
+                        <p style={{ color: '#333', textAlign: 'justify', fontSize: '0.9rem' }}>
+                            Si escoge "<strong style={{ fontWeight: 'bold', color: 'black' }}>Selección de Imágenes</strong>" está hablando de rompecabezas y pueden ser
+                            4 o 6 imágenes. <br /> Si escoge "<strong style={{ fontWeight: 'bold', color: 'black' }}>Colorear</strong>" debe ajuntar una imagen sin color en "Contenido" y una con
+                            el color real en "Imagen 1". <br /> Si escoge "<strong style={{ fontWeight: 'bold', color: 'black' }}>Pictograma</strong>" debe ajuntar la imagen real en "Contenido".
                         </p>
                     </Modal.Body>
                     <Modal.Footer>

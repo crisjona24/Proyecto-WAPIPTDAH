@@ -221,6 +221,7 @@ export function FormularioContenidoIndividual({ slug }) {
                     <option value="seleccionar_imagen">Tipo 6 - Selección de Imágenes</option>
                     <option value="cuento">Tipo 7 - Lectura Comprensiva</option>
                     <option value="selecion_multiple_img">Tipo 8 - Selección Individual con imagen</option>
+                    <option value="pictograma">Tipo 9 - Pictograma</option>
                 </select>
             </div>
             <div className="form-group">
@@ -231,7 +232,7 @@ export function FormularioContenidoIndividual({ slug }) {
             </div>
             <>
                 {
-                    tipo_contenido === "selecion_multiple_img" &&
+                    tipo_contenido === "selecion_multiple_img" || tipo_contenido === "pictograma" &&
                     <>
                         <div className='form-row row'>
                             <div className="form-group col-md-6">

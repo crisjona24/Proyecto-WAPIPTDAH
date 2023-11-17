@@ -49,7 +49,7 @@ a:focus {
     align-items: stretch;
 }
 
-.preloader{
+.preloader {
     min-width: 275px;
     max-width: 275px;
     background: #fff;
@@ -63,7 +63,7 @@ a:focus {
     max-width: 275px;
     background: #fff;
     color: #333;
-    
+
     transition: all 0.3s;
     flex: 25%;
     padding: 20px;
@@ -73,7 +73,7 @@ a:focus {
     margin-left: -275px;
 }
 
-#sidebar__{
+#sidebar__ {
     margin-top: 20%;
 }
 
@@ -102,7 +102,8 @@ a:focus {
     color: #7386D5;
     background: #fff;
 }
-.text__{
+
+.text__ {
     color: #fff;
 }
 
@@ -170,10 +171,43 @@ a.article:hover {
 /* ---------------------------------------------------
     MEDIAQUERIES
 ----------------------------------------------------- */
+@media (max-width: 940px) {
+    .preloader {
+        min-width: 250px;
+        max-width: 250px;
+    }
+
+    #sidebar {
+        min-width: 250px;
+        max-width: 250px;
+    }
+
+    #sidebar.active {
+        margin-left: -250px;
+    }
+
+}
+
+@media (max-width: 860px) {
+    .preloader {
+        min-width: 225px;
+        max-width: 225px;
+    }
+
+    #sidebar {
+        min-width: 225px;
+        max-width: 225px;
+    }
+
+    #sidebar.active {
+        margin-left: -225px;
+    }
+
+}
 
 @media (max-width: 768px) {
     #sidebar {
-        margin-left: -250px;
+        margin-left: -275px;
     }
 
     #sidebar.active {

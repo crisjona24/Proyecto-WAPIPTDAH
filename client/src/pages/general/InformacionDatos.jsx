@@ -290,7 +290,7 @@ export function InformacionIndividual() {
         <div className="w-100 h-100">
             <CabeceraRegister />
             <div className="container-fluid p-0 m-0 w-100 h-100">
-                <div className="almacenador ml-0">
+                <div className="almacenador ml-0 tamanio_almacenador_acti">
                     <>
                         {loading ? (
                             <div className="preloader">
@@ -305,7 +305,7 @@ export function InformacionIndividual() {
                             </>
                         )}
                     </>
-                    <section className="section col-9" id="mysection" style={{ border: '1px solid #ccc' }}>
+                    <section className="section col-9 section_almacenador_acti" id="mysection">
                         <div id="content">
                             <button type="button" id="sidebarCollapse" onClick={activarSidebar}
                                 className="btn mb-3" style={{ backgroundColor: '#f0f0f0', color: 'black' }}

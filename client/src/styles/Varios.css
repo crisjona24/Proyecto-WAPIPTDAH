@@ -158,6 +158,26 @@
     height: 850px;
 }
 
+.contenedor_actividad {
+    max-height: 800px;
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-top: 2%;
+}
+
+.tamanio_almacenador_acti {
+    /* Puedes ajustar la altura máxima aquí si es necesario */
+    max-height: 900px;
+}
+
+.section_almacenador_acti {
+    /* Ancho maximo permitido*/
+    height: 900px;
+    border: 1px solid #ccc;
+    /* Agregar scroll */
+    overflow-y: auto;
+}
+
 /* LISTAS */
 .alienacion-externa {
     display: grid;

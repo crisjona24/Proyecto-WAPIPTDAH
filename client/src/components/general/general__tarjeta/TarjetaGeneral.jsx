@@ -350,6 +350,17 @@ export function Individual({ datos, slug }) {
     // Slug del contenido
     const [slugContenido, setSlugContenido] = useState("");
     const [error, setError] = useState("");
+    // Control de imágenes
+    const [images, setImages] = useState([]);
+
+    // Lista completa de imágenes
+    const todasLasImgs = [
+        datos.portada_individual, datos.contenido_individual, datos.imagen1,
+        datos.imagen2, datos.imagen3, datos.imagen4, datos.imagen5
+    ];
+    useEffect(() => {
+        setImages(todasLasImgs.filter(Boolean));
+    }, [datos]);
 
     // Obtener tipo de usuario
     const verificacion = async () => {
@@ -421,8 +432,8 @@ export function Individual({ datos, slug }) {
         case "seleccionar_imagen":
             tipoContenido = "Seleccionar imagen";
             break;
-        case "juego_simple":
-            tipoContenido = "Juego simple";
+        case "pictograma":
+            tipoContenido = "Pictograma";
             break;
         default:
             tipoContenido = "No definido";
@@ -443,8 +454,8 @@ export function Individual({ datos, slug }) {
                 </div>
             </div>
             {error && <span>{error}</span>}
-            <div className="mt-5 align-items-center" style={{ height: '100vh', marginLeft: '20%' }}>
-                <Card className="mb-3" style={{ maxWidth: '75%' }}>
+            <div className="align-items-center contenedor_actividad">
+                <Card className="tarjeta__reporte" >
                     <Row >
                         <Col md={4}>
                             <Image

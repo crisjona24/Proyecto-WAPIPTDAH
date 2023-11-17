@@ -1013,6 +1013,7 @@ def api_user_register(request):
     except Exception as e:
         return JsonResponse({'error': 'Error al crear el usuario'})
 
+# Método para guardar el registro de entidad usuario
 def crear_usuario_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8):
     # Capturamos el la fecha de registro
     fecha_registro_usuario_ = datetime.now().date()
@@ -1069,6 +1070,9 @@ def api_paciente_register(request):
             # Validar correo único
             if not correo_unico(email_):
                 return JsonResponse({'correo': 'Correo ya registrado'})
+            # Validar edad límite
+            if not cumplir_edad_limite(fecha_):
+                return JsonResponse({'correo': 'No cumple con la edad establecida para registrarse'})
             # Verificar clave
             if not validar_clave(password_):
                 return JsonResponse({'clave': 'Clave sin requisitos mínimos'})
@@ -1102,6 +1106,7 @@ def api_paciente_register(request):
     except Exception as e:
         return JsonResponse({'error': 'Error al crear el usuario'})
 
+# Método para guardar el registro de entidad paciente
 def crear_paciente_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, ob10):
     # Capturamos el la fecha de registro
     fecha_registro_usuario_ = datetime.now().date()
@@ -1121,6 +1126,18 @@ def crear_paciente_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, ob10):
     )
     # Añadimos a usuario
     usuario__model.save()
+
+# Método para calcular el limite de edad establecido para crear cuenta de entidad paciente
+def cumplir_edad_limite(ob1):
+    try:
+        # Calculamos la edad con el metodo de calculo de la Entidad Paciente
+        edad = Paciente.calcular_edad(ob1)
+        # Comparamos la edad con el rango de edad permitido que es de 5 a 10
+        if edad >= 5 and edad <= 10:
+            return True
+        return False
+    except Paciente.DoesNotExist:
+        return False
 
 
 
@@ -1193,6 +1210,7 @@ def api_comun_register(request):
     except Exception as e:
         return JsonResponse({'error': 'Error al crear el usuario'})
 
+# Método para guardar el registro de entidad usuario normal
 def crear_comun_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, ob10):
     # Capturamos el la fecha de registro
     fecha_registro_usuario_ = datetime.now().date()
@@ -1220,33 +1238,36 @@ def crear_comun_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, ob10):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def verificacion_inscripcion(request):
-    try:
-         # Verificar existencia de token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        #user = get_user_from_token(token)
-        if is_paciente(user):
-            # Encontrar el paciente del user
-            paciente__ob = Paciente.objects.get(user=user)
-            # Encontrar el curso en base al id
-            detalle__inscripcion = DetalleInscripcionCurso.objects.filter(paciente=paciente__ob)
-            # Verificar si el curso existe
-            if detalle__inscripcion:
-                context = {
-                    'success': True,
-                    'inscrito': "1"
-                }
-                return JsonResponse(context)
+    if request.user.is_authenticated:
+        try:
+            # Verificar existencia de token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            #user = get_user_from_token(token)
+            if is_paciente(user):
+                # Encontrar el paciente del user
+                paciente__ob = Paciente.objects.get(user=user)
+                # Encontrar el curso en base al id
+                detalle__inscripcion = DetalleInscripcionCurso.objects.filter(paciente=paciente__ob)
+                # Verificar si el curso existe
+                if detalle__inscripcion:
+                    context = {
+                        'success': True,
+                        'inscrito': "1"
+                    }
+                    return JsonResponse(context)
+                else:
+                    context = {
+                        'success': True,
+                        'inscrito': "0"
+                    }
+                    return JsonResponse(context)
             else:
-                context = {
-                    'success': True,
-                    'inscrito': "0"
-                }
-                return JsonResponse(context)
-        else:
-            return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
-    except Exception as e:
-        return JsonResponse({'errorSalida': str(e)}, status=500)
+                return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
+        except Exception as e:
+            return JsonResponse({'errorSalida': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
 
 
@@ -1265,51 +1286,55 @@ def comprobar_separacion_coma(valor_respuesta):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def atender_peticion(request):
-    try:
-        # Decodifica el token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        #user = get_user_from_token(token)
-        if is_tecnico(user):
-            if request.method == 'POST':
-                data = json.loads(request.body)
-                slug = data.get('slug')
-                estadoR_ = data.get('estadoR')
-                vereficto_ = data.get('vereficto')
-                if atención_peticion(slug):
-                    # Enviamos el email antes de modificar
-                    peticion__ob = Peticion.objects.get(slug_peticion=slug)
-                    tecnico__ob = Usuario.objects.get(user=user)                    
-                    if send_email(peticion__ob, vereficto_, estadoR_):
-                        try:
-                            # Agregamos detalle de peticion
-                            if guardar_detalle(peticion__ob.motivo_peticion, tecnico__ob, peticion__ob):
-                                # Actualizamos el contador de ContadorPeticionesAtendidas
-                                contador_obj, created = ContadorPeticionesAtendidas.objects.get_or_create(usuario_comun=peticion__ob.usuario_comun)
-                                contador_obj.contador += 1
-                                contador_obj.save()
-                                # Enviamos la respuesta al front
-                                return JsonResponse({'success': True})
-                            else:
+    if request.user.is_authenticated:
+        try:
+            # Decodifica el token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            #user = get_user_from_token(token)
+            if is_tecnico(user):
+                if request.method == 'POST':
+                    data = json.loads(request.body)
+                    slug = data.get('slug')
+                    estadoR_ = data.get('estadoR')
+                    vereficto_ = data.get('vereficto')
+                    if atención_peticion(slug):
+                        # Enviamos el email antes de modificar
+                        peticion__ob = Peticion.objects.get(slug_peticion=slug)
+                        tecnico__ob = Usuario.objects.get(user=user)                    
+                        if send_email(peticion__ob, vereficto_, estadoR_):
+                            try:
+                                # Agregamos detalle de peticion
+                                if guardar_detalle(peticion__ob.motivo_peticion, tecnico__ob, peticion__ob):
+                                    # Actualizamos el contador de ContadorPeticionesAtendidas
+                                    contador_obj, created = ContadorPeticionesAtendidas.objects.get_or_create(usuario_comun=peticion__ob.usuario_comun)
+                                    contador_obj.contador += 1
+                                    contador_obj.save()
+                                    # Enviamos la respuesta al front
+                                    return JsonResponse({'success': True})
+                                else:
+                                    return JsonResponse({'error': 'Error al guardar el detalle'}, status=500)
+                            except Exception as e:
+                                # Aquí puedes agregar logging o imprimir el error si es necesario
                                 return JsonResponse({'error': 'Error al guardar el detalle'}, status=500)
-                        except Exception as e:
-                            # Aquí puedes agregar logging o imprimir el error si es necesario
-                            return JsonResponse({'error': 'Error al guardar el detalle'}, status=500)
+                        else:
+                            return JsonResponse({'error': 'Error al enviar el email'}, status=400)
                     else:
-                        return JsonResponse({'error': 'Error al enviar el email'}, status=400)
+                        return JsonResponse({'error': 'Error al atender la petición'}, status=400)
                 else:
-                    return JsonResponse({'error': 'Error al atender la petición'}, status=400)
+                    return JsonResponse({'error': 'Algo no esta permitido'}, status=405)
             else:
-                return JsonResponse({'error': 'Algo no esta permitido'}, status=405)
-        else:
-            return JsonResponse({'errorSalida': 'El usuario no esta autenticado'}, status=401)
-    except Peticion.DoesNotExist:
-        error = "No existe petición"
-        contexto_dos = {'error': error, 'slug': slug}
-        return JsonResponse(contexto_dos)
-    except Exception as e:
-        return JsonResponse({'error': 'Ups! Algo salió mal'}, status=500)
+                return JsonResponse({'errorSalida': 'El usuario no esta autenticado'}, status=401)
+        except Peticion.DoesNotExist:
+            error = "No existe petición"
+            contexto_dos = {'error': error, 'slug': slug}
+            return JsonResponse(contexto_dos)
+        except Exception as e:
+            return JsonResponse({'error': 'Ups! Algo salió mal'}, status=500)
+    else:
+        return JsonResponse({'errorSalida': 'El usuario no esta autenticado'}, status=401)
 
+# Método para atender petición
 def atención_peticion(ob1):
     try: 
         # Obtenemos el objeto peticions
@@ -1322,6 +1347,7 @@ def atención_peticion(ob1):
     except Exception as e:
         return False
 
+# Guardar el detalle de las peticiones atendidas
 def guardar_detalle(ob1, ob2, ob3):
     try:
         detalle_peticion = DetallePeticion.objects.create(
@@ -1337,6 +1363,7 @@ def guardar_detalle(ob1, ob2, ob3):
     except Exception as e:
         return False
 
+# Método para enviar el correo electrónico de notificación de revisión de petición
 def send_email(peticion__ob, ob1, ob2):
     # Capturamos los datos para el email
     subject = 'Notificación de revisión de petición'
@@ -1500,30 +1527,34 @@ def reset_contador_salas(request):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def atender_sala(request, slug):
-    try:
-        # Decodifica el token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        #user = get_user_from_token(token)
-        if is_paciente(user):
-            if request.method == 'GET':
-                if modificar_estado_sala(slug):
-                    return JsonResponse({'success': True})
+    if request.user.is_authenticated:
+        try:
+            # Decodifica el token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            #user = get_user_from_token(token)
+            if is_paciente(user):
+                if request.method == 'GET':
+                    if modificar_estado_sala(slug):
+                        return JsonResponse({'success': True})
+                    else:
+                        error_message = "Error al modificar el estado de la sala."
+                        context = {'error': error_message}
+                        return JsonResponse(context)
                 else:
-                    error_message = "Error al modificar el estado de la sala."
-                    context = {'error': error_message}
-                    return JsonResponse(context)
+                    return JsonResponse({'error': 'Algo no esta permitido'}, status=405)
             else:
-                return JsonResponse({'error': 'Algo no esta permitido'}, status=405)
-        else:
-            return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
-    except Peticion.DoesNotExist:
-        error = "No existe sala"
-        contexto_dos = {'error': error, 'slug': slug}
-        return JsonResponse(contexto_dos)
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+                return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
+        except Peticion.DoesNotExist:
+            error = "No existe sala"
+            contexto_dos = {'error': error, 'slug': slug}
+            return JsonResponse(contexto_dos)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
+# Método para modificar el estado de a sala
 def modificar_estado_sala(slug):
     try:
         # Obtenemos el objeto sala
@@ -1546,14 +1577,20 @@ def modificar_estado_sala(slug):
     except Exception as e:
         return False
 
-
+# Envío de correo al dar como resuelta una nueva sala de contenido
 def send_email_sala(ob1, ob2):
     # Capturamos los datos para el email
     subject = 'Notificación de resolución de sala'
-    message = ('La sala creada de nombre ' + ob1.nombre_sala + 
-               ' ha sido atendida por el paciente ' + ob1.paciente.nombre_usuario + ' ' + ob1.paciente.apellido_usuario + '\n' +
-               'La descripción de la misma era: ' + ob1.anotaciones + 
-               '\nLa misma cuenta con un estado de : Resuelto') 
+    message = f'Reciba un cordial saludo de los administradores de WAPIPTDAH. ' \
+            f'\nLa sala creada de nombre: {ob1.nombre_sala}. ' \
+            f'\nRecibimos una confirmación de resolución de sala del estudiante: {ob1.paciente.nombre_usuario} {ob1.paciente.apellido_usuario}. ' \
+            f'\nLa sala resuelta esta formada por las siguientes indicaciones: ' \
+            f'\n\n{ob1.anotacione}'\
+            f'\n\nLa misma cuenta con un estado de: ' \
+            f'\n' \
+            f'\nResuelto ' \
+            f'\n' \
+            f'\nAtentamente: WAPIPTDAH.'
     from_email = settings.EMAIL_HOST_USER
     #receiver_email = ['cristobal.rios@unl.edu.ec']
     #receiver_email= ['genoveva.suing@unl.edu.ec']
@@ -1639,28 +1676,32 @@ def reset_contador_salas_atendidas(request):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def obtener_slug_curso(request, id):
-    try: 
-        # Decodifica el token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        #user = get_user_from_token(token)
-        if is_comun(user):
-            if request.method == 'GET':
-                id_ = id
-                slug = obtener_slug(id_)
-                if slug:
-                    return JsonResponse({'success': True, 'slug': slug})
+    if request.user.is_authenticated:
+        try: 
+            # Decodifica el token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            #user = get_user_from_token(token)
+            if is_comun(user):
+                if request.method == 'GET':
+                    id_ = id
+                    slug = obtener_slug(id_)
+                    if slug:
+                        return JsonResponse({'success': True, 'slug': slug})
+                    else:
+                        error_message = "El curso no existe."
+                        context = {'error': error_message}
+                        return JsonResponse(context)
                 else:
-                    error_message = "El curso no existe."
-                    context = {'error': error_message}
-                    return JsonResponse(context)
+                    return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
             else:
-                return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
-        else:
-            return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
-    except Exception as e:
-        return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+                return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
+        except Exception as e:
+            return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+    else: 
+        return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
 
+# Método para obtener el slug del curso
 def obtener_slug(id):
     try:
         # Obtenemos el obtjeto paciente con el id
@@ -1682,28 +1723,32 @@ def obtener_slug(id):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def obtener_slug_dominio(request, slug):
-    try: 
-        # Decodifica el token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        #user = get_user_from_token(token)
-        if user and token:
-            if request.method == 'GET':
-                slug_ = slug
-                slug = obtener_slug_domi(slug_)
-                if slug:
-                    return JsonResponse({'success': True, 'slug_dominio': slug})
+    if request.user.is_authenticated:
+        try: 
+            # Decodifica el token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            #user = get_user_from_token(token)
+            if user and token:
+                if request.method == 'GET':
+                    slug_ = slug
+                    slug = obtener_slug_domi(slug_)
+                    if slug:
+                        return JsonResponse({'success': True, 'slug_dominio': slug})
+                    else:
+                        error_message = "El curso no existe."
+                        context = {'error': error_message, 'success': False}
+                        return JsonResponse(context)
                 else:
-                    error_message = "El curso no existe."
-                    context = {'error': error_message, 'success': False}
-                    return JsonResponse(context)
+                    return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
             else:
-                return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
-        else:
-            return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
-    except Exception as e:
-        return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+                return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
+        except Exception as e:
+            return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+    else:
+        return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
 
+# Método para obtener el slug del dominio
 def obtener_slug_domi(ob1):
     try:
         # Obtenemos el obtjeto contenido con el slug
@@ -1724,28 +1769,32 @@ def obtener_slug_domi(ob1):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def obtener_slug_contenido(request, slug):
-    try: 
-        # Decodifica el token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        #user = get_user_from_token(token)
-        if user and token:
-            if request.method == 'GET':
-                slug_ = slug
-                slug = obtener_slug_conte(slug_)
-                if slug:
-                    return JsonResponse({'success': True, 'slug_contenido': slug})
+    if request.user.is_authenticated:
+        try: 
+            # Decodifica el token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            #user = get_user_from_token(token)
+            if user and token:
+                if request.method == 'GET':
+                    slug_ = slug
+                    slug = obtener_slug_conte(slug_)
+                    if slug:
+                        return JsonResponse({'success': True, 'slug_contenido': slug})
+                    else:
+                        error_message = "El contenido no existe."
+                        context = {'error': error_message, 'success': False}
+                        return JsonResponse(context)
                 else:
-                    error_message = "El contenido no existe."
-                    context = {'error': error_message, 'success': False}
-                    return JsonResponse(context)
+                    return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
             else:
-                return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
-        else:
-            return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
-    except Exception as e:
-        return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+                return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
+        except Exception as e:
+            return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+    else:
+        return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
 
+# Método para obtener el slug del contenido
 def obtener_slug_conte(ob1):
     try:
         # Obtenemos el obtjeto individual con el slug
@@ -1798,6 +1847,7 @@ def api_enviar_contacto(request):
     else:
         return JsonResponse({'error': 'El usuario no está autenticado'})
 
+# Método para encontrar usuario
 def encontrar_usuario(ob1):
     # Orden de los modelos a verificar
     modelos = [UsuarioComun, Paciente, Usuario]
@@ -1812,12 +1862,12 @@ def encontrar_usuario(ob1):
     # Si ninguno de los modelos contiene el usuario, retorna False
     return False
 
+# Método para enviar correo
 def enviar_correo(ob1, ob2, ob3):
     # Capturamos los datos para el email
     subject = ob2
     message = ob3
     from_email = ob1.email_usuario
-    print(ob1.email_usuario)
     receiver_email = [settings.EMAIL_HOST_USER]
     send_mail(subject, message, from_email, receiver_email, fail_silently=False)
     return True
@@ -1830,28 +1880,32 @@ def enviar_correo(ob1, ob2, ob3):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def modificar_estado_reporte(request, id):
-    try: 
-        # Decodifica el token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        # Verificar existencia del usuario
-        if user and token:
-            if request.method == 'GET':
-                id_reporte = id
-                # Guardar Reporte
-                if modificar_estado_resultado(id_reporte):
-                    return JsonResponse({'success': True})
+    if request.user.is_authenticated:
+        try: 
+            # Decodifica el token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            # Verificar existencia del usuario
+            if user and token:
+                if request.method == 'GET':
+                    id_reporte = id
+                    # Guardar Reporte
+                    if modificar_estado_resultado(id_reporte):
+                        return JsonResponse({'success': True})
+                    else:
+                        error_message = "Error al eliminar el reporte...."
+                        context = {'error': error_message}
+                        return JsonResponse(context)
                 else:
-                    error_message = "Error al eliminar el reporte...."
-                    context = {'error': error_message}
-                    return JsonResponse(context)
+                    return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
             else:
-                return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
-        else:
-            return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
-    except Exception as e:
-        return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
-    
+                return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
+        except Exception as e:
+            return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+    else:
+        return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
+
+# Método para modificar el estado del resultao una vez se haya generado el reporte 
 def modificar_estado_resultado(ob1):
     try:
         #Obtenemos el objeto reporte a partir del id
@@ -1872,30 +1926,34 @@ def modificar_estado_resultado(ob1):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def obtener_fecha_inscripcion(request, id):
-    try: 
-        # Decodifica el token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        # Verificar existencia del usuario
-        if user and token:
-            if request.method == 'GET':
-                id_paciente = id
-                # buscamos la fecha de inscripcion del paciente
-                # Obtenemos el objeto paciente
-                paciente_ob = Paciente.objects.get(id=id_paciente)
-                # Obtenemos la fecha de inscripcion del paciente de DetalleInscripcionCurso
-                inscripcion_ = DetalleInscripcionCurso.objects.get(paciente=paciente_ob)
-                # Obtenemos la fecha de inscripcion
-                fecha_inscripcion = inscripcion_.fecha_inscripcion
-                # Verificamos y devolvemos al frontend
-                return JsonResponse({'success': True, 'fecha_inscripcion': fecha_inscripcion})
+    if request.user.is_authenticated:
+        try: 
+            # Decodifica el token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            # Verificar existencia del usuario
+            if user and token:
+                if request.method == 'GET':
+                    id_paciente = id
+                    # buscamos la fecha de inscripcion del paciente
+                    # Obtenemos el objeto paciente
+                    paciente_ob = Paciente.objects.get(id=id_paciente)
+                    # Obtenemos la fecha de inscripcion del paciente de DetalleInscripcionCurso
+                    inscripcion_ = DetalleInscripcionCurso.objects.get(paciente=paciente_ob)
+                    # Obtenemos la fecha de inscripcion
+                    fecha_inscripcion = inscripcion_.fecha_inscripcion
+                    # Verificamos y devolvemos al frontend
+                    return JsonResponse({'success': True, 'fecha_inscripcion': fecha_inscripcion})
+                else:
+                    return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
             else:
-                return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
-        else:
-            return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
-    except Exception as e:
-        return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
-    
+                return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
+        except Exception as e:
+            return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+    else:
+       return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401) 
+
+# Método para obtener la fecha de inscripcion del paciente
 def obtener_fecha(ob1, ob2):
     try:
         # Verificamos que el usuario sea paciente
@@ -1920,32 +1978,36 @@ def obtener_fecha(ob1, ob2):
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def obtener_nombre_revision(request, id):
-    try: 
-        # Decodifica el token
-        token = request.headers.get('Authorization').split(" ")[1]
-        user = get_user_from_token_jwt(token)
-        # Verificar existencia del usuario
-        if user and token:
-            if request.method == 'GET':
-                peticion_id = id
-                # Verificamos y obtenemos los valores
-                nombre_usuario, apellido_usuario = nombre_revision(peticion_id)
-                if nombre_usuario and apellido_usuario:
-                    # Verificamos y devolvemos al frontend
-                    return JsonResponse({'success': True, 
-                                         'nombre_u': nombre_usuario, 
-                                         'apellido_u': apellido_usuario})
+    if request.user.is_authenticated:
+        try: 
+            # Decodifica el token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            # Verificar existencia del usuario
+            if user and token:
+                if request.method == 'GET':
+                    peticion_id = id
+                    # Verificamos y obtenemos los valores
+                    nombre_usuario, apellido_usuario = nombre_revision(peticion_id)
+                    if nombre_usuario and apellido_usuario:
+                        # Verificamos y devolvemos al frontend
+                        return JsonResponse({'success': True, 
+                                            'nombre_u': nombre_usuario, 
+                                            'apellido_u': apellido_usuario})
+                    else:
+                        error_message = "No se pudo obtener el nombre del revisor"
+                        context = {'error': error_message}
+                        return JsonResponse(context)
                 else:
-                    error_message = "No se pudo obtener el nombre del revisor"
-                    context = {'error': error_message}
-                    return JsonResponse(context)
+                    return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
             else:
-                return JsonResponse({'error': 'No es posible ejecutar la acción'}, status=405)
-        else:
-            return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
-    except Exception as e:
-        return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+                return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
+        except Exception as e:
+            return JsonResponse({'error': 'Ups! algo salió mal'}, status=500)
+    else:
+        return JsonResponse({'error': 'El usuario no se ha autenticado'}, status=401)
 
+# Obtener el nombre del revisor de la petición
 def nombre_revision(ob1):
     try:
         # Obtenemos la peticion asociada al id
