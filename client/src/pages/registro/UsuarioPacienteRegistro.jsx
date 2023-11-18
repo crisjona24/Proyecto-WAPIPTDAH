@@ -19,7 +19,7 @@ export function UsuarioPacienteRegistro() {
                 <Container className='barraSup mt-5' >
                     <Row className='col-md-12'>
                         <div className="card-body col-md-9">
-                            <h4 style={{ padding: '10px' }}> Registro de paciente</h4>
+                            <h4 style={{ padding: '10px' }}> Registro de estudiante</h4>
                         </div>
                         <div className='card-body col-md-1'>
                             <>

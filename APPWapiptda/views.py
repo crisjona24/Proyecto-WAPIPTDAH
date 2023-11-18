@@ -1077,9 +1077,11 @@ def api_paciente_register(request):
             # Validar correo único
             if not correo_unico(email_):
                 return JsonResponse({'correo': 'Correo ya registrado'})
+            print("Valide corre unico")
             # Validar edad límite
             if not cumplir_edad_limite(fecha_):
                 return JsonResponse({'correo': 'No cumple con la edad establecida para registrarse'})
+            print("Valide edad")
             # Verificar clave
             if not validar_clave(password_):
                 return JsonResponse({'clave': 'Clave sin requisitos mínimos'})
@@ -1137,13 +1139,18 @@ def crear_paciente_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, ob10):
 # Método para calcular el limite de edad establecido para crear cuenta de entidad paciente
 def cumplir_edad_limite(ob1):
     try:
-        # Calculamos la edad con el metodo de calculo de la Entidad Paciente
-        edad = Paciente.calcular_edad(ob1)
+        # Formatear la edad para permitir que los objetos date time sean compatibles
+        fecha_nacimiento = datetime.strptime(ob1, "%Y-%m-%d").date()
+        fecha_actual = datetime.now().date()
+        edad = fecha_actual.year - fecha_nacimiento.year - ((fecha_actual.month, fecha_actual.day) < 
+                                                            (fecha_nacimiento.month, fecha_nacimiento.day))
         # Comparamos la edad con el rango de edad permitido que es de 5 a 10
-        if edad >= 5 and edad <= 10:
+        if 5 <= edad <= 10:
             return True
-        return False
-    except Paciente.DoesNotExist:
+        else:
+            return False
+    except Exception as e:
+        print("Error:", e)
         return False
 
 
