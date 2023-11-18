@@ -667,7 +667,7 @@ def api_dominio_edicion(request):
             else:
                 return JsonResponse({'error': 'El usuario no esta autenticado'})
         except Exception as e:
-            return JsonResponse({'error': 'Error al crear el dominio'})
+            return JsonResponse({'error': 'Error al editar el dominio'})
     else:
         return JsonResponse({'error': 'El usuario no esta autenticado'})
 
@@ -719,6 +719,117 @@ def eliminar_archivo_cloudinary(public_id):
         return result
     except Exception as e:
         return None
+
+
+
+##### EDICION DE CONTENIDO 
+
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def api_contenido_edicion(request):
+    if request.user.is_authenticated:
+        try:
+            # Decodifica el token para obtener el usuario
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            # Validamos si el usuario es tecnico
+            if is_tecnico(user):
+                # Encontrar al usuario relacionado al user
+                usuario__ob = Usuario.objects.get(user=user)
+                # Verificar si el usuario existe y esta en la operación correcta
+                if request.method == 'POST' and user:
+                    id_contenido = request.POST.get('identificador')
+                    nombre_contenido_ = request.POST.get('nombre')
+                    dominio_tipo_ = request.POST.get('dominio_tipo')
+                    portada_ = request.FILES.get(
+                        'portada')  # obtener archivo
+                    # Verificar si portada dominio es null o contiene contenido
+                    if portada_:
+                        portada_nueva = portada_
+                    else:
+                        portada_nueva = None
+                    # Verificar que portada es NONE
+                    if portada_nueva == None:
+                        return JsonResponse({'error': 'No se pudo editar el registro de contenido'})
+                    # Obtener el identificador público del archivo en Cloudinary de portada en Dominio
+                    public_id = obtener_public_id_contenido(id_contenido)
+                    # Verificamos el public id obtenido
+                    if public_id:
+                        # Eliminar la imagen de portada de Cloudinary
+                        eliminar_conte  = eliminar_archivo_cloudinary(public_id)
+                        if eliminar_conte and eliminar_conte.get('result') == 'ok':
+                            # Verificar si el nombre del contenido es el mismo que el anterior o es nuevo
+                            if nombre_contenido_exist(nombre_contenido_):
+                                # Editamos el contenido
+                                if editar_contenido(id_contenido, nombre_contenido_, dominio_tipo_, portada_nueva):
+                                    return JsonResponse({'success': True})
+                                else:
+                                    return JsonResponse({'error': 'Error al editar el contenido'})
+                            else:
+                                # Verificar si el nombre del contenido ya existe
+                                if nombre_contenido_exist(nombre_contenido_):
+                                    return JsonResponse({'error': 'El nombre del contenido ya existe. No es posible editar.'})
+                                else:
+                                    # Editamos el contenido
+                                    if editar_contenido(id_contenido, nombre_contenido_, dominio_tipo_, portada_nueva):
+                                        return JsonResponse({'success': True})
+                                    else:
+                                        return JsonResponse({'error': 'Error al editar el contenido'})
+                        else:
+                            return JsonResponse({'error': 'No se pudo editar el registro de contenido'})
+                    else:
+                        return JsonResponse({'error': 'No se pudo editar el registro de contenido'})
+                else:
+                    return JsonResponse({'error': 'No esta permitido'})
+            else:
+                return JsonResponse({'error': 'El usuario no esta autenticado'})
+        except Exception as e:
+            return JsonResponse({'error': 'Error al editar el contenido'})
+    else:
+        return JsonResponse({'error': 'El usuario no esta autenticado'})
+
+## Método para obtener el public id del archivo relacionado al registro para dar 
+## paso a la eliminación del archivo en Cloudinary
+def obtener_public_id_contenido(ob1):
+    try:
+        # Obtener el objeto de Contenido por su ID
+        contenido_ob = Contenido.objects.get(id=ob1)
+        # Verificar si el Contenido tiene una imagen de portada
+        if contenido_ob.portada:
+            # Obtener el public ID de la imagen en Cloudinary
+            public_id = cloudinary.CloudinaryImage(contenido_ob.portada.name).public_id
+            return public_id
+        else:
+            # El Contenido no tiene una imagen de portada
+            return None
+    except Contenido.DoesNotExist:
+        # Manejar la excepción si el Dominio no existe
+        print("El Contenido no existe.")
+        return None
+    except Exception as e:
+        # Manejar otras excepciones
+        print("Error al obtener el public ID:", e)
+        return None
+
+## Método para editar el contenido
+def editar_contenido(ob1, ob2, ob3, ob4):
+    try:
+        # Obtenemos el objeto contenido del id 
+        contenido_ob = Contenido.objects.get(id=ob1)
+        # Editamos el registro
+        contenido_ob.nombre = ob2
+        contenido_ob.dominio_tipo = ob3
+        contenido_ob.portada = ob4
+        # Guardamos el registro
+        contenido_ob.save()
+        return True
+    except Contenido.DoesNotExist:
+        return False
+    except Exception as e:
+        return False
+
 
 
 ## Método para registrar un registro de contenido en el sistema verificado por ser único

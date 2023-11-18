@@ -14,9 +14,10 @@ import { VerificarContenidoIndividual, ContenidoDatosIndividual, ContenidoIndivi
 import { info__nivel, info__dominio, info__contenido, info__contenido__respuesta } from '../../controles/controlador_registro';
 import { validarTamanoImagen } from '../../controles/alert_user';
 import { ResultadoIndividual, ResultadoEditar } from '../../api/resultado.api';
-import { SalaIndividual, EditarSala } from "../../api/sala.api"
-import { ReporteIndividual, ReporteEditar } from "../../api/reporte.api"
-import { EditarDominioManual } from "../../api/dominio.api"
+import { SalaIndividual, EditarSala } from "../../api/sala.api";
+import { ReporteIndividual, ReporteEditar } from "../../api/reporte.api";
+import { EditarDominioManual } from "../../api/dominio.api";
+import { EditarContenidoManual } from "../../api/contenido.api";
 
 /* EDICION DE NIVEL*/
 export function FormularioEdicionNivel() {
@@ -443,30 +444,6 @@ export function FormularioEdicionContenido({ slugDominio }) {
         }
     }, []);
 
-    // Edicion
-    const confirmEdicion = async (formData) => {
-        return Swal.fire({
-            title: '¿Desea guardar los cambios en el contenido?',
-            showDenyButton: true,
-            showCancelButton: true,
-            confirmButtonText: 'Actualizar',
-            denyButtonText: 'No guardar',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    await ContenidoEditar(datos.id, formData);
-                    Swal.fire("Datos actualizados", "", "success");
-                    navigate(`/contenido/all/${slugDominio}/`)
-                } catch (error) {
-                    Swal.fire('Error al actualizar', '', 'error');
-                }
-            } else if (result.isDenied) {
-                Swal.fire('Los cambios no se guardaron', '', 'info');
-                navigate(`/contenido/all/${slugDominio}/`)
-            }
-        });
-    };
-
     // Campos vacios
     const isValidForm = () => {
         if (
@@ -502,15 +479,18 @@ export function FormularioEdicionContenido({ slugDominio }) {
                 const formData = new FormData(); // Crear un objeto FormData
                 // Verificamos que portaa no este vacio
                 if (portada !== "") {
+                    formData.append('identificador', datos.id);
                     formData.append('portada', portada);
                     formData.append('nombre', nombre_contenido);
                     formData.append('dominio_tipo', dominio_tipo);
+                    // Realizar la petición de edicion
+                    await confirmEdicionManual(formData);
                 } else {
                     formData.append('nombre', nombre_contenido);
                     formData.append('dominio_tipo', dominio_tipo);
+                    // Realizar la petición de edicion
+                    await confirmEdicion(formData);
                 }
-                // Realizar la petición de edicion
-                await confirmEdicion(formData);
             }
         } catch (err) {
             if (err.message === "NOT_AUTHENTICATED") {
@@ -521,6 +501,63 @@ export function FormularioEdicionContenido({ slugDominio }) {
         }
         setHabilitado(false);
     };
+
+    // Edicion
+    const confirmEdicion = async (formData) => {
+        return Swal.fire({
+            title: '¿Desea guardar los cambios en el contenido?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Actualizar',
+            denyButtonText: 'No guardar',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await ContenidoEditar(datos.id, formData);
+                    Swal.fire("Datos actualizados", "", "success");
+                    navigate(`/contenido/all/${slugDominio}/`)
+                } catch (error) {
+                    Swal.fire('Error al actualizar', '', 'error');
+                }
+            } else if (result.isDenied) {
+                Swal.fire('Los cambios no se guardaron', '', 'info');
+                navigate(`/contenido/all/${slugDominio}/`)
+            }
+        });
+    };
+
+    // Edicion
+    const confirmEdicionManual = async (formData) => {
+        return Swal.fire({
+            title: '¿Desea guardar los cambios en el contenido?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Actualizar',
+            denyButtonText: 'No guardar',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const edit_cont = await EditarContenidoManual(formData);
+                    if (edit_cont.data.success) {
+                        Swal.fire("Datos actualizados", "", "success");
+                        navigate(`/contenido/all/${slugDominio}/`)
+                    } else {
+                        if (edit_cont.data.error) {
+                            Swal.fire(edit_cont.data.error, '', 'error');
+                        } else {
+                            Swal.fire('Error al actualizar', '', 'error');
+                        }
+                    }
+                } catch (error) {
+                    Swal.fire('Error al actualizar', '', 'error');
+                }
+            } else if (result.isDenied) {
+                Swal.fire('Los cambios no se guardaron', '', 'info');
+                navigate(`/contenido/all/${slugDominio}/`)
+            }
+        });
+    };
+
 
     return (
         <form onSubmit={enviarFContenido} encType='multipart/form-data'>

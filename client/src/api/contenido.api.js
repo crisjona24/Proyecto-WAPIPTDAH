@@ -194,3 +194,20 @@ export const BusquedaContenidos = (nombre, slug, page = 1) => {
         throw new Error("No se puede acceder a los registros de contenido: " + error.message);
     }
 };
+
+// Edición de contenido manual
+export const EditarContenidoManual = async (datos__post) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.post('wapiptdah/estudio/editar/contenido/', datos__post, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+    } catch (error) {
+        throw new Error("No se puede editar el contenido: " + error.message);
+    }
+}

@@ -173,6 +173,6 @@ export const EditarDominioManual = async (datos__post) => {
             }
         });
     } catch (error) {
-        throw new Error("No se puede crear el dominio: " + error.message);
+        throw new Error("No se puede editar el dominio: " + error.message);
     }
 }
