@@ -16,7 +16,7 @@ import { validarTamanoImagen } from '../../controles/alert_user';
 import { ResultadoIndividual, ResultadoEditar } from '../../api/resultado.api';
 import { SalaIndividual, EditarSala } from "../../api/sala.api"
 import { ReporteIndividual, ReporteEditar } from "../../api/reporte.api"
-
+import { EditarDominioManual } from "../../api/dominio.api"
 
 /* EDICION DE NIVEL*/
 export function FormularioEdicionNivel() {
@@ -250,30 +250,6 @@ export function FormularioEdicion() {
         }
     }, []);
 
-    // Edicion
-    const confirmEdicion = async (formData) => {
-        return Swal.fire({
-            title: '¿Desea guardar los cambios en el dominio?',
-            showDenyButton: true,
-            showCancelButton: true,
-            confirmButtonText: 'Actualizar',
-            denyButtonText: 'No guardar',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    await DominioEditar(datos.id, formData);
-                    Swal.fire("Datos actualizados", "", "success");
-                    navigate('/dominio/all')
-                } catch (error) {
-                    Swal.fire('Error al actualizar', '', 'error');
-                }
-            } else if (result.isDenied) {
-                Swal.fire('Los cambios no se guardaron', '', 'info');
-                navigate('/dominio/all')
-            }
-        });
-    };
-
     // Campos vacios
     const isValidForm = () => {
         if (
@@ -309,15 +285,18 @@ export function FormularioEdicion() {
                 const formData = new FormData(); // Crear un objeto FormData
                 // Verificamos que portada no sea vacio
                 if (portada_dominio !== "") {
+                    formData.append('identificador', datos.id);
                     formData.append('portada_dominio', portada_dominio);
                     formData.append('nombre', nombre_dominio);
                     formData.append('descripcion', descripcion_dominio);
+                    // Confirmamos edicion
+                    await confirmEdicionManual(formData);
                 } else {
                     formData.append('nombre', nombre_dominio);
                     formData.append('descripcion', descripcion_dominio);
+                    // Confirmamos edicion
+                    await confirmEdicion(formData);
                 }
-                // Realizar la petición POST al servidor
-                await confirmEdicion(formData);
             }
         } catch (error) {
             if (error.message === "NOT_AUTHENTICATED") {
@@ -327,6 +306,62 @@ export function FormularioEdicion() {
             }
         }
         setHabilitado(false);
+    };
+
+    // Edicion
+    const confirmEdicion = async (formData) => {
+        return Swal.fire({
+            title: '¿Desea guardar los cambios en el dominio?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Actualizar',
+            denyButtonText: 'No guardar',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await DominioEditar(datos.id, formData);
+                    Swal.fire("Datos actualizados", "", "success");
+                    navigate('/dominio/all')
+                } catch (error) {
+                    Swal.fire('Error al actualizar', '', 'error');
+                }
+            } else if (result.isDenied) {
+                Swal.fire('Los cambios no se guardaron', '', 'info');
+                navigate('/dominio/all')
+            }
+        });
+    };
+
+    const confirmEdicionManual = async (formData) => {
+        return Swal.fire({
+            title: '¿Desea guardar los cambios en el dominio?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Actualizar',
+            denyButtonText: 'No guardar',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    //await DominioEditar(datos.id, formData);
+                    const edit_Domi = await EditarDominioManual(formData);
+                    if (edit_Domi.data.success) {
+                        Swal.fire("Datos actualizados", "", "success");
+                        navigate('/dominio/all')
+                    } else {
+                        if (edit_Domi.data.error) {
+                            Swal.fire(edit_Domi.data.error, '', 'error');
+                        } else {
+                            Swal.fire('Error al actualizar', '', 'error');
+                        }
+                    }
+                } catch (error) {
+                    Swal.fire('Error al actualizar', '', 'error');
+                }
+            } else if (result.isDenied) {
+                Swal.fire('Los cambios no se guardaron', '', 'info');
+                navigate('/dominio/all')
+            }
+        });
     };
 
     return (

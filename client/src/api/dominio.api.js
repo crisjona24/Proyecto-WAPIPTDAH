@@ -158,3 +158,21 @@ export const DominioEliminar = (id) => {
         throw new Error("No se puede eliminar el dominio: " + error.message);
     }
 }
+
+// Edición de dominio manual
+export const EditarDominioManual = async (datos__post) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error("NOT_AUTHENTICATED");
+    }
+    try {
+        return await baseurl.post('wapiptdah/estudio/editar/dominio/', datos__post, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+                //'Authorization': `Token ${token}`
+            }
+        });
+    } catch (error) {
+        throw new Error("No se puede crear el dominio: " + error.message);
+    }
+}

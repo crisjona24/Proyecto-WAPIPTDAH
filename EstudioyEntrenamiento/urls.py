@@ -84,6 +84,7 @@ urlpatterns = [
     path('registro_dominio/', api_dominio_register, name='api_dominio_register'),
     ############ Registro de contenido
     path('registro_contenido/', api_contenido_register, name='api_contenido_register'),
+    path('editar/dominio/', api_dominio_edicion, name='edicion-dominio'),
     ############ Registro de actividades
     path('registro_contenido_individual/', api_contenido_individual_register, name='registro_individual'),
     ############ Registro de curso

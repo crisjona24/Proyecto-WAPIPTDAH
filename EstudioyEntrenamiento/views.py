@@ -10,9 +10,10 @@ from datetime import datetime
 
 # from django.views.decorators.csrf import csrf_exempt
 import json
-import cloudinary
 import cloudinary.uploader
 import cloudinary.api
+import cloudinary
+from cloudinary import uploader
 # from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -599,6 +600,125 @@ def control_categorias():
     except GradoTDAH.DoesNotExist:
         return False
 
+
+
+#### EDICION DE DOMINIO 
+
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def api_dominio_edicion(request):
+    if request.user.is_authenticated:
+        try:
+            # Decodifica el token para obtener el usuario
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            # Validamos si el usuario es tecnico
+            if is_tecnico(user):
+                # Encontrar al usuario relacionado al user
+                usuario__ob = Usuario.objects.get(user=user)
+                # Verificar si el usuario existe y esta en la operación correcta
+                if request.method == 'POST' and user:
+                    id_dominio = request.POST.get('identificador')
+                    nombre_dominio_ = request.POST.get('nombre')
+                    descripcion_ = request.POST.get('descripcion')
+                    portada_ = request.FILES.get(
+                        'portada_dominio')  # obtener archivo
+                    # Verificar si portada dominio es null o contiene contenido
+                    if portada_:
+                        portada_nueva = portada_
+                    else:
+                        portada_nueva = None
+                    # Verificar que portada es NONE
+                    if portada_nueva == None:
+                        return JsonResponse({'error': 'No se pudo editar el registro de dominio'})
+                    # Obtener el identificador público del archivo en Cloudinary de portada en Dominio
+                    public_id = obtener_public_id(id_dominio)
+                    # Verificamos el public id obtenido
+                    if public_id:
+                        # Eliminar la imagen de portada de Cloudinary
+                        resultado_eliminacion  = eliminar_archivo_cloudinary(public_id)
+                        print(resultado_eliminacion)
+                        if resultado_eliminacion and resultado_eliminacion.get('result') == 'ok':
+                            # Verificar si el nombre del dominio es el mismo que el anterior o es nuevo
+                            if nombre_dominio_exist(nombre_dominio_):
+                                # Editamos el dominio
+                                if editar_dominio(id_dominio, nombre_dominio_, descripcion_, portada_nueva, usuario__ob):
+                                    return JsonResponse({'success': True})
+                                else:
+                                    return JsonResponse({'error': 'Error al editar el dominio'})
+                            else:
+                                # Verificar si el nombre del dominio ya existe
+                                if nombre_dominio_exist(nombre_dominio_):
+                                    return JsonResponse({'error': 'El nombre del dominio ya existe. No es posible editar.'})
+                                else:
+                                    # Editamos el dominio
+                                    if editar_dominio(id_dominio, nombre_dominio_, descripcion_, portada_nueva, usuario__ob):
+                                        return JsonResponse({'success': True})
+                                    else:
+                                        return JsonResponse({'error': 'Error al editar el dominio'})
+                        else:
+                            return JsonResponse({'error': 'No se pudo editar el registro de dominio'})
+                    else:
+                        return JsonResponse({'error': 'No se pudo editar el registro de dominio'})
+                else:
+                    return JsonResponse({'error': 'No esta permitido'})
+            else:
+                return JsonResponse({'error': 'El usuario no esta autenticado'})
+        except Exception as e:
+            return JsonResponse({'error': 'Error al crear el dominio'})
+    else:
+        return JsonResponse({'error': 'El usuario no esta autenticado'})
+
+## Método para editar el dominio
+def editar_dominio(ob1, ob2, ob3, ob4, ob5):
+    try:
+        # Obtenemos el objeto dominio del id 
+        dominio_ob = Dominio.objects.get(id=ob1)
+        # Editamos el registro
+        dominio_ob.nombre = ob2
+        dominio_ob.descripcion = ob3
+        dominio_ob.portada_dominio = ob4
+        dominio_ob.usuario = ob5
+        # Guardamos el registro
+        dominio_ob.save()
+        return True
+    except Dominio.DoesNotExist:
+        return False
+    except Exception as e:
+        return False
+
+## Método para obtener el public id del archivo relacionado al registro para dar 
+## paso a la eliminación del archivo en Cloudinary
+def obtener_public_id(ob1):
+    try:
+        # Obtener el objeto de Dominio por su ID
+        dominio_ob = Dominio.objects.get(id=ob1)
+        # Verificar si el Dominio tiene una imagen de portada
+        if dominio_ob.portada_dominio:
+            # Obtener el public ID de la imagen en Cloudinary
+            public_id = cloudinary.CloudinaryImage(dominio_ob.portada_dominio.name).public_id
+            return public_id
+        else:
+            # El Dominio no tiene una imagen de portada
+            return None
+    except Dominio.DoesNotExist:
+        # Manejar la excepción si el Dominio no existe
+        print("El Dominio no existe.")
+        return None
+    except Exception as e:
+        # Manejar otras excepciones
+        print("Error al obtener el public ID:", e)
+        return None
+
+## Método que da origen a la eliminación del archivo en Cloudinary
+def eliminar_archivo_cloudinary(public_id):
+    try:
+        result = uploader.destroy(public_id)
+        return result
+    except Exception as e:
+        return None
 
 
 ## Método para registrar un registro de contenido en el sistema verificado por ser único
