@@ -618,30 +618,6 @@ export function FormularioEdicionIndividual({ slugContenido }) {
         }
     }, []);
 
-    // Edicion
-    const confirmEdicion = async (formData) => {
-        return Swal.fire({
-            title: '¿Desea guardar los cambios en el contenido?',
-            showDenyButton: true,
-            showCancelButton: true,
-            confirmButtonText: 'Actualizar',
-            denyButtonText: 'No guardar',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    await ContenidoIndividualEditar(datos.id, formData);
-                    Swal.fire("Datos actualizados", "", "success");
-                    navigate(`/contenido/individual/all/${slugContenido}/`)
-                } catch (error) {
-                    Swal.fire('Error al actualizar', '', 'error');
-                }
-            } else if (result.isDenied) {
-                Swal.fire('Los cambios no se guardaron', '', 'info');
-                navigate(`/contenido/individual/all/${slugContenido}/`)
-            }
-        });
-    };
-
     // Campos vacios
     const isValidForm = () => {
         if (
@@ -709,7 +685,6 @@ export function FormularioEdicionIndividual({ slugContenido }) {
         try {
             if (token) {
                 const formData = new FormData(); // Crear un objeto FormData
-                console.log("hola", nuevaDescripcion)
                 // Cambio de descripcion
                 if (activo) {
                     formData.append('descripcion_individual', nuevaDescripcion);
@@ -752,6 +727,30 @@ export function FormularioEdicionIndividual({ slugContenido }) {
         }
         setHabilitado(false);
 
+    };
+
+    // Edicion
+    const confirmEdicion = async (formData) => {
+        return Swal.fire({
+            title: '¿Desea guardar los cambios en el contenido?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Actualizar',
+            denyButtonText: 'No guardar',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await ContenidoIndividualEditar(datos.id, formData);
+                    Swal.fire("Datos actualizados", "", "success");
+                    navigate(`/contenido/individual/all/${slugContenido}/`)
+                } catch (error) {
+                    Swal.fire('Error al actualizar', '', 'error');
+                }
+            } else if (result.isDenied) {
+                Swal.fire('Los cambios no se guardaron', '', 'info');
+                navigate(`/contenido/individual/all/${slugContenido}/`)
+            }
+        });
     };
 
     return (

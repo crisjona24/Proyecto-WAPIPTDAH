@@ -711,7 +711,7 @@ export function FormularioSala() {
         }
         // Entrada
         if (!entradaValida) {
-            Swal.fire("Por favor ingrese el formato: Nombre Apellido", "", "warning");
+            Swal.fire("Por favor ingrese el formato: Nombres Apellidos", "", "warning");
             return;
         }
         // Flujo normal
@@ -804,9 +804,10 @@ export function FormularioSala() {
         }
     };
 
-    // Validar entrada
+    // Validacion de entrada
     const validarEntrada = (value) => {
-        const generar = /^[a-zA-Z]+ [a-zA-Z]+$/;
+        // Control de entrada para cuatro valores
+        const generar = /^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+ [A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$/;
         return generar.test(value);
     };
 
@@ -844,7 +845,8 @@ export function FormularioSala() {
             </div>
             <div className="form-group">
                 <label className='label' htmlFor="paciente">Nombre de paciente:</label>
-                <input className='form-control w-100' type="text" placeholder="Ingrese el nombre ejm: Luis Chavez**" id="paciente"
+                <input className='form-control w-100' type="text"
+                    placeholder="Ingrese el nombre ejm: Luis Luis Chavez Chavez**" id="paciente"
                     name="paciente" value={nombre_paciente} onChange={cambioEntrada} />
             </div>
             <Button type="submit" variant="success" disabled={habilitado}>

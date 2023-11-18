@@ -4,7 +4,6 @@ from APPWapiptda.models import *
 from APPWapiptda.serializer import *
 from APPWapiptda.views import *
 #from rest_framework import viewsets, generics
-import re
 from django.http import JsonResponse
 #from django.urls import reverse
 from datetime import datetime
@@ -42,6 +41,7 @@ def generar_identificador_contenido():
     return identificador_c
 
 # Método para generar un identificador único para cada registro de contenido individual
+# que permitirá diferenciar las actividades que serán asignadas mediante las salas de contenido
 def generar_identificador_individual():
     """Genera un identificador único para Contenido Individual."""
     identificador_i = str(random.randint(20001, 30000))
@@ -62,7 +62,8 @@ def generar_identificador_curso():
 ## METODOS PARA VERIFICAR LA EXISTENCIA DE REGISTROS
     
 
-## VERIFICAR NIVEL ###
+## Método para verficar la existencia de un registro de nivel mediante un slug
+## que permite buscar y comprobar la existencia del registro
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -96,7 +97,8 @@ def verificar_nivel(request, slug):
         return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
 
-## VERIFICAR DOMINIO ###
+## Método para verficar la existencia de un registro de dominio mediante un slug
+## que permite buscar y comprobar la existencia del registro
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -130,7 +132,8 @@ def verificar_dominio(request, slug):
         return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
 
-## VERIFICAR CONTENIDO ###
+## Método para verficar la existencia de un registro de contenido mediante un slug
+## que permite buscar y comprobar la existencia del registro
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -165,7 +168,8 @@ def verificar_contenido(request, slug):
         return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
 
-## VERIFICAR CONTENIDO INDIVIDUAL ###
+## Método para verficar la existencia de un registro de una actividad mediante un slug
+## que permite buscar y comprobar la existencia del registro
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -200,7 +204,8 @@ def verificar_contenido_individual(request, slug):
         return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
 
-## VERIFICAR CURSO ###
+## Método para verficar la existencia de un registro de curso mediante un slug
+## que permite buscar y comprobar la existencia del registro
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -235,7 +240,8 @@ def verificar_curso(request, slug):
         return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
 
-## VERIFICAR PETICION ###
+## Método para verficar la existencia de un registro de una petición mediante un slug
+## que permite buscar y comprobar la existencia del registro
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -269,7 +275,8 @@ def verificar_peticion(request, slug):
         return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
 
-## VERIFICAR CONTENIDO ###
+## Método para verficar la existencia de un registro de resultado mediante un slug
+## que permite buscar y comprobar la existencia del registro
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -303,7 +310,8 @@ def verificar_resultado(request, slug):
         return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
 
-## VERIFICAR SALA ###
+## Método para verficar la existencia de un registro de sala mediante un slug
+## que permite buscar y comprobar la existencia del registro
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -337,7 +345,8 @@ def verificar_sala(request, slug):
         return JsonResponse({'error': 'El usuario no esta autenticado'}, status=401)
 
 
-## VERIFICAR REPORTE ###
+## Método para verficar la existencia de un registro de reporte mediante un slug
+## que permite buscar y comprobar la existencia del registro
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -376,7 +385,8 @@ def verificar_reporte(request, slug):
 
 
 
-#  METODO PARA REGISTRO DE GRADO TDAH
+## Método para registro del nivel de TDAH en el sistema, donde se debe considerar la existencia de dos
+## niveles y unicamente se podra hacerlo si no existen registros y no sean mayor a dos
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -463,7 +473,8 @@ def numero_de_dominios():
         return 0
 
 
-# METODO PARA DEVOLVER EL CONTADOR DE NIVELES
+## Método para devolver el contador de niveles para controla el registro de dominios
+## y controlar el número de controladores de dominios
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -492,7 +503,9 @@ def api_nivel_contador(request):
         return JsonResponse({'error': 'El usuario no esta autenticado'})
  
 
-# METODO DE REGISTRO DE DOMINIO
+# Método para el registro de dominios en el sistema controlado por medio del numero de 
+## categorías que se encuentra registrado en el registro de nivel. Esto es controlado por 
+## la duplicidad del registro de dominio por medio del nombre
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -588,7 +601,8 @@ def control_categorias():
 
 
 
-# METODO DE REGISTRO DE CONTENIDO
+## Método para registrar un registro de contenido en el sistema verificado por ser único
+## para evitar la duplicidad de registros y que se encuentre relacionado a un dominio
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -659,7 +673,9 @@ def nombre_contenido_exist(ob1):
 
 
 
-# METODO DE REGISTRO DE CONTENIDO INDIVIDUAL
+# Método para guardar un registro de actividad en el sistema controlado por medio del 
+## tipo de actividad y a través de esto verificar cuantos registros de archivos de contenido
+# ## tipo imagen se van a realizar.  
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -825,7 +841,8 @@ def guardar_contenido_individual_4(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9):
 
 
 
-# METODO DE REGISTRO DE CURSO
+# Método para realizar el registro de curso en el sistema controlado por medio del nombre único
+## para evitar la duplicidad de registros y que se encuentre relacionado a un usuario común
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -893,7 +910,8 @@ def nombreCurso_exist(ob1):
 
 
 
-# METODO DE REGISTRO EN CURSO
+# Método para guardar el registro de inscripción de un estudiante en un curso 
+## donde la inscripción al curso debe ser única
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -938,7 +956,8 @@ def guardar_inscripcion(ob1, ob2):
 
 
 
-# METODO DE REGISTRO DE PETICION
+# Método para guardar el registro de petición en el sistema controlado por el envió de un correo
+## electrónico a los usuarios técnicos registrados en el sistema
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -999,7 +1018,8 @@ def guardar_peticion(ob1, ob2, ob3, ob4):
     except Exception as e:
         return False
 
-# Método para enviar correo de notificación de petición existentes a los usuarios tecnicos registrados en el sistema
+# Método para enviar correo de notificación de petición existentes a los usuarios tecnicos 
+## registrados en el sistema
 def enviar_correo_peticion(ob1):
     try:
         # Obtenemos el nombre de usuario y appellido del usuario comun
@@ -1031,7 +1051,8 @@ def enviar_correo_peticion(ob1):
         return False
 
 
-# METODO DE REGISTRO DE RESULTADO
+# Método para guardar el registro de resultado originado por un estudiante al momento de responder a 
+## una actividad específica en el sistema
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1136,7 +1157,9 @@ def guardar_resultado_no(ob1, ob2, ob3, ob4, ob5, ob6, ob7):
 
 
 
-## METODO DE REGISTRO DE SALA
+# Método para guardar el registro de sala en el sistema controlado la existencia 
+## de un curso, el estudiante en un curso registrado por el usuario común, la existencia 
+## del identificador de actividad otorgado 
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1167,8 +1190,9 @@ def api_sala_register(request):
         codigo_identificador_ = data.get('codigo_identificador')
         nombre_paciente_ = data.get('nombre_paciente')
         nombres_divididos = nombre_paciente_.split(' ')
-        nombre = nombres_divididos[0]
-        apellido = nombres_divididos[1]
+        # Toma las dos primeras posiciones para nombre y las dos siguientes para apellido
+        nombre = nombres_divididos[0] + ' ' + nombres_divididos[1]
+        apellido = nombres_divididos[2] + ' ' + nombres_divididos[3]
 
         if not curso_existe(usuario__ob):
             return JsonResponse({'error': "No tiene un curso registrado. No puede registrar salas."})
@@ -1301,7 +1325,9 @@ def nombresala_exist(ob1):
 
 
 
-## METODO DE EDICION DE SALA
+# Método para editar el registro de sala por medio del identificador de la misma. 
+## Se verifica la existencia de un curso, la existencia del nombre de la sala 
+## y la existencia del identificador de actividad otorgado
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1396,7 +1422,7 @@ def nombresala_exist_edicion(ob1, ob2):
 
 
 
-## GENERAR REPORTE ##
+## Generación del registro de reporte en el sistema controlado por medio de la existencia de un resultado
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1458,7 +1484,9 @@ def guardar_reporte(ob1, ob2):
     
 
 
-## GENERAR REPORTE POR NOMBRE DE PACIENTE ##
+# Generación del registro de reportes por medio del nombre de un estudiante
+## Se verifica la existencia de un curso, la existencia del nombre del estudiante, del estado 
+## de los resultados con respecto a la existencia de un registro de reporte asociado
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1595,7 +1623,8 @@ def Reporte_general_Nombre(ob1, ob2, ob3):
 
 
 
-# METODO DE OBTENER CONTENIDO
+# Método para recuperar el contenido de un registro de actividad. Se obtiene la información
+## relacionada por medio del slug del resultado que actua como identificador de la actividad
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1708,7 +1737,7 @@ def contenido_individual(request, slug):
 
 
 
-# METODO DE OBTENER CONTENIDO PRINCIPAL
+# Método para obtener la información relacionada a un registro de contenido a través del slug.
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1731,7 +1760,7 @@ def contenido_principal(request, slug):
 
 
 
-## OBTENER SLUG DE CONTENIDO ###
+# Método para obtener la información relacionada a un registro de actividad a través del código.
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])

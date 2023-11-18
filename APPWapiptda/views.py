@@ -177,7 +177,7 @@ def verificar_cedula_ecuatoriana(cedula):
     return digito_verificador == int(cedula[9])
 
 
-## Validar entradas de nombres para evitar expresiones regulares
+## Validar entradas de nombres para evitar expresiones regulares que desencadenen ataques de sql injection
 def validar_nombres(ob1, ob2):
     # Expresión regular para verificar que ambos nombres cumplan con el formato deseado
     formato_valido = re.compile(r'^[A-Za-zÁáÉéÍíÓóÚúÑñ]+\s[A-Za-zÁáÉéÍíÓóÚúÑñ]+$')
@@ -477,7 +477,7 @@ def datos_usuario(request):
 
 
 
-###### METODOS DE REGISTRO DE USUARIO #####
+###### METODOS DE REGISTRO DE USUARIO, RECUPERACION/CAMBIO DE CLAVE #####
 
 
 ## Método para verificar si un registro existe o no dentro de la base de datos
@@ -946,7 +946,14 @@ def verificacion_correo_V(ob1):
         return False
 
 
-# METODO DE REGISTRO DE USUARIO
+
+
+
+######  METODOs DE REGISTRO DE USUARIO ######
+
+
+
+
 @api_view(['POST'])
 def api_user_register(request):
     try:
@@ -1233,7 +1240,11 @@ def crear_comun_normal(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, ob10):
 
 
 
-# VERIFICACION DE INSCRIPCION
+#### METODOS DE VERIFICACIÓN DE REGISTROS EN LA BASE DE DATOS   
+
+
+
+# Método para verificar si el usuario ya existe Y esta inscrito en un curso
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1271,7 +1282,8 @@ def verificacion_inscripcion(request):
 
 
 
-# METODO DE COMPORBAR SI HAY COMA
+# Método para verificar la existencia de una separacion por coma en los registros 
+# obtneidos desde la base de datos
 def comprobar_separacion_coma(valor_respuesta):
     # Verificar si el string contiene una coma
     if ',' in valor_respuesta:
@@ -1281,7 +1293,8 @@ def comprobar_separacion_coma(valor_respuesta):
 
 
 
-# METODO PARA ATENER PETICION Y ENVIAR CORREO
+# Método para dar paso al registro de atención de una petición del usuario común y 
+# posteriormente enviar un mensaje por correo electrónico para confirmar la operación 
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1298,29 +1311,31 @@ def atender_peticion(request):
                     slug = data.get('slug')
                     estadoR_ = data.get('estadoR')
                     vereficto_ = data.get('vereficto')
-                    if atención_peticion(slug):
-                        # Enviamos el email antes de modificar
-                        peticion__ob = Peticion.objects.get(slug_peticion=slug)
-                        tecnico__ob = Usuario.objects.get(user=user)                    
-                        if send_email(peticion__ob, vereficto_, estadoR_):
-                            try:
-                                # Agregamos detalle de peticion
-                                if guardar_detalle(peticion__ob.motivo_peticion, tecnico__ob, peticion__ob):
-                                    # Actualizamos el contador de ContadorPeticionesAtendidas
-                                    contador_obj, created = ContadorPeticionesAtendidas.objects.get_or_create(usuario_comun=peticion__ob.usuario_comun)
-                                    contador_obj.contador += 1
-                                    contador_obj.save()
-                                    # Enviamos la respuesta al front
-                                    return JsonResponse({'success': True})
-                                else:
-                                    return JsonResponse({'error': 'Error al guardar el detalle'}, status=500)
-                            except Exception as e:
-                                # Aquí puedes agregar logging o imprimir el error si es necesario
-                                return JsonResponse({'error': 'Error al guardar el detalle'}, status=500)
-                        else:
-                            return JsonResponse({'error': 'Error al enviar el email'}, status=400)
-                    else:
+                    # Atender la petición
+                    if not atención_peticion(slug):
                         return JsonResponse({'error': 'Error al atender la petición'}, status=400)
+                    # Si se atiende la petición se da paso al envío del correo
+                    peticion__ob = Peticion.objects.get(slug_peticion=slug)
+                    tecnico__ob = Usuario.objects.get(user=user)
+                    if send_email(peticion__ob, vereficto_, estadoR_):
+                        try:
+                            # Agregamos detalle de peticion
+                            if guardar_detalle(peticion__ob.motivo_peticion, tecnico__ob, peticion__ob):
+                                # Actualizamos el contador de ContadorPeticionesAtendidas
+                                contador_obj, created = ContadorPeticionesAtendidas.objects.get_or_create(
+                                    usuario_comun=peticion__ob.usuario_comun)
+                                contador_obj.contador += 1
+                                contador_obj.save()
+                                # Enviamos la respuesta al front
+                                return JsonResponse({'success': True})
+                            else:
+                                return JsonResponse({'error': 'Error al guardar el detalle'}, status=500)
+                        except Exception as e:
+                            # Aquí puedes agregar logging o imprimir el error si es necesario
+                            return JsonResponse({'error': 'Error al guardar el detalle'}, status=500)
+                    else:
+                        return JsonResponse({'error': 'Error al enviar el email'}, status=400)
+
                 else:
                     return JsonResponse({'error': 'Algo no esta permitido'}, status=405)
             else:
@@ -1334,7 +1349,7 @@ def atender_peticion(request):
     else:
         return JsonResponse({'errorSalida': 'El usuario no esta autenticado'}, status=401)
 
-# Método para atender petición
+# Método para atender petición: cambia el estado de revisión de la petición
 def atención_peticion(ob1):
     try: 
         # Obtenemos el objeto peticions
@@ -1357,31 +1372,38 @@ def guardar_detalle(ob1, ob2, ob3):
         )
         # Añadimos a contenido
         detalle_peticion.save()
-        # Correo
-
         return True
     except Exception as e:
         return False
 
 # Método para enviar el correo electrónico de notificación de revisión de petición
+
+
 def send_email(peticion__ob, ob1, ob2):
     # Capturamos los datos para el email
     subject = 'Notificación de revisión de petición'
-    message = ('Su petición de tipo ' + peticion__ob.tipo_peticion + 
-               ' ha sido atendida.\n' +
-               'El motivo de la misma era: ' + peticion__ob.motivo_peticion + 
-               '\nEl verdicto de la revisión es : ' + ob1 +
-               '\nLa misma cuenta con un estado de : ' + ob2) 
+    message = f'Reciba un cordial saludo de los administradores de WAPIPTDAH. ' \
+        f'\nRecibimos la confirmación de revisión de una petición emitada por usted.' \
+        f'\nEste es un mensaje para informar y verificar que la petición fue atendida y revisada por los técnicos en cuestión. ' \
+        f'\n\n1. Su peticion de tipo: ' \
+        f'\n{peticion__ob.tipo_peticion}'\
+        f'\nha sido atendida.'\
+        f'\n\n2. El motivo de la misma era: ' \
+        f'\n{peticion__ob.motivo_peticion}' \
+        f'\nEl verdicto de la revisión es: {ob1} ' \
+        f'\nLa misma cuenta con un estado de: {ob2}' \
+        f'\nAtentamente: WAPIPTDAH.'
     from_email = settings.EMAIL_HOST_USER
-    #receiver_email = ['cristobal.rios@unl.edu.ec']
-    #receiver_email= ['genoveva.suing@unl.edu.ec']
+    # receiver_email = ['cristobal.rios@unl.edu.ec']
+    # receiver_email= ['genoveva.suing@unl.edu.ec']
     receiver_email = [peticion__ob.usuario_comun.email_usuario]
 
-    send_mail(subject, message, from_email, receiver_email, fail_silently=False)
+    send_mail(subject, message, from_email,
+              receiver_email, fail_silently=False)
     return True
 
 
-## METODO DE OBTENER EL NUMERO DE PETICIONES NUEVAS AGREGADAS
+## Método para obtener y resetear el número de peticiiones emitidas por el usuario común
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1405,7 +1427,7 @@ def reset_contador_peticiones(request):
         return JsonResponse({'error': 'No se puede resetear contador'}, status=405)
 
 
-## METODO DE OBTENER EL NUMERO DE PETICIONES ATENDIDAS
+## Método para obtener y resetear el número de peticiiones atendidas por el usuario 
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1454,7 +1476,7 @@ def reset_contador_peticiones_atendidas(request):
 
 
 
-## CONTADOR DE SALAS 
+## Método para obtener y resetear el número de salas emitidas para el estudiante
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1477,6 +1499,7 @@ def get_contador_salas(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500) 
 
+# Obtiene el numero del contador existente
 def numero_contador(user):
     try:
         # Obtenemos el objeto usuario comun
@@ -1487,16 +1510,22 @@ def numero_contador(user):
     except ContadorSalas.DoesNotExist:
         return 0
 
+# Verificar que existe un contador para un usuario en específico
 def paciente_existe_contador(user):
     try:
         # Obtenemos el objeto usuario comun
         usuario__ob = Paciente.objects.get(user=user)
-        # Filtramos el contador del usuariuo comun
-        contador_ = ContadorSalas.objects.get(paciente=usuario__ob)
-        return True
+        # Filtramos el contador del usuariuo paciente para verificar su existencia 
+        if ContadorSalas.objects.get(paciente=usuario__ob):
+            return True
+        return False
+    except Paciente.DoesNotExist:
+        return False
     except ContadorSalas.DoesNotExist:
         return False
+    
 
+# Método para resetear el contador de salas existentes para los estudiantes
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1522,7 +1551,7 @@ def reset_contador_salas(request):
         return JsonResponse({'error': str(e)}, status=500) 
 
 
-## ATENDER SALA ###
+## Método para registrar la atención de las salas de contenido por parte de los esudiantes 
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1600,7 +1629,7 @@ def send_email_sala(ob1, ob2):
     return True
 
 
-## CONTADOR DE SALAS ATENDIDAS
+## Método para verificar el contador de salas atendidas por los estudiantes
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1623,6 +1652,7 @@ def get_contador_salas_atendidas(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500) 
 
+# Verificar la existencia del contador
 def comunN_existe_contador(user):
     try:
         # Obtenemos el objeto usuario comun
@@ -1634,6 +1664,7 @@ def comunN_existe_contador(user):
         return False
     return False
 
+# Obtener el contador
 def numero_contador_SA(user):
     try:
         # Obtenemos el objeto usuario comun
@@ -1645,6 +1676,7 @@ def numero_contador_SA(user):
         return 0
 
 
+# Método para resetear el contador de salas atendidas por los estudiantes
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1671,7 +1703,7 @@ def reset_contador_salas_atendidas(request):
 
 
 
-## OBTENER SLUG DE SLUG DE CURSO ###
+## Obtener el slug de curso para redireccionamiento interno
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1718,7 +1750,7 @@ def obtener_slug(id):
     except DetalleInscripcionCurso.DoesNotExist:
         return False
 
-## OBTENER SLUG DE SLUG DE DOMINIO ###
+## Obtener el slug de dominio para redireccionamiento interno
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1764,7 +1796,8 @@ def obtener_slug_domi(ob1):
         return False
     
 
-## OBTENER SLUG DE SLUG DE CONTENIDO ###
+
+## Obtener el slug de contenido para redireccionamiento interno
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1875,7 +1908,8 @@ def enviar_correo(ob1, ob2, ob3):
 
 
 
-## GENERAR REPORTE ##
+## Método para modificar el estado del reporte una vez que este haya sido eliminado
+## y dar paso a la rectificación del estado de resultado
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1921,7 +1955,7 @@ def modificar_estado_resultado(ob1):
 
 
 
-# GENERAR REPORTE ##
+## Método para obtener la fecha de inscripción del estudiante a un curso
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -1973,7 +2007,7 @@ def obtener_fecha(ob1, ob2):
         return False
 
 
-# GENERAR REPORTE ##
+## Método para obtener el nombre de revisor de una petición 
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
