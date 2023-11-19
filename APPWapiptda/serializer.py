@@ -113,6 +113,7 @@ class ResultadoSerializerOnly(serializers.ModelSerializer):
         model = Resultado
         fields = ('id', 'observacion')
 
+
 # Clase de serialización para los registros de curso generados 
 # por el usuario comun
 class CursoSerializer(serializers.ModelSerializer):
@@ -120,6 +121,17 @@ class CursoSerializer(serializers.ModelSerializer):
         model = Curso
         fields = ('id', 'nombre_curso', 'descripcion_curso', 'slug_curso', 'usuario_comun',
                   'identificador_curso', 'fecha_edicion_curso', 'fecha_registro_curso')
+    
+    # Validación de nombre de curso no duplicado para edicion
+    def validar_nombre_curso(self, value):
+        instance = self.instance
+        # Verificar si hay algún otro curso con el mismo nombre
+        existe_otro_curso = Curso.objects.exclude(
+            id=instance.id if instance else None).filter(nombre_curso=value).exists()
+        if existe_otro_curso:
+            return serializers.ValidationError("Ya existe un curso con este nombre")
+        return value
+    
 
 # Clase de serialización para los registros de inscripciones a cursos
 class DetalleInscripcionCursoSerializer(serializers.ModelSerializer):

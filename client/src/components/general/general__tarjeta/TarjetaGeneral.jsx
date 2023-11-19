@@ -514,7 +514,7 @@ export function Individual({ datos, slug }) {
                                 <hr />
                                 <Row className="mb-3">
                                     <Card.Title style={{ fontSize: '1rem' }}>Imagen de portada / actividad</Card.Title>
-                                        <CarruselIndividual imagenes={images} />
+                                    <CarruselIndividual imagenes={images} />
                                 </Row>
                                 <Card.Text>
                                     <small className="text-muted" style={{ fontFamily: 'Roboto' }}>Acciones</small>
@@ -603,11 +603,7 @@ export function Peticion({ datos }) {
             if (datosRevisor.data.success) {
                 setRevisorN(datosRevisor.data.nombre_u);
                 setRevisorA(datosRevisor.data.apellido_u);
-            } else {
-                if (datosRevisor.data.error) {
-                    Swal.fire(datosRevisor.data.error, "", "warning");
-                }
-            }
+            } 
         } catch (error) {
             if (error.message === "NOT_AUTHENTICATED") {
                 navigate('/login');
@@ -709,7 +705,14 @@ export function Peticion({ datos }) {
                                             <>
                                                 <Card.Title style={{ fontSize: '1rem' }}>Revisador por</Card.Title>
                                                 <Card.Text className="texto-peticion" >
-                                                    {revisorN} {revisorA}
+                                                    {
+                                                        revisorN === "" && revisorA === "" ? (
+                                                            <span className="text-danger">Sin revisor</span>
+                                                        ) : (
+                                                            <span>{revisorN} {revisorA}</span>
+                                                        )
+                                                    }
+                                                    
                                                 </Card.Text>
                                             </>
                                         )

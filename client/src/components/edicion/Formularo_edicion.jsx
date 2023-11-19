@@ -985,30 +985,6 @@ export function FormularioEdicionCurso() {
         }
     }, []);
 
-    // Edicion
-    const confirmEdicion = async (datos__post) => {
-        return Swal.fire({
-            title: '¿Desea guardar los cambios en el curso?',
-            showDenyButton: true,
-            showCancelButton: true,
-            confirmButtonText: 'Actualizar',
-            denyButtonText: 'No guardar',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    await CursoEditar(datosCurso.id, datos__post);
-                    Swal.fire("Datos actualizados", "", "success");
-                    navigate('/cursos/all')
-                } catch (error) {
-                    Swal.fire('Error al actualizar', '', 'error');
-                }
-            } else if (result.isDenied) {
-                Swal.fire('Los cambios no se guardaron', '', 'info');
-                navigate('/cursos/all')
-            }
-        });
-    };
-
     // Envio de datos
     const enviarFCurso = async (e) => {
         e.preventDefault();
@@ -1038,6 +1014,34 @@ export function FormularioEdicionCurso() {
         }
         setHabilitado(false);
     };
+
+    // Edicion
+    const confirmEdicion = async (datos__post) => {
+        return Swal.fire({
+            title: '¿Desea guardar los cambios en el curso?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Actualizar',
+            denyButtonText: 'No guardar',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await CursoEditar(datosCurso.id, datos__post);
+                    Swal.fire("Datos actualizados", "", "success");
+                    navigate('/cursos/all')
+                } catch (error) {
+                    // Acceder al mensaje de error
+                    const errorMessage = error.message || "Error desconocido al actualizar";
+                    // Mostrar el mensaje de error
+                    Swal.fire(errorMessage, '', 'error');
+                }
+            } else if (result.isDenied) {
+                Swal.fire('Los cambios no se guardaron', '', 'info');
+                navigate('/cursos/all')
+            }
+        });
+    };
+
 
     // Campos vacios
     const isValidForm = () => {

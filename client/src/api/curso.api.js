@@ -108,15 +108,21 @@ export const CursoEditar = (id, curso) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.put(`wapiptdah/aplicacion/curso/${id}/`, curso,
+        const response = baseurl.put(`wapiptdah/aplicacion/curso/${id}/`, curso,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
-                    //'Authorization': `Token ${token}`
                 }
-            })
+            });
+        return response.data;
     } catch (error) {
-        throw new Error("No se puede editar el curso: " + error.message);
+        if (error.response) {
+            throw new Error("No se puede editar el curso: " + error.response.data.detail);
+        } else if (error.message === "NOT_AUTHENTICATED") {
+            throw new Error("No autenticado. Inicie sesión para realizar esta acción.");
+        } else {
+            throw new Error("Error desconocido al editar el curso: " + error.message);
+        }
     }
 };
 
