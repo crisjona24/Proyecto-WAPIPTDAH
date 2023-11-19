@@ -633,35 +633,43 @@ def api_dominio_edicion(request):
                     # Verificar que portada es NONE
                     if portada_nueva == None:
                         return JsonResponse({'error': 'No se pudo editar el registro de dominio'})
-                    # Obtener el identificador público del archivo en Cloudinary de portada en Dominio
-                    public_id = obtener_public_id(id_dominio)
-                    # Verificamos el public id obtenido
-                    if public_id:
-                        # Eliminar la imagen de portada de Cloudinary
-                        resultado_eliminacion  = eliminar_archivo_cloudinary(public_id)
-                        print(resultado_eliminacion)
-                        if resultado_eliminacion and resultado_eliminacion.get('result') == 'ok':
-                            # Verificar si el nombre del dominio es el mismo que el anterior o es nuevo
-                            if nombre_dominio_exist(nombre_dominio_):
+                    # Verificar si el nombre del dominio es el mismo que el anterior o es nuevo
+                    if nombre_dominio_exist(nombre_dominio_):
+                        # Obtener el identificador público del archivo en Cloudinary de portada en Dominio
+                        public_id = obtener_public_id(id_dominio)
+                        # Verificamos el public id obtenido
+                        if public_id:
+                            # Eliminar la imagen de portada de Cloudinary
+                            resultado_eliminacion  = eliminar_archivo_cloudinary(public_id)
+                            if resultado_eliminacion and resultado_eliminacion.get('result') == 'ok':
                                 # Editamos el dominio
                                 if editar_dominio(id_dominio, nombre_dominio_, descripcion_, portada_nueva, usuario__ob):
                                     return JsonResponse({'success': True})
                                 else:
                                     return JsonResponse({'error': 'Error al editar el dominio'})
                             else:
-                                # Verificar si el nombre del dominio ya existe
-                                if nombre_dominio_exist(nombre_dominio_):
-                                    return JsonResponse({'error': 'El nombre del dominio ya existe. No es posible editar.'})
-                                else:
+                                return JsonResponse({'error': 'No se pudo editar el registro de dominio'})
+                        else:
+                            return JsonResponse({'error': 'No se pudo editar el registro de dominio'})
+                    else:
+                        # Verificar si el nombre del dominio ya existe
+                        if nombre_dominio_exist(nombre_dominio_):
+                            return JsonResponse({'error': 'El nombre del dominio ya existe. No es posible editar.'})
+                        else:
+                            # Verificamos el public id obtenido
+                            if public_id:
+                                # Eliminar la imagen de portada de Cloudinary
+                                resultado_eliminacion  = eliminar_archivo_cloudinary(public_id)
+                                if resultado_eliminacion and resultado_eliminacion.get('result') == 'ok':
                                     # Editamos el dominio
                                     if editar_dominio(id_dominio, nombre_dominio_, descripcion_, portada_nueva, usuario__ob):
                                         return JsonResponse({'success': True})
                                     else:
                                         return JsonResponse({'error': 'Error al editar el dominio'})
-                        else:
-                            return JsonResponse({'error': 'No se pudo editar el registro de dominio'})
-                    else:
-                        return JsonResponse({'error': 'No se pudo editar el registro de dominio'})
+                                else:
+                                    return JsonResponse({'error': 'No se pudo editar el registro de dominio'})
+                            else:
+                                return JsonResponse({'error': 'No se pudo editar el registro de dominio'})
                 else:
                     return JsonResponse({'error': 'No esta permitido'})
             else:
@@ -736,8 +744,6 @@ def api_contenido_edicion(request):
             user = get_user_from_token_jwt(token)
             # Validamos si el usuario es tecnico
             if is_tecnico(user):
-                # Encontrar al usuario relacionado al user
-                usuario__ob = Usuario.objects.get(user=user)
                 # Verificar si el usuario existe y esta en la operación correcta
                 if request.method == 'POST' and user:
                     id_contenido = request.POST.get('identificador')
@@ -753,34 +759,45 @@ def api_contenido_edicion(request):
                     # Verificar que portada es NONE
                     if portada_nueva == None:
                         return JsonResponse({'error': 'No se pudo editar el registro de contenido'})
-                    # Obtener el identificador público del archivo en Cloudinary de portada en Dominio
-                    public_id = obtener_public_id_contenido(id_contenido)
-                    # Verificamos el public id obtenido
-                    if public_id:
-                        # Eliminar la imagen de portada de Cloudinary
-                        eliminar_conte  = eliminar_archivo_cloudinary(public_id)
-                        if eliminar_conte and eliminar_conte.get('result') == 'ok':
-                            # Verificar si el nombre del contenido es el mismo que el anterior o es nuevo
-                            if nombre_contenido_exist(nombre_contenido_):
+                    # Verificar si el nombre del contenido es el mismo que el anterior o es nuevo
+                    if nombre_contenido_exist(nombre_contenido_):
+                        # Obtener el identificador público del archivo en Cloudinary de portada en Dominio
+                        public_id = obtener_public_id_contenido(id_contenido)
+                        # Verificamos el public id obtenido
+                        if public_id:
+                            # Eliminar la imagen de portada de Cloudinary
+                            eliminar_conte  = eliminar_archivo_cloudinary(public_id)
+                            if eliminar_conte and eliminar_conte.get('result') == 'ok':
                                 # Editamos el contenido
                                 if editar_contenido(id_contenido, nombre_contenido_, dominio_tipo_, portada_nueva):
                                     return JsonResponse({'success': True})
                                 else:
                                     return JsonResponse({'error': 'Error al editar el contenido'})
                             else:
-                                # Verificar si el nombre del contenido ya existe
-                                if nombre_contenido_exist(nombre_contenido_):
-                                    return JsonResponse({'error': 'El nombre del contenido ya existe. No es posible editar.'})
-                                else:
+                                return JsonResponse({'error': 'No se pudo editar el registro de contenido'})
+                        else:
+                            return JsonResponse({'error': 'No se pudo editar el registro de contenido'})
+                    else:
+                        # Verificar si el nombre del contenido ya existe
+                        if nombre_contenido_exist(nombre_contenido_):
+                            return JsonResponse({'error': 'El nombre del contenido ya existe. No es posible editar.'})
+                        else:
+                            # Obtener el identificador público del archivo en Cloudinary de portada en Dominio
+                            public_id = obtener_public_id_contenido(id_contenido)
+                            # Verificamos el public id obtenido
+                            if public_id:
+                                # Eliminar la imagen de portada de Cloudinary
+                                eliminar_conte  = eliminar_archivo_cloudinary(public_id)
+                                if eliminar_conte and eliminar_conte.get('result') == 'ok':
                                     # Editamos el contenido
                                     if editar_contenido(id_contenido, nombre_contenido_, dominio_tipo_, portada_nueva):
                                         return JsonResponse({'success': True})
                                     else:
                                         return JsonResponse({'error': 'Error al editar el contenido'})
-                        else:
-                            return JsonResponse({'error': 'No se pudo editar el registro de contenido'})
-                    else:
-                        return JsonResponse({'error': 'No se pudo editar el registro de contenido'})
+                                else:
+                                    return JsonResponse({'error': 'No se pudo editar el registro de contenido'})
+                            else:
+                                return JsonResponse({'error': 'No se pudo editar el registro de contenido'})
                 else:
                     return JsonResponse({'error': 'No esta permitido'})
             else:
