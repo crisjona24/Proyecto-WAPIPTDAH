@@ -124,15 +124,31 @@ export const ContenidoEditar = (id, contenido) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.put(`wapiptdah/aplicacion/contenido/${id}/`, contenido,
+        const respons = baseurl.put(`wapiptdah/aplicacion/contenido/${id}/`, contenido,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
-                    //'Authorization': `Token ${token}`
                 }
             })
+        return respons;
     } catch (error) {
-        throw new Error("No se puede editar el registro de contenido: " + error.message);
+        if (error.response) {
+            // Manejar errores de respuesta del servidor
+            if (error.response.data.nombre) {
+                // Error de validación del nombre
+                console.error("Error de nombre:", error.response.data.nombre);
+            }
+            if (error.response.data.portada_dominio) {
+                // Error relacionado con la portada
+                console.error("Error de portada:", error.response.data.portada);
+            }
+        } else if (error.message === "NOT_AUTHENTICATED") {
+            // Manejar error de autenticación
+            console.error("No autenticado. Inicie sesión para realizar esta acción.");
+        } else {
+            // Manejar otros errores desconocidos
+            console.error("Error desconocido al editar el dominio:", error.message);
+        }
     }
 }
 

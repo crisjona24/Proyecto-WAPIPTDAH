@@ -91,15 +91,27 @@ export const NivelEditar = (id, grado) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return baseurl.put(`wapiptdah/aplicacion/grado/${id}/`, grado,
+        const response = baseurl.put(`wapiptdah/aplicacion/grado/${id}/`, grado,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
-                    //'Authorization': `Token ${token}`
                 }
             })
+        return response;
     } catch (error) {
-        throw new Error("No se puede editar el nivel: " + error.message);
+        if (error.response) {
+            // Manejar errores de respuesta del servidor
+            if (error.response.data.nombre) {
+                // Error de validación del nombre
+                console.error("Error de nombre:", error.response.data.nombre);
+            }
+        } else if (error.message === "NOT_AUTHENTICATED") {
+            // Manejar error de autenticación
+            console.error("No autenticado. Inicie sesión para realizar esta acción.");
+        } else {
+            // Manejar otros errores desconocidos
+            console.error("Error desconocido al editar el dominio:", error.message);
+        }
     }
 }
 
@@ -162,7 +174,7 @@ export const EnviarCorreo = async (datos__post) => {
 
 
 // Verificación de la existencia de un registro de nivel
-export const VerificarNumeronivel= async () => {
+export const VerificarNumeronivel = async () => {
     const tokenLocal = localStorage.getItem('token');
     if (!tokenLocal) {
         throw new Error("NOT_AUTHENTICATED");

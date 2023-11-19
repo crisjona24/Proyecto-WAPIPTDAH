@@ -108,15 +108,31 @@ export const DominioEditar = async (id, dominio) => {
         throw new Error("NOT_AUTHENTICATED");
     }
     try {
-        return await baseurl.put(`wapiptdah/aplicacion/dominio/${id}/`, dominio,
+        const response = baseurl.put(`wapiptdah/aplicacion/dominio/${id}/`, dominio,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`
-                    //'Authorization': `Token ${token}`
                 }
             })
+        return response;
     } catch (error) {
-        throw new Error("No se puede editar el dominio: " + error.message);
+        if (error.response) {
+            // Manejar errores de respuesta del servidor
+            if (error.response.data.nombre) {
+                // Error de validación del nombre
+                console.error("Error de nombre:", error.response.data.nombre);
+            }
+            if (error.response.data.portada_dominio) {
+                // Error relacionado con la portada_dominio
+                console.error("Error de portada_dominio:", error.response.data.portada_dominio);
+            }
+        } else if (error.message === "NOT_AUTHENTICATED") {
+            // Manejar error de autenticación
+            console.error("No autenticado. Inicie sesión para realizar esta acción.");
+        } else {
+            // Manejar otros errores desconocidos
+            console.error("Error desconocido al editar el dominio:", error.message);
+        }
     }
 }
 

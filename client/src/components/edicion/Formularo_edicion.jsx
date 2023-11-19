@@ -286,18 +286,19 @@ export function FormularioEdicion() {
                 const formData = new FormData(); // Crear un objeto FormData
                 // Verificamos que portada no sea vacio
                 if (portada_dominio !== "") {
-                    formData.append('identificador', datos.id);
+                    //formData.append('identificador', datos.id);
                     formData.append('portada_dominio', portada_dominio);
                     formData.append('nombre', nombre_dominio);
                     formData.append('descripcion', descripcion_dominio);
                     // Confirmamos edicion
-                    await confirmEdicionManual(formData);
+                    //await confirmEdicionManual(formData);
                 } else {
                     formData.append('nombre', nombre_dominio);
                     formData.append('descripcion', descripcion_dominio);
                     // Confirmamos edicion
-                    await confirmEdicion(formData);
+                    //await confirmEdicion(formData);
                 }
+                await confirmEdicion(formData);
             }
         } catch (error) {
             if (error.message === "NOT_AUTHENTICATED") {
@@ -322,9 +323,22 @@ export function FormularioEdicion() {
                 try {
                     await DominioEditar(datos.id, formData);
                     Swal.fire("Datos actualizados", "", "success");
-                    navigate('/dominio/all')
+                    navigate('/dominio/all');
+                    window.location.reload();
                 } catch (error) {
-                    Swal.fire('Error al actualizar', '', 'error');
+                    if (error.response && error.response.status === 400) {
+                        // Manejar errores de respuesta del servidor con código 400
+                        if (error.response.data.nombre) {
+                            Swal.fire(error.response.data.nombre[0], "", 'error');
+                        }
+                        if (error.response.data.portada_dominio) {
+                            Swal.fire(error.response.data.portada_dominio[0], "", 'error');
+                        }
+                    } else if (error.message === "NOT_AUTHENTICATED") {
+                        Swal.fire("No autenticado", "Inicie sesión para realizar esta acción.", 'error');
+                    } else {
+                        Swal.fire("Ups ocurrió un error", "", 'error');
+                    }
                 }
             } else if (result.isDenied) {
                 Swal.fire('Los cambios no se guardaron', '', 'info');
@@ -479,18 +493,19 @@ export function FormularioEdicionContenido({ slugDominio }) {
                 const formData = new FormData(); // Crear un objeto FormData
                 // Verificamos que portaa no este vacio
                 if (portada !== "") {
-                    formData.append('identificador', datos.id);
+                    //formData.append('identificador', datos.id);
                     formData.append('portada', portada);
                     formData.append('nombre', nombre_contenido);
                     formData.append('dominio_tipo', dominio_tipo);
                     // Realizar la petición de edicion
-                    await confirmEdicionManual(formData);
+                    //await confirmEdicionManual(formData);
                 } else {
                     formData.append('nombre', nombre_contenido);
                     formData.append('dominio_tipo', dominio_tipo);
                     // Realizar la petición de edicion
-                    await confirmEdicion(formData);
+                    //await confirmEdicion(formData);
                 }
+                await confirmEdicion(formData);
             }
         } catch (err) {
             if (err.message === "NOT_AUTHENTICATED") {
@@ -516,8 +531,24 @@ export function FormularioEdicionContenido({ slugDominio }) {
                     await ContenidoEditar(datos.id, formData);
                     Swal.fire("Datos actualizados", "", "success");
                     navigate(`/contenido/all/${slugDominio}/`)
-                } catch (error) {
+                    window.location.reload();
+                } /*catch (error) {
                     Swal.fire('Error al actualizar', '', 'error');
+                }*/
+                catch (error) {
+                    if (error.response && error.response.status === 400) {
+                        // Manejar errores de respuesta del servidor con código 400
+                        if (error.response.data.nombre) {
+                            Swal.fire(error.response.data.nombre[0], "", 'error');
+                        }
+                        if (error.response.data.portada_dominio) {
+                            Swal.fire(error.response.data.portada[0], "", 'error');
+                        }
+                    } else if (error.message === "NOT_AUTHENTICATED") {
+                        Swal.fire("No autenticado", "Inicie sesión para realizar esta acción.", 'error');
+                    } else {
+                        Swal.fire("Ups ocurrió un error", "", 'error');
+                    }
                 }
             } else if (result.isDenied) {
                 Swal.fire('Los cambios no se guardaron', '', 'info');
@@ -1028,12 +1059,18 @@ export function FormularioEdicionCurso() {
                 try {
                     await CursoEditar(datosCurso.id, datos__post);
                     Swal.fire("Datos actualizados", "", "success");
-                    navigate('/cursos/all')
+                    navigate('/cursos/all');
                 } catch (error) {
-                    // Acceder al mensaje de error
-                    const errorMessage = error.message || "Error desconocido al actualizar";
-                    // Mostrar el mensaje de error
-                    Swal.fire(errorMessage, '', 'error');
+                    if (error.response && error.response.status === 400) {
+                        // Manejar errores de respuesta del servidor con código 400
+                        if (error.response.data.nombre) {
+                            Swal.fire(error.response.data.nombre[0], "", 'error');
+                        }
+                    } else if (error.message === "NOT_AUTHENTICATED") {
+                        Swal.fire("No autenticado", "Inicie sesión para realizar esta acción.", 'error');
+                    } else {
+                        Swal.fire("Ups ocurrió un error", "", 'error');
+                    }
                 }
             } else if (result.isDenied) {
                 Swal.fire('Los cambios no se guardaron', '', 'info');

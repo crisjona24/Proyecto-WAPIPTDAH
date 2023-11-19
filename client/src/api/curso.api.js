@@ -114,15 +114,28 @@ export const CursoEditar = (id, curso) => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-        return response.data;
+        return response;
     } catch (error) {
         if (error.response) {
+            // Manejar errores de respuesta del servidor
+            if (error.response.data.nombre) {
+                // Error de validación del nombre
+                console.error("Error de nombre:", error.response.data.nombre);
+            }
+        } else if (error.message === "NOT_AUTHENTICATED") {
+            // Manejar error de autenticación
+            console.error("No autenticado. Inicie sesión para realizar esta acción.");
+        } else {
+            // Manejar otros errores desconocidos
+            console.error("Error desconocido al editar el dominio:", error.message);
+        }
+        /*if (error.response) {
             throw new Error("No se puede editar el curso: " + error.response.data.detail);
         } else if (error.message === "NOT_AUTHENTICATED") {
             throw new Error("No autenticado. Inicie sesión para realizar esta acción.");
         } else {
             throw new Error("Error desconocido al editar el curso: " + error.message);
-        }
+        }*/
     }
 };
 

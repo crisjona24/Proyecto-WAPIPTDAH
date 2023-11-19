@@ -1,6 +1,8 @@
 from .models import *
 from django.contrib.auth.models import User
 from rest_framework import serializers
+import cloudinary
+from cloudinary import uploader
 
 # Clase de serialización para user
 class UserSerializer(serializers.ModelSerializer):
@@ -36,6 +38,23 @@ class GraditoTDAHSerializer(serializers.ModelSerializer):
         model = GradoTDAH
         fields = ('id', 'nombre_nivel', 'descripcion_grado', 'numero_categorias', 'grado_dificultad',
                   'slug_grado', 'usuario_tecnico')
+    
+    # Validación de nombre de nivel no duplicado para edicion
+    def validar_nombre_nivel(self, value):
+        instance = self.instance
+        print(f"Valor actual de 'value': {value}")
+        existe_otro_nivel = GradoTDAH.objects.exclude(
+            id=instance.id if instance else None).filter(nombre_nivel=value).exists()
+        print(f"¿Existe otro nivel con el mismo nombre?: {existe_otro_nivel}")
+        if existe_otro_nivel:
+            raise serializers.ValidationError({"nombre" : "Ya existe un nivel con este nombre"})
+        return value
+    
+    def validate(self, data):
+        # Llamando a la validación del nombre de curso
+        nombre_nivel = data.get('nombre_nivel')
+        self.validar_nombre_nivel(nombre_nivel)
+        return data
 
 # Clase de serialización para los dominios registrados en el sistema
 class DominioSerializer(serializers.ModelSerializer):
@@ -44,6 +63,52 @@ class DominioSerializer(serializers.ModelSerializer):
         fields = ('id', 'nombre', 'descripcion', 'slug_dominio',
                   'identificador_dominio', 'portada_dominio',
                   'fecha_registro_dominio')
+        
+    # Validación de nombre no duplicado en la edición
+    def validar_nombre_dominio(self, value):
+        instance = self.instance
+        # Verificar si hay algún otro curso con el mismo nombre
+        existe_otro_dominio = Dominio.objects.exclude(
+            id=instance.id if instance else None).filter(nombre=value).exists()
+        if existe_otro_dominio:
+            raise serializers.ValidationError({"nombre":"Ya existe un dominio con este nombre"})
+        
+        if instance:
+            public_id = self.obtener_public_id(instance.id)
+            # Elimina la imagen actual en Cloudinary solo si se proporciona una nueva imagen
+            nueva_imagen = self.initial_data.get('portada_dominio')
+            if public_id and nueva_imagen:
+                resultado_eliminacion = self.eliminar_archivo_cloudinary(public_id)
+                if resultado_eliminacion.get('result') == 'not found':
+                    raise serializers.ValidationError({"portada_dominio": "Error al eliminar la imagen actual"})
+
+        return value
+    
+    # Método para obtener el public id de la portada
+    def obtener_public_id(self, dominio_id):
+        try:
+            dominio_ob = Dominio.objects.get(id=dominio_id)
+            if dominio_ob.portada_dominio:
+                return cloudinary.CloudinaryImage(dominio_ob.portada_dominio.name).public_id
+            return None
+        except Dominio.DoesNotExist:
+            return None
+        except Exception as e:
+            return None
+        
+    # Método para eliminar la imagen de portada
+    def eliminar_archivo_cloudinary(self, public_id):
+        try:
+            result = uploader.destroy(public_id)
+            return result
+        except Exception as e:
+            return None
+        
+    def validate(self, data):
+        # Llamando a la validación del nombre de dominio
+        nombre_dominio = data.get('nombre')
+        self.validar_nombre_dominio(nombre_dominio)
+        return data
 
 # Clase de serialización para los tipos de contenido registrados en el sistema
 class ContenidoSerializer(serializers.ModelSerializer):
@@ -51,6 +116,52 @@ class ContenidoSerializer(serializers.ModelSerializer):
         model = Contenido
         fields = ('id', 'nombre', 'identificador_contenido', 'slug_contenido',
                   'dominio_tipo', 'portada', 'dominio', 'fecha_registro_contenido')
+    
+    # Validación de nombre no duplicado en la edición
+    def validar_nombre_contenido(self, value):
+        instance = self.instance
+        # Verificar si hay algún otro curso con el mismo nombre
+        existe_otro_contenido = Contenido.objects.exclude(
+            id=instance.id if instance else None).filter(nombre=value).exists()
+        if existe_otro_contenido:
+            raise serializers.ValidationError({"nombre": "Ya existe un contenido con este nombre"})
+        
+        if instance:
+            public_id = self.obtener_public_id(instance.id)
+            # Elimina la imagen actual en Cloudinary solo si se proporciona una nueva imagen
+            nueva_imagen = self.initial_data.get('portada')
+            if public_id and nueva_imagen:
+                resultado_eliminacion = self.eliminar_archivo_cloudinary(public_id)
+                if resultado_eliminacion.get('result') == 'not found':
+                    raise serializers.ValidationError({"portada": "Error al eliminar la imagen actual"})
+
+        return value
+    
+    # Método para obtener el public id de la portada
+    def obtener_public_id(self, contenido_id):
+        try:
+            contenido_ob = Contenido.objects.get(id=contenido_id)
+            if contenido_ob.portada:
+                return cloudinary.CloudinaryImage(contenido_ob.portada.name).public_id
+            return None
+        except Contenido.DoesNotExist:
+            return None
+        except Exception as e:
+            return None
+        
+    # Método para eliminar la imagen de portada
+    def eliminar_archivo_cloudinary(self, public_id):
+        try:
+            result = uploader.destroy(public_id)
+            return result
+        except Exception as e:
+            return None
+        
+    def validate(self, data):
+        # Llamando a la validación del nombre de dominio
+        nombre_contenido = data.get('nombre')
+        self.validar_nombre_contenido(nombre_contenido)
+        return data
 
 # Clase de serialización para las actividades registrados en el sistema
 class ContenidIndividualSerializer(serializers.ModelSerializer):
@@ -125,12 +236,19 @@ class CursoSerializer(serializers.ModelSerializer):
     # Validación de nombre de curso no duplicado para edicion
     def validar_nombre_curso(self, value):
         instance = self.instance
-        # Verificar si hay algún otro curso con el mismo nombre
+        print(f"Valor actual de 'value': {value}")
         existe_otro_curso = Curso.objects.exclude(
             id=instance.id if instance else None).filter(nombre_curso=value).exists()
+        print(f"¿Existe otro curso con el mismo nombre?: {existe_otro_curso}")
         if existe_otro_curso:
-            return serializers.ValidationError("Ya existe un curso con este nombre")
+            raise serializers.ValidationError({"nombre" : "Ya existe un curso con este nombre"})
         return value
+    
+    def validate(self, data):
+        # Llamando a la validación del nombre de curso
+        nombre_curso = data.get('nombre_curso')
+        self.validar_nombre_curso(nombre_curso)
+        return data
     
 
 # Clase de serialización para los registros de inscripciones a cursos
