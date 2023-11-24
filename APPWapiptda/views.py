@@ -555,7 +555,7 @@ def generar_token_tiempo(ob1, tiempo_Exp=60):
     # Calcula la fecha y hora de expiración para ser registrada en el objeto de Recuperación
     expiracion_tiempo = datetime.utcnow() + timedelta(minutes=tiempo_Exp)
     # Crea una instancia de la entidad Recuperacion
-    recuperacion = Recuperacion(usuario=ob1, fecha_creacion=datetime.utcnow(), fecha_limite=expiracion_tiempo, tipo='recuperar')
+    recuperacion = Recuperacion(usuario=ob1, fecha_creacion=datetime.utcnow(), fecha_limite=expiracion_tiempo)
     recuperacion.save()
     # Crea un token único
     token = generar_token_unico()  
@@ -577,7 +577,7 @@ def generar_token_verificacion(email_, tiempo_Exp=60):
     # Calcula la fecha y hora de expiración para ser registrada en el objeto de Recuperación
     expiracion_tiempo = datetime.utcnow() + timedelta(minutes=tiempo_Exp)
     # Crea una instancia de la entidad Recuperacion
-    verificacion = Verificacion(fecha_creacion=datetime.utcnow(), fecha_limite=expiracion_tiempo, tipo='verificar', correo= email_)
+    verificacion = Verificacion(fecha_creacion=datetime.utcnow(), fecha_limite=expiracion_tiempo, correo= email_)
     verificacion.save()
     # Crea un token único
     token = generar_token_unico()  

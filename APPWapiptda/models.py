@@ -27,7 +27,6 @@ class Recuperacion(models.Model):
     token = models.CharField(max_length=255)
     fecha_creacion = models.DateTimeField(auto_now_add=False, blank=True, null=True)
     fecha_limite = models.DateTimeField(auto_now_add=False, blank=True, null=True)
-    tipo = models.CharField(max_length=60, blank=True, null=True)
     atendido = models.BooleanField(default=False)
 
     def esta_vencido(self):
@@ -47,7 +46,6 @@ class Verificacion(models.Model):
     token = models.CharField(max_length=255)
     fecha_creacion = models.DateTimeField(auto_now_add=False, blank=True, null=True)
     fecha_limite = models.DateTimeField(auto_now_add=False, blank=True, null=True)
-    tipo = models.CharField(max_length=60, blank=True, null=True)
     atendido = models.BooleanField(default=False)
 
     def esta_vencido(self):
