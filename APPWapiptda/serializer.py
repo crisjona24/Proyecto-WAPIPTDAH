@@ -279,11 +279,11 @@ class PeticionSerializer(serializers.ModelSerializer):
 class DetallePeticionSerializer(serializers.ModelSerializer):
     #usuario_tecnico = serializers.SerializerMethodField()
     usuario_tecnico = serializers.CharField(source='usuario_tecnico.nombre_usuario', read_only=True)
-
+    motivo_peticion = serializers.CharField(source='peticion.motivo_peticion', read_only=True)
     class Meta:
         model = DetallePeticion
-        fields = ('id', 'motivo_peticion', 'fecha_detalle_peticion', 'estado_detalle_revision',
-                  'peticion', 'usuario_tecnico')
+        fields = ('id', 'fecha_detalle_peticion', 'estado_detalle_revision', 'edi_detalle',
+                  'peticion', 'usuario_tecnico', 'motivo_peticion')
         
 # Clase de serialización para los registros de salas generados
 # por el usuario comun
@@ -324,32 +324,32 @@ class ReporteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reporte
         fields = ('id', 'titulo_reporte', 'descripcion_reporte', 'slug_reporte', 'estado_reporte', 
-                  'usuario_comun', 'contenido_individual', 'paciente', 'resultado', 'fecha_registro_reporte',
+                  'usuario_comun', 'resultado', 'fecha_registro_reporte',
                   'fecha_edicion_reporte', 'respuesta_r',
                   'nombre_paciente', 'apellido_paciente', 'correo_paciente', 'descripcion_individual',
                   'respuesta', 'tipo_contenido', 'tiempo_m_', 'tiempo_s_', 'observacion_', 'celular_paciente',
                   'fecha_registro_resultado_', 'edad_paciente', 'direccion_paciente', 'identificador_contenido')
     
     def get_nombre_paciente(self, obj):
-        return obj.paciente.nombre_usuario
+        return obj.resultado.paciente.nombre_usuario
     def get_apellido_paciente(self, obj):
-        return obj.paciente.apellido_usuario
+        return obj.resultado.paciente.apellido_usuario
     def get_correo_paciente(self, obj):
-        return obj.paciente.email_usuario
+        return obj.resultado.paciente.email_usuario
     def get_edad_paciente(self, obj):
-        return obj.paciente.edad
+        return obj.resultado.paciente.edad
     def get_celular_paciente(self, obj):
-        return obj.paciente.celular
+        return obj.resultado.paciente.celular
     def get_direccion_paciente(self, obj):
-        return obj.paciente.direccion
+        return obj.resultado.paciente.direccion
     def get_descripcion_individual(self, obj):
-        return obj.contenido_individual.descripcion_individual
+        return obj.resultado.contenido_individual.descripcion_individual
     def get_respuesta(self, obj):
-        return obj.contenido_individual.respuesta
+        return obj.resultado.contenido_individual.respuesta
     def get_tipo_contenido(self, obj):
-        return obj.contenido_individual.tipo_contenido
+        return obj.resultado.contenido_individual.tipo_contenido
     def get_identificador_contenido(self, obj):
-        return obj.contenido_individual.identificador_individual
+        return obj.resultado.contenido_individual.identificador_individual
     def get_tiempo_m_(self, obj):
         return obj.resultado.tiempo_m
     def get_tiempo_s_(self, obj):

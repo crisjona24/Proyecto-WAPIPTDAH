@@ -1327,7 +1327,7 @@ def atender_peticion(request):
                     if send_email(peticion__ob, vereficto_, estadoR_):
                         try:
                             # Agregamos detalle de peticion
-                            if guardar_detalle(peticion__ob.motivo_peticion, tecnico__ob, peticion__ob):
+                            if guardar_detalle(tecnico__ob, peticion__ob):
                                 # Actualizamos el contador de ContadorPeticionesAtendidas
                                 contador_obj, created = ContadorPeticionesAtendidas.objects.get_or_create(
                                     usuario_comun=peticion__ob.usuario_comun)
@@ -1370,12 +1370,14 @@ def atención_peticion(ob1):
         return False
 
 # Guardar el detalle de las peticiones atendidas
-def guardar_detalle(ob1, ob2, ob3):
+def guardar_detalle(ob1, ob2):
     try:
+        # Obtenemos la fecha
+        fecha_actual = datetime.now().date()
         detalle_peticion = DetallePeticion.objects.create(
-            motivo_peticion=ob1,
-            usuario_tecnico=ob2,
-            peticion=ob3
+            fecha_detalle_peticion=fecha_actual,
+            usuario_tecnico=ob1,
+            peticion=ob2
         )
         # Añadimos a contenido
         detalle_peticion.save()
@@ -1384,8 +1386,6 @@ def guardar_detalle(ob1, ob2, ob3):
         return False
 
 # Método para enviar el correo electrónico de notificación de revisión de petición
-
-
 def send_email(peticion__ob, ob1, ob2):
     # Capturamos los datos para el email
     subject = 'Notificación de revisión de petición'

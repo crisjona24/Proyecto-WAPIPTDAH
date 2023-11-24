@@ -1070,14 +1070,18 @@ def Reporte_por_Cedula(ob1, ob2):
         if is_comun(user):
             # Obtener el usuario comun
             usuario__ob = UsuarioComun.objects.get(user=user)
-            # Obtener los reportes creados por el usuario comun y que pertenezcan a un paciente especifico 
-            # por medio de la céula
-            reportes_cedula = Reporte.objects.filter(usuario_comun=usuario__ob, paciente__dni=ob2).order_by('fecha_registro_reporte')
+            # Obtener los resultados asociados al paciente mediante el dni
+            resultados= Resultado.objects.filter(paciente__dni=ob2)
+            # Obtener los reportes creados por el usuario comun y que esten dentro de 
+            # de los resultados obtenidos
+            reportes_cedula = Reporte.objects.filter(usuario_comun=usuario__ob, resultado__in=resultados).order_by('fecha_registro_reporte')
             return reportes_cedula
         elif is_tecnico(user):
-            # Obtener los reportes creados por el usuario comun y que pertenezcan a un paciente especifico 
-            # por medio de la céula
-            reportes_cedula = Reporte.objects.filter(paciente__dni=ob2).order_by('fecha_registro_reporte')
+            # Obtener los resultados asociados al paciente mediante el dni
+            resultados= Resultado.objects.filter(paciente__dni=ob2)
+            # Obtener los reportes creados y que esten dentro de 
+            # de los resultados obtenidos
+            reportes_cedula = Reporte.objects.filter(resultado__in=resultados).order_by('fecha_registro_reporte')
             return reportes_cedula
         else:
             return []
@@ -1257,8 +1261,10 @@ def Reporte_por_Nombre_Apellido(request, nombre, apellido):
             # Obtener los cursos a los que está inscrito el paciente
             inscripciones = DetalleInscripcionCurso.objects.filter(paciente=paciente__ob, curso__in=cursos).exists()
             if inscripciones:
-                # Obtener los reportes  del paciente
-                reportes = Reporte.objects.filter(paciente=paciente__ob).order_by('fecha_registro_reporte')
+                # Obtener los resultados del paciente
+                resultados = Resultado.objects.filter(paciente=paciente__ob)
+                # Obtener los reportes  del paciente acorde a los resultados
+                reportes = Reporte.objects.filter(resultado__in=resultados).order_by('fecha_registro_reporte')
                 return reportes
             else :
                 return []
@@ -1266,8 +1272,10 @@ def Reporte_por_Nombre_Apellido(request, nombre, apellido):
             if is_tecnico(user):
                 # Obtener el paciente por nombre y apellido ignorando mayusculas y minusculas
                 paciente__ob = Paciente.objects.get(nombre_usuario__icontains=nombre, apellido_usuario__icontains=apellido)
+                # Obtener los resultados del paciente
+                resultados = Resultado.objects.filter(paciente=paciente__ob)
                 # Obtener los reportes  del paciente
-                reportes = Reporte.objects.filter(paciente=paciente__ob).order_by('fecha_registro_reporte')
+                reportes = Reporte.objects.filter(resultado__in=resultados).order_by('fecha_registro_reporte')
                 return reportes
             else:
                 return []

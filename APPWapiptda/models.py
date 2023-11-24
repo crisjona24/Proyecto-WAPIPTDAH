@@ -386,15 +386,15 @@ class Peticion(models.Model):
 
 # MODELO DE DETALLE PETICION
 class DetallePeticion(models.Model):
-    motivo_peticion = models.CharField(max_length=250, blank=False, null=True)
-    fecha_detalle_peticion = models.DateField(auto_now=True)
+    fecha_detalle_peticion = models.DateField(auto_now_add=False, blank=True, null=True)
+    edi_detalle = models.DateField(auto_now=True)
     estado_detalle_revision = models.BooleanField(default=True)
     # Foraneas
     peticion = models.ForeignKey(Peticion, on_delete=models.CASCADE, blank=True, null=True)
     usuario_tecnico = models.ForeignKey(Usuario, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
-        return f"Motivo : {self.motivo_peticion} | Rrevision : {self.estado_detalle_revision}"
+        return f"Motivo : {self.peticion.motivo_peticion} | Revision : {self.estado_detalle_revision}"
 
 #MODELO DE SALA
 class Sala(models.Model):
@@ -437,8 +437,6 @@ class Reporte(models.Model):
     estado_reporte = models.BooleanField(default=True)
     # Foraneas
     usuario_comun = models.ForeignKey(UsuarioComun, on_delete=models.SET_NULL, related_name='reportes', blank=True, null=True)
-    contenido_individual = models.ForeignKey(ContenidoIndividual, on_delete=models.SET_NULL, related_name='reportes_contenido', blank=True, null=True)
-    paciente = models.ForeignKey(Paciente, on_delete=models.SET_NULL, related_name='reportes_paciente', blank=True, null=True)
     resultado = models.ForeignKey(Resultado, on_delete=models.SET_NULL, related_name='reportes_resultado', blank=True, null=True)
 
     def save(self, *args, **kwargs):

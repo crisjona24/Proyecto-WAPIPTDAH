@@ -1707,8 +1707,8 @@ def guardar_reporte(ob1, ob2):
         #Obtenemos el objeto resultado
         resultado_ob = Resultado.objects.get(id=ob1)
         # Obtenemos datos necesarios para el reporte
-        paciente_ob = resultado_ob.paciente
-        contenido_individual_ob = resultado_ob.contenido_individual
+        #paciente_ob = resultado_ob.paciente
+        #contenido_individual_ob = resultado_ob.contenido_individual
         usuario_comun_ob = UsuarioComun.objects.get(user=ob2)
         # Capturamos la fecha del momento de registro
         fecha_registro_reporte_ = datetime.now().date()
@@ -1717,8 +1717,8 @@ def guardar_reporte(ob1, ob2):
             titulo_reporte = "Reporte de Resultado",
             descripcion_reporte = "No hay una descripción, debe ser agregada.",
             usuario_comun = usuario_comun_ob,
-            contenido_individual = contenido_individual_ob,
-            paciente = paciente_ob,
+            #contenido_individual = contenido_individual_ob,
+            #paciente = paciente_ob,
             resultado = resultado_ob,
             fecha_registro_reporte = fecha_registro_reporte_
         )
