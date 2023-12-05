@@ -5,12 +5,12 @@ from .controlers import *
 
 # ROUTERS
 router = routers.DefaultRouter()
-router.register('user', UserView)
+router.register('user', UserView, basename='user')
 router.register('usuario', UsuarioView)
 router.register('paciente', PacienteView)
-router.register('comun', ComunView)
+router.register('comun', ComunView, basename='comun')
 # Movimiento a la otra app
-router.register('grado', GradoTDAHView)
+router.register('grado', GradoTDAHView, basename='grado')
 router.register('dominio', DominioView)
 router.register('contenido', ContenidoView)
 router.register('contenido_individual', ContenidoIndividualView)

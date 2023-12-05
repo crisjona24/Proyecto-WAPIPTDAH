@@ -1,12 +1,15 @@
-from django.urls import path, include
-from rest_framework import routers
+from django.urls import path
 from EstudioyEntrenamiento.views import *
 from EstudioyEntrenamiento.controlers import *
 
 urlpatterns = [
-
+    ########### Verificaciones
+    path('verificar/nivel/<str:slug>/', verificar_nivel, name='verificar_nivel'),
+    path('verificar/numero/niveles/', api_nivel_contador, name='verificar-contador'),
+    path('verificar/dominio/<str:slug>/', verificar_dominio, name='verificar_dominio'),
+    path('verificar/contenido/<str:slug>/', verificar_contenido, name='verificar_contenido'),
+    path('verificar/curso/<str:slug>/', verificar_curso, name='verificar-curso'),
     ########### Listados personalizados
-    
     path('contenidos/<str:slug>/', ContenidoListView.as_view(), name='contenidos-list'),
     path('contenidos/individuales/<str:slug>/', ContenidoIndividualListView.as_view(), name='contenidos-individuales-list'),
     path('contenidos/individuales/todo/<str:slug>/', ContenidoIndividualTodoListView.as_view(), name='contenidos-individuales-todo-list'),
@@ -65,12 +68,7 @@ urlpatterns = [
     path('lista/peticion/usuario/tipo/<str:tipo>/<int:id>/', PeticionTipo_U_ListView.as_view(), name='peticion-list-tipo-u'),
 
 
-    ########### Verificaciones
-    path('verificar/nivel/<str:slug>/', verificar_nivel, name='verificar_nivel'),
-    path('verificar/numero/niveles/', api_nivel_contador, name='verificar-contador'),
-    path('verificar/dominio/<str:slug>/', verificar_dominio, name='verificar_dominio'),
-    path('verificar/contenido/<str:slug>/', verificar_contenido, name='verificar_contenido'),
-    path('verificar/curso/<str:slug>/', verificar_curso, name='verificar-curso'),
+
     path('verificar/peticion/<str:slug>/', verificar_peticion, name='verificar-peticion'),
     path('verificar/resultado/<str:slug>/', verificar_resultado, name='verificar-resultado'),
     path('verificar/sala/<str:slug>/', verificar_sala, name='verificar-sala'),
