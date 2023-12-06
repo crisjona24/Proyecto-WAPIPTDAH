@@ -58,6 +58,184 @@ class TestGradoTDAHInstancia(APITestCase):
         # Verificar la respuesta
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+# Registro de Reporte
+class ReporteTestCase(TestCase):
+    def setUp(self):
+        self.cliente = Client()
+        self.user = UserFactory.create()
+        self.usuario = UsuarioFactory.create()
+        self.user2 = User.objects.create_user(username='MariaArias', 
+                                              password='1234')
+        self.usuario_comun = UsuarioComunFactory.create(user=self.user2)
+        self.user3 = User.objects.create_user(username='LizbethArias', 
+                                              password='1234')
+        self.paciente = PacienteFactory.create(user=self.user3)
+        # Creamos objetos
+        self.dominio = DominioFactory.create()
+        self.contenido = ContenidoFactory.create()
+        self.actividad = ContenidoIndividualFactory.create()
+        self.resultado = ResultadoFactory.create()
+        # Reporte
+        self.reporte = ReporteFactory.create()
+
+    def test_reporte_creation(self):
+        print("Verificar creación de reporte")
+        self.user2.set_password('1234')
+        self.user2.save()
+        response = self.cliente.login(username=self.usuario_comun.username_usuario, 
+                                      password='1234')
+        self.assertEqual(response, True)
+        self.assertEqual(self.usuario_comun.nombre_usuario, "Maria")
+        self.assertEqual(self.usuario_comun.is_comun, True)
+        # Verificar reporte creado por un usuario comun
+        self.assertEqual(self.reporte.usuario_comun.username_usuario, "MariaArias")
+        self.assertEqual(self.reporte.usuario_comun.is_comun, True)
+        self.assertEqual(self.reporte.resultado.paciente.username_usuario, "LizbethArias")
+    
+# Eliminación y modificación de registro de reporte
+class TestReporteInstancia(APITestCase):
+    def setUp(self):
+        self.cliente = Client()
+        self.user = UserFactory.create()
+        self.usuario = UsuarioFactory.create()
+        self.user2 = User.objects.create_user(username='MariaArias', 
+                                              password='1234')
+        self.usuario_comun = UsuarioComunFactory.create(user=self.user2)
+        self.user3 = User.objects.create_user(username='LizbethArias', 
+                                              password='1234')
+        self.paciente = PacienteFactory.create(user=self.user3)
+        # Creamos objetos
+        self.dominio = DominioFactory.create()
+        self.contenido = ContenidoFactory.create()
+        self.actividad = ContenidoIndividualFactory.create()
+        self.resultado = ResultadoFactory.create()
+        # Reporte
+        self.reporte = ReporteFactory.create()
+
+    # Autenticación del cliente comun
+    def get_authenticated_client(self, user):
+        client = APIClient()
+        client.force_authenticate(user=user)
+        return client
+    
+    # Eliminación de registro de reporte
+    def test_eliminar_reporte(self):
+        print("Eliminación de registro de reporte")
+        # Obtener un cliente autenticado como usuario comun
+        client = self.get_authenticated_client(self.user2)
+        # Obtener la URL para eliminar el reporte actual
+        url = reverse('reporte-detail', kwargs={'pk': self.reporte.id})
+        # Hacer una solicitud DELETE
+        response = client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        # Verificar que el reporte fue eliminado
+        with self.assertRaises(Reporte.DoesNotExist):
+            self.reporte.refresh_from_db()
+
+    # Modificación de registro de TDAH
+    def test_modificar_reporte(self):
+        print("Modificación de registro de reporte")
+        # Obtener un cliente autenticado como usuario comun
+        client = self.get_authenticated_client(self.user2)
+        # Obtener la URL para modificar el registro de reporte
+        url = reverse('reporte-detail', kwargs={'pk': self.reporte.id})
+        # Nuevos datos para la modificación
+        nuevos_datos_re = {
+            'descripcion_reporte': 'NuevaDescripcion',
+        }
+        # Hacer una solicitud PUT
+        response = client.put(url, data=nuevos_datos_re, format='json')
+        # Verificar la respuesta
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+# Registro de Resultado
+class ResultadoTestCase(TestCase):
+    def setUp(self):
+        self.cliente = Client()
+        self.user = UserFactory.create()
+        self.usuario = UsuarioFactory.create()
+        self.user2 = User.objects.create_user(username='MariaArias', 
+                                              password='1234')
+        self.usuario_comun = UsuarioComunFactory.create(user=self.user2)
+        self.user3 = User.objects.create_user(username='LizbethArias', 
+                                              password='1234')
+        self.paciente = PacienteFactory.create(user=self.user3)
+        # Creamos objetos
+        self.dominio = DominioFactory.create()
+        self.contenido = ContenidoFactory.create()
+        self.actividad = ContenidoIndividualFactory.create()
+        # Resultado
+        self.resultado = ResultadoFactory.create()
+
+    def test_resultado_creation(self):
+        print("Verificar creación de resultado")
+        self.user3.set_password('1234')
+        self.user3.save()
+        response = self.cliente.login(username=self.paciente.username_usuario, 
+                                      password='1234')
+        self.assertEqual(response, True)
+        self.assertEqual(self.paciente.nombre_usuario, "Lizbeth")
+        self.assertEqual(self.paciente.is_paciente, True)
+        # Verificar resultado creado por un paciente
+        self.assertEqual(self.resultado.paciente.username_usuario, "LizbethArias")
+        self.assertEqual(self.resultado.paciente.nombre_usuario, "Lizbeth")
+        self.assertEqual(self.resultado.paciente.is_paciente, True)
+
+
+# Eliminación y modificación de registro de reporte
+class TestResultadoInstancia(APITestCase):
+    def setUp(self):
+        self.cliente = Client()
+        self.user = UserFactory.create()
+        self.usuario = UsuarioFactory.create()
+        self.user2 = User.objects.create_user(username='MariaArias', 
+                                              password='1234')
+        self.usuario_comun = UsuarioComunFactory.create(user=self.user2)
+        self.user3 = User.objects.create_user(username='LizbethArias', 
+                                              password='1234')
+        self.paciente = PacienteFactory.create(user=self.user3)
+        # Creamos objetos
+        self.dominio = DominioFactory.create()
+        self.contenido = ContenidoFactory.create()
+        self.actividad = ContenidoIndividualFactory.create()
+        # Resultado
+        self.resultado = ResultadoFactory.create()
+
+    # Autenticación del cliente comun
+    def get_authenticated_client(self, user):
+        client = APIClient()
+        client.force_authenticate(user=user)
+        return client
+    
+    # Eliminación de registro de resultado
+    def test_eliminar_resultado(self):
+        print("Eliminación de registro de resultado")
+        # Obtener un cliente autenticado como paciente
+        client = self.get_authenticated_client(self.user3)
+        # Obtener la URL para eliminar el resultado actual
+        url = reverse('resultado-detail', kwargs={'pk': self.resultado.id})
+        # Hacer una solicitud DELETE
+        response = client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        # Verificar que el resultado fue eliminado
+        with self.assertRaises(Resultado.DoesNotExist):
+            self.resultado.refresh_from_db()
+
+    # Modificación de registro de resultado
+    def test_modificar_resultado(self):
+        print("Modificación de registro de resultado")
+        # Obtener un cliente autenticado como paciente
+        client = self.get_authenticated_client(self.user3)
+        # Obtener la URL para modificar el registro de resultado
+        url = reverse('resultado-detail', kwargs={'pk': self.resultado.id})
+        # Nuevos datos para la modificación
+        nuevos_datos_re = {
+            'observacion': 'NuevaObservacion',
+        }
+        # Hacer una solicitud PUT
+        response = client.put(url, data=nuevos_datos_re, format='json')
+        # Verificar la respuesta
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 """ 
     def get_authenticated_client(self, user):

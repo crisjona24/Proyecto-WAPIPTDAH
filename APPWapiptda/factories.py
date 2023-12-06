@@ -24,7 +24,7 @@ class UsuarioComunFactory(factory.Factory):
     fecha_registro_usuario = "2020-10-10"
     genero = "Femenino"
     area_estudio = "Ingenieria"
-    user = factory.SubFactory(UserFactory)
+    
 
 
 class UsuarioFactory(factory.Factory):
@@ -39,7 +39,7 @@ class UsuarioFactory(factory.Factory):
     fecha_nacimiento = "1999-10-10"
     dni = "1234567890"
     fecha_registro_usuario = "2020-10-10"
-
+    user = factory.SubFactory(UserFactory)
 
 class PacienteFactory(factory.Factory):
     class Meta:
@@ -67,3 +67,67 @@ class GradoFactory(factory.Factory):
     grado_dificultad = "Alto"
     fecha_registro_grado = "2020-10-10"
     usuario_tecnico = factory.SubFactory(UsuarioFactory)
+
+# Fábrica de Dominio
+class DominioFactory(factory.Factory):
+    class Meta:
+        model = Dominio
+
+    id = 1
+    nombre = "Dominio 1"
+    descripcion = "Descripcion Dominio 1"
+    identificador_dominio = 121212
+    fecha_registro_dominio = "2020-10-10"
+    usuario = factory.SubFactory(UsuarioFactory)
+
+# Fábrica de Contenido
+class ContenidoFactory(factory.Factory):
+    class Meta:
+        model = Contenido
+
+    id = 1
+    nombre = "Contenido 1"
+    identificador_contenido = 121212
+    dominio_tipo = "Sensorial"
+    fecha_registro_contenido = "2020-10-10"
+    dominio = factory.SubFactory(DominioFactory)
+
+# Fábrica de Contenido Individual
+class ContenidoIndividualFactory(factory.Factory):
+    class Meta:
+        model = ContenidoIndividual
+
+    id = 1
+    descripcion_individual = "Descripcion Contenido Individual 1"
+    identificador_individual = 232323
+    fecha_registro_individual = "2020-10-10"
+    nivel = "Hiperactividad"
+    tipo_contenido = "seleccion_individual"
+    respuesta = "Respuesta Contenido Individual 1"
+    contenido = factory.SubFactory(ContenidoFactory)
+
+# Fabrica de Resultado
+class ResultadoFactory(factory.Factory):
+    class Meta:
+        model = Resultado
+
+    id = 1
+    respuesta = "Respuesta Resultado 1"
+    tiempo_m = 10
+    tiempo_s = 5
+    observacion = "Observacion Resultado 1"
+    fecha_registro_resultado = "2020-10-10"
+    contenido_individual = factory.SubFactory(ContenidoIndividualFactory)
+    paciente = factory.SubFactory(PacienteFactory)
+
+# Fábrica de Reportes
+class ReporteFactory(factory.Factory):
+    class Meta:
+        model = Reporte
+
+    id = 1
+    titulo_reporte = "Reporte 1"
+    descripcion_reporte = "Descripcion Reporte 1"
+    fecha_registro_reporte = "2020-10-10"
+    usuario_comun = factory.SubFactory(UsuarioComunFactory)
+    resultado = factory.SubFactory(ResultadoFactory)
