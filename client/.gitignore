@@ -25,3 +25,12 @@ dist-ssr
 
 # Archivos
 /src/pages/registro/Contenido.test.jsx
+/src/pages/registro/Curso.test.jsx
+/src/pages/registro/Dominio.test.jsx
+/src/pages/registro/Nivel.test.jsx
+/src/pages/registro/Peticion.test.jsx
+/src/pages/registro/Reporte.test.jsx
+/src/pages/registro/Resultado.test.jsx
+/src/pages/registro/Sala.test.jsx
+/src/pages/registro/Usuario.test.jsx
+/src/pages/registro/Prueba.jsx
