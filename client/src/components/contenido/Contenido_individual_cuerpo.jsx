@@ -4,6 +4,7 @@
 import "../../styles/Contenido_individual.css";
 import "../../styles/Varios.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Button, Modal } from "react-bootstrap";
 // Componentes
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -35,6 +36,7 @@ export function ContenidoCuerpo({ context, slugContenido, tipoUsuarioP }) {
     const navigate = useNavigate();
     const [error, setError] = useState("");
     let tipoFormulario;
+    let mensajeAyuda;
     // NUEVO
     const [contenidosI, setContenidos] = useState([]);
     const [slugSiguiente, setSlugSiguiente] = useState("");
@@ -71,30 +73,39 @@ export function ContenidoCuerpo({ context, slugContenido, tipoUsuarioP }) {
         switch (context.tipo) {
             case 'selecion_individual':
                 tipoFormulario = <FormularioUno context={context} usuario={tipoUsuario} slugContenido={slugContenido} />;
+                mensajeAyuda = <ModalContenidoTipo1 />;
                 break;
             case "verdadero_falso":
                 tipoFormulario = <FormularioDos context={context} usuario={tipoUsuario} slugContenido={slugContenido} />;
+                mensajeAyuda = <ModalContenidoTipo2 />;
                 break;
             case "selecion_multiple":
                 tipoFormulario = <FormularioTres context={context} usuario={tipoUsuario} slugContenido={slugContenido} />;
+                mensajeAyuda = <ModalContenidoTipo3 />;
                 break;
             case "responder_preguntas":
                 tipoFormulario = <Formulariocuatro context={context} usuario={tipoUsuario} slugContenido={slugContenido} />;
+                mensajeAyuda = <ModalContenidoTipo4 />;
                 break;
             case "pintar_imagen":
                 tipoFormulario = <FormularioCinco context={context} usuario={tipoUsuario} slugContenido={slugContenido} />;
+                mensajeAyuda = <ModalContenidoTipo5 />;
                 break;
             case "seleccionar_imagen":
                 tipoFormulario = <FormularioSeis context={context} usuario={tipoUsuario} slugContenido={slugContenido} />;
+                mensajeAyuda = <ModalContenidoTipo6 />;
                 break;
             case "cuento":
                 tipoFormulario = <FormularioSiete context={context} usuario={tipoUsuario} slugContenido={slugContenido} />;
+                mensajeAyuda = <ModalContenidoTipo7 />;
                 break;
             case 'selecion_multiple_img':
                 tipoFormulario = <FormularioNueve context={context} usuario={tipoUsuario} slugContenido={slugContenido} />;
+                mensajeAyuda = <ModalContenidoTipo8 />;
                 break;
             case 'pictograma':
                 tipoFormulario = <FormularioDiez context={context} usuario={tipoUsuario} slugContenido={slugContenido} />;
+                mensajeAyuda = <ModalContenidoTipo6 />;
                 break;
             default:
                 tipoFormulario = <FormularioDefault />;
@@ -181,10 +192,7 @@ export function ContenidoCuerpo({ context, slugContenido, tipoUsuarioP }) {
                 </div>
                 <div className="row col-md-12">
                     <div className="titulo__ayuda">
-                        <Link>
-                            <span className="p-1">Necesitas ayuda</span>
-                            <FontAwesomeIcon title="Regresar" className="boton__regreso btn btn-success" icon={faQuestion} />
-                        </Link>
+                        {mensajeAyuda}
                     </div>
                 </div>
                 <div className="almacen__subtitulo row col-md-12 m-1">
@@ -242,6 +250,397 @@ export function ContenidoCuerpo({ context, slugContenido, tipoUsuarioP }) {
     )
 
 }
+
+
+// Creamos los modales de información para cada tipo de contenido
+// Modal de información para contenido de tipo 1
+export function ModalContenidoTipo1() {
+    // Variables de abrir y cerrar modal
+    const [verModal, setVerModal] = useState(false);
+    const abrirModal = () => setVerModal(true);
+    const cerrarModal = () => setVerModal(false);
+
+    return (
+        <>
+            <Button variant="sucess" onClick={abrirModal}>
+                <span className="p-2">Necesitas ayuda</span>
+                <FontAwesomeIcon title="Ayuda" className="boton__regreso btn btn-success" icon={faQuestion} />
+            </Button>
+
+            <Modal show={verModal} onHide={cerrarModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Indicación para contenido</Modal.Title>
+                </Modal.Header>
+                {/* Contenido del modal */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {/* Parte izquierda (GIF) */}
+                    <div style={{ flex: '1', width: '25%', marginRight: '5px', marginLeft: '5px' }}>
+                        {/* Insertar tu gif animado */}
+                        <img
+                            src="/gif/NNJugando.gif"
+                            alt="GIF animado"
+                            style={{ width: '100%', height: 'auto' }}
+                        />
+                    </div>
+                    {/* Parte derecha (Texto) */}
+                    <div style={{ flex: '3', width: '75%', marginRight: '10px', marginLeft: '5px' }}>
+                        <p style={{ fontSize: '1.1rem', textAlign: 'justify', color: '#333', marginTop: '10px' }}>
+                            Debes seleccionar <strong><u>una sola respuesta</u> </strong>
+                            de acuerdo a la indicación para resolver la actividad del docente.
+                            LLama a tu docente si tienes dudas.
+                        </p>
+                    </div>
+                </div>
+                <Modal.Footer>
+                    <Button variant="success" onClick={cerrarModal}>
+                        Entenidido
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+        </>
+    )
+}
+
+// Modal de información para contenido de tipo 2
+export function ModalContenidoTipo2() {
+    // Variables de abrir y cerrar modal
+    const [verModal, setVerModal] = useState(false);
+    const abrirModal = () => setVerModal(true);
+    const cerrarModal = () => setVerModal(false);
+
+    return (
+        <>
+            <Button variant="sucess" onClick={abrirModal}>
+                <span className="p-2">Necesitas ayuda</span>
+                <FontAwesomeIcon title="Ayuda" className="boton__regreso btn btn-success" icon={faQuestion} />
+            </Button>
+
+            <Modal show={verModal} onHide={cerrarModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Indicación para contenido</Modal.Title>
+                </Modal.Header>
+                {/* Contenido del modal */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {/* Parte izquierda (GIF) */}
+                    <div style={{ flex: '1', width: '25%', marginRight: '5px', marginLeft: '5px' }}>
+                        {/* Insertar tu gif animado */}
+                        <img
+                            src="/gif/NNJugando.gif"
+                            alt="GIF animado"
+                            style={{ width: '100%', height: 'auto' }}
+                        />
+                    </div>
+                    {/* Parte derecha (Texto) */}
+                    <div style={{ flex: '3', width: '75%', marginRight: '10px', marginLeft: '5px' }}>
+                        <p style={{ fontSize: '1.1rem', textAlign: 'justify', color: '#333', marginTop: '10px' }}>
+                            Debes seleccionar <strong><u>verdadero o falso</u> </strong>
+                            según creas conveniente, de acuerdo a la indicación para resolver
+                            la actividad del docente.
+                            LLama a tu docente si tienes dudas.
+                        </p>
+                    </div>
+                </div>
+                <Modal.Footer>
+                    <Button variant="success" onClick={cerrarModal}>
+                        Entenidido
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    )
+}
+
+// Modal de información para contenido de tipo 3
+export function ModalContenidoTipo3() {
+    // Variables de abrir y cerrar modal
+    const [verModal, setVerModal] = useState(false);
+    const abrirModal = () => setVerModal(true);
+    const cerrarModal = () => setVerModal(false);
+
+    return (
+        <>
+            <Button variant="sucess" onClick={abrirModal}>
+                <span className="p-2">Necesitas ayuda</span>
+                <FontAwesomeIcon title="Ayuda" className="boton__regreso btn btn-success" icon={faQuestion} />
+            </Button>
+
+            <Modal show={verModal} onHide={cerrarModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Indicación para contenido</Modal.Title>
+                </Modal.Header>
+                {/* Contenido del modal */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {/* Parte izquierda (GIF) */}
+                    <div style={{ flex: '1', width: '25%', marginRight: '5px', marginLeft: '5px' }}>
+                        {/* Insertar tu gif animado */}
+                        <img
+                            src="/gif/NNJugando.gif"
+                            alt="GIF animado"
+                            style={{ width: '100%', height: 'auto' }}
+                        />
+                    </div>
+                    {/* Parte derecha (Texto) */}
+                    <div style={{ flex: '3', width: '75%', marginRight: '10px', marginLeft: '5px' }}>
+                        <p style={{ fontSize: '1.1rem', textAlign: 'justify', color: '#333', marginTop: '10px' }}>
+                            Debes seleccionar <strong><u>diferentes respuestas</u> </strong>
+                            según creas conveniente, de acuerdo a la indicación para resolver
+                            la actividad del docente.
+                            LLama a tu docente si tienes dudas.
+                        </p>
+                    </div>
+                </div>
+                <Modal.Footer>
+                    <Button variant="success" onClick={cerrarModal}>
+                        Entenidido
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    )
+}
+
+// Modal de información para contenido de tipo 4
+export function ModalContenidoTipo4() {
+    // Variables de abrir y cerrar modal
+    const [verModal, setVerModal] = useState(false);
+    const abrirModal = () => setVerModal(true);
+    const cerrarModal = () => setVerModal(false);
+
+    return (
+        <>
+            <Button variant="sucess" onClick={abrirModal}>
+                <span className="p-2">Necesitas ayuda</span>
+                <FontAwesomeIcon title="Ayuda" className="boton__regreso btn btn-success" icon={faQuestion} />
+            </Button>
+
+            <Modal show={verModal} onHide={cerrarModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Indicación para contenido</Modal.Title>
+                </Modal.Header>
+                {/* Contenido del modal */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {/* Parte izquierda (GIF) */}
+                    <div style={{ flex: '1', width: '25%', marginRight: '5px', marginLeft: '5px' }}>
+                        {/* Insertar tu gif animado */}
+                        <img
+                            src="/gif/NNJugando.gif"
+                            alt="GIF animado"
+                            style={{ width: '100%', height: 'auto' }}
+                        />
+                    </div>
+                    {/* Parte derecha (Texto) */}
+                    <div style={{ flex: '3', width: '75%', marginRight: '10px', marginLeft: '5px' }}>
+                        <p style={{ fontSize: '1.1rem', textAlign: 'justify', color: '#333', marginTop: '10px' }}>
+                            Debes <strong><u>responder a las preguntas</u> </strong>mostradas
+                            de acuerdo a la indicación para resolver la actividad.
+                            LLama a tu docente si tienes dudas.
+                        </p>
+                    </div>
+                </div>
+                <Modal.Footer>
+                    <Button variant="success" onClick={cerrarModal}>
+                        Entenidido
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    )
+}
+
+// Modal de información para contenido de tipo 5
+export function ModalContenidoTipo5() {
+    // Variables de abrir y cerrar modal
+    const [verModal, setVerModal] = useState(false);
+    const abrirModal = () => setVerModal(true);
+    const cerrarModal = () => setVerModal(false);
+
+    return (
+        <>
+            <Button variant="sucess" onClick={abrirModal}>
+                <span className="p-2">Necesitas ayuda</span>
+                <FontAwesomeIcon title="Ayuda" className="boton__regreso btn btn-success" icon={faQuestion} />
+            </Button>
+
+            <Modal show={verModal} onHide={cerrarModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Indicación para contenido</Modal.Title>
+                </Modal.Header>
+                {/* Contenido del modal */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {/* Parte izquierda (GIF) */}
+                    <div style={{ flex: '1', width: '25%', marginRight: '5px', marginLeft: '5px' }}>
+                        {/* Insertar tu gif animado */}
+                        <img
+                            src="/gif/NNJugando.gif"
+                            alt="GIF animado"
+                            style={{ width: '100%', height: 'auto' }}
+                        />
+                    </div>
+                    {/* Parte derecha (Texto) */}
+                    <div style={{ flex: '3', width: '75%', marginRight: '10px', marginLeft: '5px' }}>
+                        <p style={{ fontSize: '1.1rem', textAlign: 'justify', color: '#333', marginTop: '10px' }}>
+                            Debes seleccionar el <strong><u>color adecuado</u> </strong>
+                            de acuerdo a la indicación para resolver la actividad.
+                            LLama a tu docente si tienes dudas.
+                        </p>
+                    </div>
+                </div>
+                <Modal.Footer>
+                    <Button variant="success" onClick={cerrarModal}>
+                        Entenidido
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    )
+}
+
+// Modal de información para contenido de tipo 6
+export function ModalContenidoTipo6() {
+    // Variables de abrir y cerrar modal
+    const [verModal, setVerModal] = useState(false);
+    const abrirModal = () => setVerModal(true);
+    const cerrarModal = () => setVerModal(false);
+
+    return (
+        <>
+            <Button variant="sucess" onClick={abrirModal}>
+                <span className="p-2">Necesitas ayuda</span>
+                <FontAwesomeIcon title="Ayuda" className="boton__regreso btn btn-success" icon={faQuestion} />
+            </Button>
+
+            <Modal show={verModal} onHide={cerrarModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Indicación para contenido</Modal.Title>
+                </Modal.Header>
+                {/* Contenido del modal */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {/* Parte izquierda (GIF) */}
+                    <div style={{ flex: '1', width: '25%', marginRight: '5px', marginLeft: '5px' }}>
+                        {/* Insertar tu gif animado */}
+                        <img
+                            src="/gif/NNJugando.gif"
+                            alt="GIF animado"
+                            style={{ width: '100%', height: 'auto' }}
+                        />
+                    </div>
+                    {/* Parte derecha (Texto) */}
+                    <div style={{ flex: '3', width: '75%', marginRight: '10px', marginLeft: '5px' }}>
+                        <p style={{ fontSize: '1.1rem', textAlign: 'justify', color: '#333', marginTop: '10px' }}>
+                            Debes mover las <strong><u>imágenes</u> </strong>
+                            hasta formar una figura de acuerdo a la indicación para resolver la actividad.
+                            LLama a tu docente si tienes dudas.
+                        </p>
+                    </div>
+                </div>
+                <Modal.Footer>
+                    <Button variant="success" onClick={cerrarModal}>
+                        Entenidido
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    )
+}
+
+// Modal de información para contenido de tipo 7
+export function ModalContenidoTipo7() {
+    // Variables de abrir y cerrar modal
+    const [verModal, setVerModal] = useState(false);
+    const abrirModal = () => setVerModal(true);
+    const cerrarModal = () => setVerModal(false);
+
+    return (
+        <>
+            <Button variant="sucess" onClick={abrirModal}>
+                <span className="p-2">Necesitas ayuda</span>
+                <FontAwesomeIcon title="Ayuda" className="boton__regreso btn btn-success" icon={faQuestion} />
+            </Button>
+
+            <Modal show={verModal} onHide={cerrarModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Indicación para contenido</Modal.Title>
+                </Modal.Header>
+                {/* Contenido del modal */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {/* Parte izquierda (GIF) */}
+                    <div style={{ flex: '1', width: '25%', marginRight: '5px', marginLeft: '5px' }}>
+                        {/* Insertar tu gif animado */}
+                        <img
+                            src="/gif/NNJugando.gif"
+                            alt="GIF animado"
+                            style={{ width: '100%', height: 'auto' }}
+                        />
+                    </div>
+                    {/* Parte derecha (Texto) */}
+                    <div style={{ flex: '3', width: '75%', marginRight: '10px', marginLeft: '5px' }}>
+                        <p style={{ fontSize: '1.1rem', textAlign: 'justify', color: '#333', marginTop: '10px' }}>
+                            Debes leer el <strong><u>cuento</u> </strong> y responder las
+                            <strong><u>interrogantes</u> </strong>
+                            de acuerdo a la indicación para resolver la actividad.
+                            LLama a tu docente si tienes dudas.
+                        </p>
+                    </div>
+                </div>
+                <Modal.Footer>
+                    <Button variant="success" onClick={cerrarModal}>
+                        Entenidido
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    )
+}
+
+// Modal de información para contenido de tipo 8
+export function ModalContenidoTipo8() {
+    // Variables de abrir y cerrar modal
+    const [verModal, setVerModal] = useState(false);
+    const abrirModal = () => setVerModal(true);
+    const cerrarModal = () => setVerModal(false);
+
+    return (
+        <>
+            <Button variant="sucess" onClick={abrirModal}>
+                <span className="p-2">Necesitas ayuda</span>
+                <FontAwesomeIcon title="Ayuda" className="boton__regreso btn btn-success" icon={faQuestion} />
+            </Button>
+
+            <Modal show={verModal} onHide={cerrarModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Indicación para contenido</Modal.Title>
+                </Modal.Header>
+                {/* Contenido del modal */}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {/* Parte izquierda (GIF) */}
+                    <div style={{ flex: '1', width: '25%', marginRight: '5px', marginLeft: '5px' }}>
+                        {/* Insertar tu gif animado */}
+                        <img
+                            src="/gif/NNJugando.gif"
+                            alt="GIF animado"
+                            style={{ width: '100%', height: 'auto' }}
+                        />
+                    </div>
+                    {/* Parte derecha (Texto) */}
+                    <div style={{ flex: '3', width: '75%', marginRight: '10px', marginLeft: '5px' }}>
+                        <p style={{ fontSize: '1.1rem', textAlign: 'justify', color: '#333', marginTop: '10px' }}>
+                            Debes seleccionar la <strong><u>imagen</u> </strong>
+                            apropiada de acuerdo a la indicación para resolver la actividad.
+                            LLama a tu docente si tienes dudas.
+                        </p>
+                    </div>
+                </div>
+                <Modal.Footer>
+                    <Button variant="success" onClick={cerrarModal}>
+                        Entenidido
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    )
+}
+
 
 {/*
                         <>
