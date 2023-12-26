@@ -23,7 +23,7 @@ dist-ssr
 /client/babel.config.cjs
 /client/jest.config.cjs
 /client/jest.setup.js
-#/client/src/pages/registro/Contenido.test.jsx
+/client/src/pages/registro/Contenido.test.jsx
 #/client/src/pages/registro/Curso.test.jsx
 #/client/src/pages/registro/Dominio.test.jsx
 #/client/src/pages/registro/Nivel.test.jsx
