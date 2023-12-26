@@ -20,6 +20,10 @@ dist
 dist-ssr
 *.local
 
+/client/babel.config.cjs
+/client/jest.config.cjs
+/client/jest.setup.js
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -30,3 +34,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Archivos
+/EstudioyEntrenamiento/test.py
+/APPWapiptda/test.py
+/APPWapiptda/factories.py
