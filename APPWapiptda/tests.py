@@ -237,6 +237,9 @@ class TestResultadoInstancia(APITestCase):
         # Verificar la respuesta
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+# Test de funcion de busqueda de registros 
+
+
 """ 
     def get_authenticated_client(self, user):
         # Autenticar un cliente con un usuario específico

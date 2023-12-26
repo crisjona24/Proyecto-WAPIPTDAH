@@ -87,6 +87,7 @@ WSGI_APPLICATION = 'proyecto_WAPIPTDAH.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -94,6 +95,20 @@ DATABASES = {
     }
 }
 
+"""
+# Base de datos PostgreSQL database
+LLAVE = config('LLAVE')
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'wapiptdah_db',
+        'USER': 'wapiptdah_user',
+        'PASSWORD': LLAVE,
+        'HOST': 'localhost', # Para desarrollo
+        'PORT': '5432',  # Puerto por defecto de PostgreSQL
+    }
+}
+"""
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

@@ -24,8 +24,6 @@ class UsuarioComunFactory(factory.Factory):
     fecha_registro_usuario = "2020-10-10"
     genero = "Femenino"
     area_estudio = "Ingenieria"
-    
-
 
 class UsuarioFactory(factory.Factory):
     class Meta:
@@ -50,7 +48,7 @@ class PacienteFactory(factory.Factory):
     username_usuario = "LizbethArias"
     celular = "0999999999"
     fecha_nacimiento = "1999-10-10"
-    dni = "1234567890"
+    dni = "1105339756"
     fecha_registro_usuario = "2020-10-10"
     contacto_emergencia = "0999999999"
     direccion = "Calle 1"
@@ -131,3 +129,25 @@ class ReporteFactory(factory.Factory):
     fecha_registro_reporte = "2020-10-10"
     usuario_comun = factory.SubFactory(UsuarioComunFactory)
     resultado = factory.SubFactory(ResultadoFactory)
+
+# Fábrica de Cursos
+class CursoFactory(factory.Factory):
+    class Meta:
+        model = Curso
+
+    id = 1
+    nombre_curso = "Curso 1"
+    descripcion_curso = "Descripcion Curso 1"
+    identificador_curso = 454578
+    fecha_registro_curso = "2020-10-10"
+    usuario_comun = factory.SubFactory(UsuarioComunFactory)
+
+# Fábrica de Registro de inscripción
+class RegistroFactory(factory.Factory):
+    class Meta:
+        model = DetalleInscripcionCurso
+
+    id = 1
+    fecha_inscripcion = "2020-10-10"
+    curso = factory.SubFactory(CursoFactory)
+    paciente = factory.SubFactory(PacienteFactory)
