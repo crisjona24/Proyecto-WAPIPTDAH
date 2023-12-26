@@ -24,14 +24,15 @@ dist-ssr
 /client/jest.config.cjs
 /client/jest.setup.js
 /client/src/pages/registro/Contenido.test.jsx
-#/client/src/pages/registro/Curso.test.jsx
-#/client/src/pages/registro/Dominio.test.jsx
-#/client/src/pages/registro/Nivel.test.jsx
-#/client/src/pages/registro/Peticion.test.jsx
-#/client/src/pages/registro/Reporte.test.jsx
-#/client/src/pages/registro/Resultado.test.jsx
-#/client/src/pages/registro/Sala.test.jsx
-#/client/src/pages/registro/Usuario.test.jsx
+/client/src/pages/registro/Curso.test.jsx
+/client/src/pages/registro/Dominio.test.jsx
+/client/src/pages/registro/Nivel.test.jsx
+/client/src/pages/registro/Peticion.test.jsx
+/client/src/pages/registro/Reporte.test.jsx
+/client/src/pages/registro/Resultado.test.jsx
+/client/src/pages/registro/Sala.test.jsx
+/client/src/pages/registro/Usuario.test.jsx
+/client/src/pages/registro/Prueba.jsx
 
 # Editor directories and files
 .vscode/*
