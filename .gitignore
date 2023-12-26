@@ -45,6 +45,6 @@ dist-ssr
 *.sw?
 
 # Archivos
-/EstudioyEntrenamiento/test.py
-/APPWapiptda/test.py
+/EstudioyEntrenamiento/tests.py
+/APPWapiptda/tests.py
 /APPWapiptda/factories.py
