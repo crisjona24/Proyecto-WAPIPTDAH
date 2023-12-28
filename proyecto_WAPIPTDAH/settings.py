@@ -21,17 +21,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+""" IMPORTACION DE SECRETOS """
 SECRET_KEY = config('KEY')
 NEW_SECRET_KEY = config('KEY_NEW')
+NOMBRE_CLOUDINARY = config('NAME_CLOUDINARY')
+LLAVE_CLOUDINARY = config('API_KEY_CLOUDINARY')
+SECRETO_CLOUDINARY = config('API_SECRET_CLOUD')
+LLAVE_POSTGRESQL = config('LLAVE_POSTGRESQL')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# ACCESS CONTROL ALLOW ORIGIN
 ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,10 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'gdstorage',
     'APPWapiptda',
     'EstudioyEntrenamiento',
-    #'Juegos',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt', # Token de JWT para inicio de sesión
@@ -87,7 +90,7 @@ WSGI_APPLICATION = 'proyecto_WAPIPTDAH.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -96,19 +99,20 @@ DATABASES = {
 }
 
 """
-# Base de datos PostgreSQL database
-LLAVE = config('LLAVE')
+
+""" CONFIGURACIÓN DE BASE DE DATOS POSTGRESQL """
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'wapiptdah_db',
-        'USER': 'wapiptdah_user',
-        'PASSWORD': LLAVE,
+        'NAME': 'wapiptda_db',
+        'USER': 'wapiptda_user',
+        'PASSWORD': LLAVE_POSTGRESQL,
         'HOST': 'localhost', # Para desarrollo
         'PORT': '5432',  # Puerto por defecto de PostgreSQL
     }
 }
-"""
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -128,12 +132,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# CLOUDINARY
 
+""" CLOUDINARY: CONFIGURACIÓN PARA ALMACENAMIENTO DE ARCHIVOS """
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dccz4uwhg',
-    'API_KEY': '524625377856815',
-    'API_SECRET': 'wn1xDBuxQU07BtnK2vbLvdYqhjg',
+    'CLOUD_NAME': NOMBRE_CLOUDINARY,
+    'API_KEY': LLAVE_CLOUDINARY,
+    'API_SECRET': SECRETO_CLOUDINARY,
     'SECURE': False,
     'EXCLUDE_DELETE_ORPHANED_MEDIA_PATHS': (),
 }
@@ -153,11 +157,12 @@ USE_I18N = True
 
 USE_TZ = True
 
-# Session middleware
-#SESSION_EXPIRE_SECONDS = 2700  # 45 minutos
+
+""" CONFIGURACIÓN DE SESSION MIDDLEWARE PARA MANEJO DE SESIONES """
 SESSION_EXPIRE_SECONDS = 300  # 5 minutos
 SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
 #SESSION_TIMEOUT_REDIRECT = '/'
+#SESSION_EXPIRE_SECONDS = 2700  # 45 minutos
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -171,12 +176,8 @@ STATIC_ROOT = '/code/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Google drive
-#DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-#DEFAULT_FILE_STORAGE = 'django_googledrive_storage.storage.GoogleDriveStorage'
-#GOOGLE_DRIVE_STORAGE_JSON_KEY_FILE = (os.path.join(BASE_DIR, 'proyecto_WAPIPTDAH/client_secret_442998640809-l1kgpi9o3esrpc0q3gt7nsf5vr0jj5mb.apps.googleusercontent.com.json'),)
 
-#  REST FRAMEWORK
+""" CONFIGURACIÓN DE REST FRAMEWORK PARA MANEJO DE DATOS """
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -184,7 +185,8 @@ REST_FRAMEWORK = {
     ],
 }
 
-# SIMPLE JWT
+
+""" CONFIGURACIÓN DE TOKEN JWT PARA SEGURIDAD DE ENTRADAS Y SALIDAS DE DATOS """
 from datetime import timedelta
 SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
@@ -199,22 +201,22 @@ SIMPLE_JWT = {
     "VALIDATE_TOKEN": True,
 }
 
-### CORREO ### 
+
+""" CONFIGURACIÓN DE LA CONECCIÓN DE CORREO ELECTRÓNICO  """
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('PASSWORD')
-#EMAIL_HOST_PASSWORD = 'pkarfmadwtyfddjr'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-#EMAIL_PORT = 465
+#EMAIL_PORT = 465 # No se especifica el puerto ssl para facilidad de entrega
 
 
-# CORS HEADERS
+""" CONFIGURACIÓN PARA LOS CORS HEADERS DE ACCESO DEL FRONTEND """
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
 
 # DOMINIO   
-SITE_URL = "http://aprender-wapiptdah.com"
+#SITE_URL = "http://aprender-wapiptdah.com"
