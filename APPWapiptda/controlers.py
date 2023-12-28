@@ -85,13 +85,6 @@ class ContenidoIndividualView(viewsets.ModelViewSet):
     pagination_class = Paginacion2
 
 
-# PROTECCION CON JWT
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
-class AlmacenActividadView(viewsets.ModelViewSet):
-    queryset = AlmacenActividad.objects.all().order_by('id')
-    serializer_class = AlmacenActividadSerializer
-
 ##### Lista de contenido individual registrado en el sistema
 ##### sin paginacion
 # PROTECCION CON JWT

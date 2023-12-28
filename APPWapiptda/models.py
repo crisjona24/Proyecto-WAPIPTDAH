@@ -5,12 +5,6 @@ from cloudinary_storage.storage import MediaCloudinaryStorage, RawMediaCloudinar
 from datetime import date, datetime, timedelta
 import pytz
 
-"""from gdstorage.storage import GoogleDriveStorage
-
-# Define Google Drive Storage
-gd_storage = GoogleDriveStorage()
-"""
-
 ''' 
 Los modelos son la representacion de los datos que seran 
 almacenados en la base de datos con fines de uso legal 
@@ -290,20 +284,6 @@ class ContenidoIndividual(models.Model):
     def __str__(self):
         return f"Descripción : {self.descripcion_individual}"
     
-
-class AlmacenActividad(models.Model):
-    # Para seleccion de con imagenes
-    contenido_individual = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
-    imagen1 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
-    imagen2 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
-    imagen3 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
-    imagen4 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
-    imagen5 = models.ImageField(upload_to='samples/contenido_prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
-    fecha_registro = models.DateField(auto_now_add=False, blank=True, null=True)
-    fecha_edicion = models.DateField(auto_now=True)
-    # Foranea
-    actividad = models.ForeignKey(ContenidoIndividual, on_delete=models.CASCADE, blank=True, null=True)
-
 # MODELO DE RESULTADO
 class Resultado(models.Model):
     respuesta = models.TextField(blank=False, null=True)
@@ -460,18 +440,3 @@ class ContadorSalas(models.Model):
 class ContadorSalasAtendidas(models.Model):
     contador = models.IntegerField(default=0)
     usuario_comun = models.ForeignKey(UsuarioComun, on_delete=models.CASCADE, blank=True, null=True)
-    
-# Prueba
-class Peti(models.Model):
-    estado_peticion = models.BooleanField(default=True)
-    fecha_detalle_peticion = models.DateField(auto_now=True)
-    archivo = models.FileField(upload_to='samples/peticion/', storage=RawMediaCloudinaryStorage(), blank=True)
-
-    def get_archivo_url(self):
-        if self.archivo and hasattr(self.archivo, 'url'):
-            return self.archivo.url
-        else:
-            return None
-        
-    def __str__(self):
-        return f"{self.fecha_detalle_peticion}"

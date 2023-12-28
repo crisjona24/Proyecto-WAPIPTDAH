@@ -25,7 +25,6 @@ router.register('detalle_sala', DetalleSalaView)
 router.register('reporte', ReporteView, basename='reporte')
 router.register('dominios', ListaSoloDominiosView)
 router.register('contenidos', ListaSoloContenidosView)
-router.register('almacen', AlmacenActividadView)
 
 urlpatterns = [
     path('aplicacion/', include(router.urls)),

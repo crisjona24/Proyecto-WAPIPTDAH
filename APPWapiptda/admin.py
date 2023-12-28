@@ -35,5 +35,3 @@ admin.site.register(Sala)
 admin.site.register(DetalleSala)
 
 admin.site.register(Reporte)
-
-admin.site.register(Peti)
