@@ -2048,6 +2048,264 @@ def obtener_slug_CI(codigo):
 
 
 
+# Método para editar las actividades de estudio dependiendo del tipo de
+# contenido. El tipo de contenido determina la forma de eliminar los archivos
+# de Cloudinary
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def api_contenido_individual_Edicion(request):
+    if request.user.is_authenticated:
+        try:
+            print("Entre al editar")
+            # Decodifica el token
+            token = request.headers.get('Authorization').split(" ")[1]
+            user = get_user_from_token_jwt(token)
+            #user = get_user_from_token(token)
+            # Validamos si el usuario es tecnico
+            if is_tecnico(user):
+                if request.method == 'POST' and user:
+                    id_actividad = request.POST.get('identificador')
+                    descripcion_ = request.POST.get('descripcion_individual')
+                    respuesta_ = request.POST.get('respuesta')
+                    tipocontenido_ = request.POST.get('tipo_contenido')
+                    nombre_nivel_ = request.POST.get('nivel')
+                    # Imágenes
+                    contenido_ = request.FILES.get('contenido_individual')
+                    img1_ = request.FILES.get('img1')
+                    img2_ = request.FILES.get('img2')
+                    img3_ = request.FILES.get('img3')
+                    img4_ = request.FILES.get('img4')
+                    img5_ = request.FILES.get('img5')
+                    ####
+                    # Verificar si las imagenes del contenido vienen todas vacias o NONE
+                    if not existen_imagenes_actividad(tipocontenido_, contenido_, img1_, img2_, img3_, img4_, img5_):
+                        return JsonResponse({'error': 'No se pudo editar el registro de actividad. Deben ser todas las imágenes.'})
+                    print("Entre al editar x2")
+                    # Obtener el arreglo de identificador público de los archivos en Cloudinary de imagen
+                    public_id = obtener_public_id_actividad(id_actividad, tipocontenido_, contenido_, img1_, img2_, img3_, img4_, img5_)
+                    print(public_id)
+                    # Verificar si el arreglo no es nulo
+                    if public_id:
+                        # Eliminar las imagenes de cloudinary una por una del arreglo
+                        for eliminar_conte in public_id:
+                            eliminar_conte  = eliminar_archivo_cloudinary(eliminar_conte)
+                        print(eliminar_conte)
+                        # Si todos los archivos de eliminar se edita segun el tipo
+                        if eliminar_conte and eliminar_conte.get('result') == 'ok':
+                            # Dividimos la forma de editar acuerdo al tipo
+                            if tipocontenido_ == 'pintar_imagen':
+                                if editar_actividad_PI(id_actividad, descripcion_, nombre_nivel_, respuesta_, contenido_, img1_):
+                                    return JsonResponse({'success': True})
+                                else:
+                                    return JsonResponse({'error': 'No se pudo editar el registro de actividad'})
+                            elif tipocontenido_ == 'selecion_multiple_img' or tipocontenido_ == 'pictograma':
+                                if editar_actividad_SE_PIC(id_actividad, descripcion_, nombre_nivel_, respuesta_, contenido_, img1_, img2_, img3_):
+                                    return JsonResponse({'success': True})
+                                else:
+                                    return JsonResponse({'error': 'No se pudo editar el registro de actividad'})
+                            elif tipocontenido_ == 'seleccionar_imagen':
+                                print("Entre en el tipo de cnotenidop")
+                                if contenido_ or img1_ or img2_ or img3_ and not img4_ and not img5_:
+                                    if editar_actividad_SE_PIC(id_actividad, descripcion_, nombre_nivel_, respuesta_, contenido_, img1_, img2_, img3_):
+                                        return JsonResponse({'success': True})
+                                    else:
+                                        return JsonResponse({'error': 'No se pudo editar el registro de actividad'})
+                                elif contenido_ or img1_ or img2_ or img3_ or img4_ or img5_:
+                                    if editar_actividad_SE6(id_actividad, descripcion_, nombre_nivel_, respuesta_, contenido_, img1_, img2_, img3_, img4_, img5_):
+                                        return JsonResponse({'success': True})
+                                    else:
+                                        return JsonResponse({'error': 'No se pudo editar el registro de actividad'})
+                            else:
+                                if editar_actividad_P(id_actividad, descripcion_, nombre_nivel_, respuesta_, contenido_):
+                                    return JsonResponse({'success': True})
+                                else:
+                                    return JsonResponse({'error': 'No se pudo editar el registro de actividad'})
+                        else:
+                            return JsonResponse({'error': 'No se pudo editar el registro de actividad'})
+                    else:
+                        return JsonResponse({'error': 'No se pudo editar el registro de actividad'})
+                else:
+                    return JsonResponse({'error': 'Error al actualizar el contenido'})
+            else:
+                return JsonResponse({'error': 'El usuario no esta autenticado'})
+        except Exception as e:
+            return JsonResponse({'error': 'Error al actualizar el contenido individual'})
+    else:
+        return JsonResponse({'error': 'El usuario no esta autenticado'})
 
 
+## Controlar si las imagenes vienen vacias según el tipo de contenido
+def existen_imagenes_actividad(tipo, ob1, ob2, ob3, ob4, ob5, ob6):
+    if tipo == 'pintar_imagen':
+        # Controlar que al menos exista una de ambas
+        if ob1 == None and ob2 == None:
+            return False
+        else:
+            return True
+    elif tipo == 'selecion_multiple_img' or tipo == 'pictograma':
+        if ob1 == None and ob2 == None and ob3 == None and ob4 == None:
+            return False
+        else:
+            return True
+    elif tipo == 'seleccionar_imagen':
+        # Verificar si son 4 o 6 imagenes
+        if ob1 == None and ob2 == None and ob3 == None and ob4 == None and ob5 == None and ob6 == None:
+            return False
+        else:
+            return True
+    else:
+        if ob1 == None:
+            return False
+        else:
+            return True
 
+## Método para obtener el public id del archivo relacionado al registro para dar 
+## paso a la eliminación del archivo en Cloudinary
+def obtener_public_id_actividad(ob1, tipoContenido, ob2, ob3, ob4, ob5, ob6, ob7):
+    try:
+        # Obtener el objeto de Actividad por su ID
+        actividad_ob = ContenidoIndividual.objects.get(id=ob1)
+        # Inicializamos un arreglo
+        public_id = []
+        # Verificar el tipo de contenido
+        if tipoContenido == 'pintar_imagen':
+            # Obtener un arreglo con los public_id de las imagenes que son 2
+            if ob2:
+                public_id.append(cloudinary.CloudinaryImage(actividad_ob.contenido_individual.name).public_id)
+            if ob3:
+                public_id.append(cloudinary.CloudinaryImage(actividad_ob.imagen1.name).public_id)
+            return public_id
+        elif tipoContenido == 'selecion_multiple_img' or tipoContenido == 'pictograma':
+            # Obtener un arreglo con los public_id de las imagenes que son un total de 4
+            if ob2:
+                public_id.append(cloudinary.CloudinaryImage(actividad_ob.contenido_individual.name).public_id)
+            if ob3:
+                public_id.append(cloudinary.CloudinaryImage(actividad_ob.imagen1.name).public_id)
+            if ob4:
+                public_id.append(cloudinary.CloudinaryImage(actividad_ob.imagen2.name).public_id)
+            if ob5:
+                public_id.append(cloudinary.CloudinaryImage(actividad_ob.imagen3.name).public_id)
+            return public_id
+        elif tipoContenido == 'seleccionar_imagen':
+            # Obtener un arreglo con los public_id de las imagenes verificando si tiene 4 o 6
+            if ob2:
+                public_id.append(cloudinary.CloudinaryImage(actividad_ob.contenido_individual.name).public_id)
+            if ob3:
+                public_id.append(cloudinary.CloudinaryImage(actividad_ob.imagen1.name).public_id)
+            if ob4:
+                public_id.append(cloudinary.CloudinaryImage(actividad_ob.imagen2.name).public_id)
+            if ob5:
+                public_id.append(cloudinary.CloudinaryImage(actividad_ob.imagen3.name).public_id)
+            if actividad_ob.imagen4 and ob6:
+                public_id.append(cloudinary.CloudinaryImage(actividad_ob.imagen4.name).public_id)
+            if actividad_ob.imagen5 and ob7:
+                public_id.append(cloudinary.CloudinaryImage(actividad_ob.imagen5.name).public_id)
+            print("Obtuve los public id")
+            return public_id
+        # El resto de tipo que solo tiene contenido_individual como imagen
+        else:
+            public_id.append(cloudinary.CloudinaryImage(actividad_ob.contenido_individual.name).public_id)
+            return public_id
+    except ContenidoIndividual.DoesNotExist:
+        # Manejar la excepción si la actividad no existe
+        print("El Contenido no existe.")
+        return None
+    except Exception as e:
+        # Manejar otras excepciones
+        print("Error al obtener el public ID:", e)
+        return None
+
+# Métodos de edición de actividad según el contenidp
+def editar_actividad_PI(ob1, ob2, ob3, ob4, ob5, ob6):
+    try:
+        print("Entre a pintar imagen")
+        # Obtenemos el objeto de contenido individual por el id
+        ob_actividad = ContenidoIndividual.objects.get(id=ob1)
+        # Agregamos los datos de edición
+        ob_actividad.descripcion_individual = ob2
+        ob_actividad.nivel = ob3
+        ob_actividad.respuesta = ob4
+        # Verificar si la imagen de contenido es vacio o no
+        if ob5:
+            ob_actividad.contenido_individual = ob5
+        # Verificar si la imagen de contenido es vacio o no
+        if ob6:
+            ob_actividad.imagen1 = ob6
+        ob_actividad.save()
+        return True
+    except ContenidoIndividual.DoesNotExist:
+        return False
+    except Exception as e:
+        return False
+
+def editar_actividad_SE_PIC(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8):
+    try:
+        # Obtenemos el objeto de contenido individual por el id
+        ob_actividad = ContenidoIndividual.objects.get(id=ob1)
+        # Agregamos los datos de edición
+        ob_actividad.descripcion_individual = ob2
+        ob_actividad.nivel = ob3
+        ob_actividad.respuesta = ob4
+        # Verificar si la imagen de contenido es vacio o no
+        if ob5:
+            ob_actividad.contenido_individual = ob5
+        # Verificar si la imagen de contenido es vacio o no
+        if ob6:
+            ob_actividad.imagen1 = ob6
+        # Verificar si la imagen de contenido es vacio o no
+        if ob7:
+            ob_actividad.imagen2 = ob7
+        # Verificar si la imagen de contenido es vacio o no
+        if ob8:
+            ob_actividad.imagen3 = ob8
+        ob_actividad.save()
+        return True
+    except ContenidoIndividual.DoesNotExist:
+        return False
+    except Exception as e:
+        return False
+
+def editar_actividad_P(ob1, ob2, ob3, ob4, ob5):
+    try:
+        # Obtenemos el objeto de contenido individual por el id
+        ob_actividad = ContenidoIndividual.objects.get(id=ob1)
+        # Agregamos los datos de edición
+        ob_actividad.descripcion_individual = ob2
+        ob_actividad.nivel = ob3
+        ob_actividad.respuesta = ob4
+        ob_actividad.contenido_individual = ob5
+        ob_actividad.save()
+        return True
+    except ContenidoIndividual.DoesNotExist:
+        return False
+    except Exception as e:
+        return False
+
+def editar_actividad_SE6(ob1, ob2, ob3, ob4, ob5, ob6, ob7, ob8, ob9, ob10 ):
+    try:
+        # Obtenemos el objeto de contenido individual por el id
+        ob_actividad = ContenidoIndividual.objects.get(id=ob1)
+        # Agregamos los datos de edición
+        ob_actividad.descripcion_individual = ob2
+        ob_actividad.nivel = ob3
+        ob_actividad.respuesta = ob4
+        # Verificar si la imagen de contenido es vacio o no
+        if ob5:
+            ob_actividad.contenido_individual = ob5
+        if ob6:
+            ob_actividad.imagen1 = ob6
+        if ob7:
+            ob_actividad.imagen2 = ob7
+        if ob8:
+            ob_actividad.imagen3 = ob8
+        if ob9:
+            ob_actividad.imagen4 = ob9
+        if ob10:
+            ob_actividad.imagen5 = ob10
+        ob_actividad.save()
+        return True
+    except ContenidoIndividual.DoesNotExist:
+        return False
+    except Exception as e:
+        return False

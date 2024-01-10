@@ -86,6 +86,7 @@ urlpatterns = [
     path('editar/contenido/', api_contenido_edicion, name='edicion-contenido'),
     ############ Registro de actividades
     path('registro_contenido_individual/', api_contenido_individual_register, name='registro_individual'),
+    path('editar/actividad/', api_contenido_individual_Edicion, name='edicion-actividad'),
     ############ Registro de curso
     path('registro_curso/', api_curso_register, name='curso-registro'),
     path('registro/curso/<int:id>/', api_curso_inscripcion, name='inscripcion-registro'),

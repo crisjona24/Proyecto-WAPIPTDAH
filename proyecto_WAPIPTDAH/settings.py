@@ -97,8 +97,8 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-"""
 
+""" 
 """ CONFIGURACIÓN DE BASE DE DATOS POSTGRESQL """
 
 DATABASES = {
@@ -108,7 +108,7 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': LLAVE_POSTGRESQL,
         'HOST': 'localhost', # Para desarrollo
-        'PORT': '5432',  # Puerto por defecto de PostgreSQL
+        'PORT': '',  # Puerto por defecto de PostgreSQL
     }
 }
 
@@ -219,3 +219,20 @@ CORS_ALLOWED_ORIGINS = [
 
 # DOMINIO   
 #SITE_URL = "http://aprender-wapiptdah.com"
+
+
+""" CONFIGURACIÓN PARA TAREAS CONCURRENTES """
+from celery import Celery
+from celery.schedules import crontab
+
+nombre_app = Celery('proyecto_WAPIPTDAH')
+nombre_app.config_from_object('django.conf:settings', namespace='CELERY')
+# Descubrimiento de tareas
+nombre_app.autodiscover_tasks()
+# Configurar planificador de tareas
+nombre_app.conf.beat_schedule = {
+    'eliminar-usuarios-vencidos': {
+        'task': 'APPWapiptda.tasks.eliminar_usuarios_vencidos',
+        'schedule': crontab(minute=0, hour=0),
+    },
+}

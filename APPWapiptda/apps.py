@@ -5,5 +5,10 @@ class AppwapiptdaConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'APPWapiptda'
 
-    """def ready(self):
-        import APPWapiptda.signals"""
+    # Registro de signals
+    def ready(self):
+        super().ready()
+        self.registrar_senales()
+
+    def registrar_senales(self):
+        import APPWapiptda.signals  # Importa el archivo signals.py

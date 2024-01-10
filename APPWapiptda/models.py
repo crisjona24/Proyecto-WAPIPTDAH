@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.text import slugify
-from cloudinary_storage.storage import MediaCloudinaryStorage, RawMediaCloudinaryStorage
+from cloudinary_storage.storage import MediaCloudinaryStorage
+#RawMediaCloudinaryStorage
 from datetime import date, datetime, timedelta
 import pytz
 
@@ -11,9 +12,6 @@ almacenados en la base de datos con fines de uso legal
 y en vias del desarrollo del presente PIC. Cristobal Rios
 
 '''
-
-# Correo
-from django.utils.crypto import get_random_string
 
 # MODELO DE RECUPERACION DE CLAVE
 class Recuperacion(models.Model):
@@ -76,12 +74,6 @@ class Usuario(models.Model):
         self.slug_usuario = slugify(
             self.nombre_usuario + "-" + self.apellido_usuario)
         super(Usuario, self).save(*args, **kwargs)
-
-    # Correo
-    def generate_confirmation_token(self):
-        self.confirmation_token = get_random_string(length=40)
-        self.save()
-    # Correo
 
     @property
     def edad(self):
@@ -192,18 +184,19 @@ class GradoTDAH(models.Model):
 # MODELO DOMINIO
 class Dominio(models.Model):
     nombre = models.CharField(max_length=80, blank=False, null=True)
-    descripcion = models.TextField(max_length=250, blank=False, null=True)
+    descripcion = models.TextField(blank=False, null=True)
     identificador_dominio = models.IntegerField(unique=True, blank=False, null=True)
     fecha_registro_dominio = models.DateField(auto_now_add=False, blank=True, null=True)
     fecha_edicion_dominio = models.DateField(auto_now=True)
     estado_dominio = models.BooleanField(default=True)
-    slug_dominio = models.SlugField(unique=True, blank=True)
+    slug_dominio = models.SlugField(max_length=250, unique=True, blank=True)
     portada_dominio = models.ImageField( upload_to='samples/fondo_dominio_react/', storage=MediaCloudinaryStorage(), null=True, blank=True)
     # Llave foranea
     usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        self.slug_dominio = slugify(self.nombre + "-" + self.descripcion)
+        ident_domi= str(self.identificador_dominio)
+        self.slug_dominio = slugify(self.nombre + "-" + ident_domi)
         super(Dominio, self).save(*args, **kwargs)
 
     def get_portada_url(self):
@@ -227,7 +220,7 @@ class Contenido(models.Model):
     portada = models.ImageField(upload_to='samples/prueba/', storage=MediaCloudinaryStorage(), null=True, blank=True)
 
     # Foranea
-    dominio = models.ForeignKey(Dominio, on_delete=models.SET_NULL, blank=True, null=True)
+    dominio = models.ForeignKey(Dominio, on_delete=models.CASCADE, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         self.slug_contenido = slugify(self.nombre + "-" + self.dominio_tipo)
@@ -244,7 +237,7 @@ class Contenido(models.Model):
 
 # MODELO DE CONTENIDO INDIVIDUAL
 class ContenidoIndividual(models.Model):
-    descripcion_individual = models.TextField( max_length=250, blank=False, null=True)
+    descripcion_individual = models.TextField(blank=False, null=True)
     identificador_individual = models.IntegerField(unique=True, blank=False, null=True)
     fecha_registro_individual = models.DateField(auto_now_add=False, blank=True, null=True)
     fecha_edicion_individual = models.DateField(auto_now=True)
@@ -315,17 +308,18 @@ class Resultado(models.Model):
 # MODELO DE CURSO
 class Curso(models.Model):
     nombre_curso = models.CharField(max_length=100, blank=False, null=True)
-    descripcion_curso = models.TextField(max_length=250, blank=False, null=True)
+    descripcion_curso = models.TextField(blank=False, null=True)
     identificador_curso = models.IntegerField(unique=True, blank=False, null=True)
     fecha_registro_curso = models.DateField(auto_now_add=False, blank=True, null=True)
     fecha_edicion_curso = models.DateField(auto_now=True)
     estado_curso = models.BooleanField(default=True)
-    slug_curso = models.SlugField(unique=True, blank=True, max_length=70)
+    slug_curso = models.SlugField(max_length=250, unique=True, blank=True)
     # Foranea
     usuario_comun = models.ForeignKey(UsuarioComun, on_delete=models.CASCADE, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        self.slug_curso = slugify(self.nombre_curso + "-" + self.descripcion_curso)
+        ident_curso = str(self.identificador_curso)
+        self.slug_curso = slugify(self.nombre_curso + "-" + ident_curso)
         super(Curso, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -346,12 +340,12 @@ class DetalleInscripcionCurso(models.Model):
 class Peticion(models.Model):
     motivo_peticion = models.CharField(max_length=250, blank=False, null=True)
     tipo_peticion = models.CharField(max_length=80, blank=False, null=True)
-    peticion_cuerpo = models.TextField(max_length=250, blank=False, null=True)
+    peticion_cuerpo = models.TextField(blank=False, null=True)
     estado_peticion = models.BooleanField(default=True)
     estado_revision= models.BooleanField(default=False)
     fecha_registro_peticion = models.DateField(auto_now_add=False, blank=True, null=True)
     fecha_edicion_peticion = models.DateField(auto_now=True)
-    slug_peticion = models.SlugField(unique=True, blank=True)
+    slug_peticion = models.SlugField(unique=True, blank=True, null=True)
     # Foraneas
     usuario_comun = models.ForeignKey(UsuarioComun, on_delete=models.CASCADE, blank=True, null=True)
 
@@ -377,15 +371,15 @@ class DetallePeticion(models.Model):
 #MODELO DE SALA
 class Sala(models.Model):
     nombre_sala = models.CharField(max_length=80, blank=False, null=True)
-    anotaciones = models.TextField()
+    anotaciones = models.TextField(blank=True, null=True)
     codigo_identificador = models.CharField(max_length=80, blank=False, null=True)
     fecha_registro_sala = models.DateField(auto_now_add=False, blank=True, null=True)
     fecha_edicion_sala = models.DateField(auto_now=True)
     estado_sala = models.BooleanField(default=True)
     sala_atendida = models.BooleanField(default=False)
-    slug_sala = models.SlugField(unique=True, blank=True)
+    slug_sala = models.SlugField(unique=True, blank=True, null=True)
     # Foraneas
-    paciente = models.ForeignKey(Paciente, on_delete=models.SET_NULL, blank=True, null=True)
+    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         self.slug_sala = slugify(self.nombre_sala)
@@ -400,7 +394,7 @@ class DetalleSala(models.Model):
     estado_detalle_sala = models.BooleanField(default=True)
     # Foraneas
     sala = models.ForeignKey(Sala, on_delete=models.CASCADE, blank=True, null=True)
-    usuario_comun = models.ForeignKey(UsuarioComun, on_delete=models.SET_NULL, blank=True, null=True)
+    usuario_comun = models.ForeignKey(UsuarioComun, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return f"Fecha : {self.fecha_detalle_sala} | Estado : {self.estado_detalle_sala}"
@@ -409,16 +403,16 @@ class DetalleSala(models.Model):
 class Reporte(models.Model):
     titulo_reporte = models.CharField(max_length=200, blank=False, null=True)
     descripcion_reporte = models.TextField(blank=False, null=True)
-    slug_reporte = models.SlugField(unique=False, blank=False, null=True)
     fecha_registro_reporte = models.DateField(auto_now_add=False, blank=True, null=True)
     fecha_edicion_reporte = models.DateField(auto_now=True)
     estado_reporte = models.BooleanField(default=True)
+    slug_reporte = models.SlugField(unique=False, blank=False, null=True, max_length=250)
     # Foraneas
-    usuario_comun = models.ForeignKey(UsuarioComun, on_delete=models.SET_NULL, related_name='reportes', blank=True, null=True)
-    resultado = models.ForeignKey(Resultado, on_delete=models.SET_NULL, related_name='reportes_resultado', blank=True, null=True)
+    usuario_comun = models.ForeignKey(UsuarioComun, on_delete=models.CASCADE, related_name='reportes', blank=True, null=True)
+    resultado = models.ForeignKey(Resultado, on_delete=models.CASCADE, related_name='reportes_resultado', blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        self.slug_reporte = slugify(self.titulo_reporte + '-' + self.descripcion_reporte)
+        self.slug_reporte = slugify(self.titulo_reporte + "-" + "New-Report")
         super(Reporte, self).save(*args, **kwargs)
 
     def __str__(self):

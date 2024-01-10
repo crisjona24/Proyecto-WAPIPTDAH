@@ -8,3 +8,6 @@ API_KEY_CLOUDINARY = '524625377856815'
 API_SECRET_CLOUD = 'wn1xDBuxQU07BtnK2vbLvdYqhjg'
 LLAVE_POSTGRESQL = 'postgreswapip24tdah'
 2. Las condfiguraciones del .gitignore son durante el desarrollo.
+
+PASSWORD = "pjrpujobqyngsohd"
+EMAIL_HOST_USER = "crioss3an@gmail.com"

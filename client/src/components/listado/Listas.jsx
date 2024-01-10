@@ -178,7 +178,14 @@ export function NivelLista({ usuario }) {
                         <p className="mb-0">{error}</p>
                     </div>
                 }
-
+                {
+                    niveles.length === 0 &&
+                    <div className="d-flex justify-content-center mt-5">
+                        <div className="spinner-border" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                }
                 {
                     niveles.map((nivel) => (
                         <div className="contenedor-listado__nivel" key={nivel.id}>
@@ -242,21 +249,6 @@ export function NivelLista({ usuario }) {
                     ))
                 }
                 <hr style={{ color: '#0C2342' }} />
-                {
-                    usuario.tipo === "tecnico" &&
-
-                    <div className="cabeza__Nivel">
-                        <div className="container">
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <h4 className="display-7 mt-2">
-                                        Reportes
-                                    </h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
             </>
 
         </div>
@@ -849,7 +841,7 @@ export function ResultadoLista({ usuario }) {
         // Validar tamaño de cédula
         if (cedula.length < 10) {
             Swal.fire("La cédula debe tener al menos 10 dígitos", "", "warning");
-            resetearBusquedaCedula();
+            resetearBusqueda();
             return;
         }
         // Verificar cédula ingresada
@@ -858,7 +850,7 @@ export function ResultadoLista({ usuario }) {
                 const resultadoCedula = await ResultadoporCedula(cedula, page);
                 if (resultadoCedula.data.results.length === 0) {
                     Swal.fire("No existen resultados de estudiante con esa cédula. Ingrese una válida.", "", "warning");
-                    resetearBusquedaCedula();
+                    resetearBusqueda();
                     return;
                 } else {
                     setResultadosBusqueda(resultadoCedula.data.results);
@@ -1103,6 +1095,7 @@ export function ResultadoLista({ usuario }) {
                                 <div className="col-9 d-flex flex-row">
                                     <select name="fecha" id="fecha"
                                         value={limite} onChange={(e) => setLimite(e.target.value)} className="form-select"
+                                        disabled={isTamanio}
                                     >
                                         <option value="0">Ninguno</option>
                                         <option value="7">Últimos 7 días</option>
@@ -2647,6 +2640,7 @@ export function ReporteLista({ usuario }) {
                                 <div className="col-9 d-flex flex-row">
                                     <select name="fecha" id="fecha"
                                         value={limite} onChange={(e) => setLimite(e.target.value)} className="form-select"
+                                        disabled={isTamanio}
                                     >
                                         <option value="0">Ninguno</option>
                                         <option value="7">Últimos 7 días</option>
