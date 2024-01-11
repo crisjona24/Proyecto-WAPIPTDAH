@@ -89,7 +89,7 @@ export function NivelLista({ usuario }) {
                                         </div>
                                     </div>
                                     <div className="card__nivel">
-                                        <div className="textos__nivel d-flex flex-column justify-content-between">
+                                        <div className="textos__nivel alin-nivel">
                                             <li>
                                                 <h3 className="titulo__dato"> Nombre </h3>
                                             </li>
