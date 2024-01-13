@@ -182,7 +182,7 @@ export function ContenidoCuerpo({ context, slugContenido, tipoUsuarioP }) {
             <div className="container pt-2">
                 <div className="row col-md-12">
                     <div className="titulo__cabecera p-1">
-                        <Link to={`/contenido/individual/all/${slugContenido}/`} className="boton__regreso btn btn-success">
+                        <Link to={`/contenido/individual/all/${slugContenido}/`} className="btn_operacion btn btn-success">
                             <FontAwesomeIcon icon={faBackward} />
                         </Link>
                         <h2 className="display-6">
