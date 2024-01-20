@@ -1438,9 +1438,15 @@ def api_sala_register(request):
         codigo_identificador_ = data.get('codigo_identificador')
         nombre_paciente_ = data.get('nombre_paciente')
         nombres_divididos = nombre_paciente_.split(' ')
-        # Toma las dos primeras posiciones para nombre y las dos siguientes para apellido
-        nombre = nombres_divididos[0] + ' ' + nombres_divididos[1]
-        apellido = nombres_divididos[2] + ' ' + nombres_divididos[3]
+        # Toma las dos primeras posiciones para nombre y las dos siguientes 
+        #para apellido en caso de llegar 4 valores, si son 5 valores los tres primeros 
+        # para nombre
+        if len(nombres_divididos) == 4:
+            nombre = nombres_divididos[0] + ' ' + nombres_divididos[1]
+            apellido = nombres_divididos[2] + ' ' + nombres_divididos[3]
+        elif len(nombres_divididos) == 5:
+            nombre = nombres_divididos[0] + ' ' + nombres_divididos[1] + ' ' + nombres_divididos[2]
+            apellido = nombres_divididos[3] + ' ' + nombres_divididos[4]
 
         if not curso_existe(usuario__ob):
             return JsonResponse({'error': "No tiene un curso registrado. No puede registrar salas."})
