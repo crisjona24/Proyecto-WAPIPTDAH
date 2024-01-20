@@ -87,7 +87,7 @@ export function FormularioUsuario() {
         } catch (error) {
             mostrarError('Error al registrar usuario');
             setHabilitado2(false);
-        } 
+        }
     };
 
     // Funcion para guardar datos
@@ -846,12 +846,16 @@ export function FormularioComun() {
                     </select>
                 </div>
             </div>
-            <div className='form-group'>
-                <label className='label' htmlFor="cedula">Cédula de identidad:</label>
-                <input className='form-control w-100' maxLength={10} type="text" placeholder="Ingrese el número de cédula**" name='cedula' id="cedula"
-                    value={cedula}
-                    onChange={validarCedula} />
-            </div>
+            {
+                !datos?.tipo &&
+                <div className='form-group'>
+                    <label className='label' htmlFor="cedula">Cédula de identidad:</label>
+                    <input className='form-control w-100' maxLength={10} type="text" placeholder="Ingrese el número de cédula**" name='cedula' id="cedula"
+                        value={cedula}
+                        onChange={validarCedula} />
+                </div>
+            }
+
             <Button type="submit" variant="success" disabled={habilitado}>
                 {habilitado ? 'Guardando...' : 'Guardar'}
             </Button>
