@@ -129,7 +129,7 @@ export function IniciarSesion() {
                                         </Link>
                                     </li>
                                     <div className='login-footer'>
-                                        <li style={{ listStyle: 'none', marginTop: '1%' }} >
+                                        <li style={{ listStyle: 'none' }} >
                                             <Link style={{ textDecoration: 'none' }} to="/registro">
                                                 <span className="text">
                                                     ¿No tienes una cuenta?. CLIC AQUÍ..
@@ -137,7 +137,6 @@ export function IniciarSesion() {
                                             </Link>
                                         </li>
                                     </div>
-
                                     <div className="login-footer">
                                         <span className="text">
                                             Registrate con
@@ -162,11 +161,13 @@ export function IniciarSesion() {
                                     </div>
                                 </form>
                             </div>
+                            <div >
+                                <img style={{ width: '20%', marginTop: '5%' }} src="/img/ComputaciónUNL.jpg" alt="Logo de Computación" />
+                            </div>
                         </div>
                     </div>
                 </main>
             </div>
-
         </div>
     )
 }
