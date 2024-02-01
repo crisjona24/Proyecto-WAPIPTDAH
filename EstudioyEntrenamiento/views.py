@@ -1907,27 +1907,30 @@ def contenido_individual(request, slug):
                     valor_respuesta = contenidoI__ob.respuesta
                     # Obtener el tipo de contenido
                     tipo__contenido = contenido__ob.dominio_tipo
-                    # Comprobar si existe una sola descripcion o varias
-                    if comprobar_separacion_coma(descripcion__contenido):
-                        descripcion_separada = descripcion__contenido.split(', ')
-                        descripcion__contenido = descripcion_separada
+                    # Comprobar si existe una sola descripcion o varias preguntas
+                    if (contenidoI__ob.tipo_contenido == 'responder_preguntas' or contenidoI__ob.tipo_contenido == 'pintar_imagen' or contenidoI__ob.tipo_contenido == 'cuento'):
+                        if comprobar_separacion_coma(descripcion__contenido):
+                            descripcion_separada = descripcion__contenido.split(', ')
+                            descripcion__contenido = descripcion_separada
+                        else:
+                            descripcion__contenido = descripcion__contenido
                     else:
                         descripcion__contenido = descripcion__contenido
-                    # Comprobar si existe una sola respuesta o varias
-                    if comprobar_separacion_coma(valor_respuesta):
-                        valores_separados = valor_respuesta.split(', ')
-                        valores_separados = [valor.capitalize()
-                                            for valor in valores_separados]
+                    # Comprobar si existe una sola respuesta o varias para la seleccion multiple
+                    contenedor = valor_respuesta
+                    context = {
+                        'url__contenido': url__contenido,
+                        'contenedor': contenedor,
+                        'nombre__contenido': nombre__contenido,
+                        'descripcion__contenido': descripcion__contenido,
+                        'identificador': identificador,
+                        'tipo__contenido': tipo__contenido,
+                        'slug': slug
+                    }
+                    if contenidoI__ob.tipo_contenido == 'selecion_multiple' and comprobar_separacion_coma(valor_respuesta):
+                        valores_separados = [valor.capitalize() for valor in valor_respuesta.split(', ')]
                         contenedor = valores_separados
-                        context = {'url__contenido': url__contenido, 'contenedor': contenedor,
-                                'nombre__contenido': nombre__contenido, 'descripcion__contenido': descripcion__contenido, 'identificador': identificador,
-                                'tipo__contenido': tipo__contenido, 'slug': slug}
-                    else:
-                        contenedor = valor_respuesta
-                        context = {'url__contenido': url__contenido, 'contenedor': contenedor,
-                                'nombre__contenido': nombre__contenido, 'descripcion__contenido': descripcion__contenido, 'identificador': identificador,
-                                'tipo__contenido': tipo__contenido, 'slug': slug}
-
+                        context['contenedor'] = contenedor
                     # Determinar el tipo de contenido y renderizar la plantilla adeacuada al tipo
                     if (contenidoI__ob.tipo_contenido == 'selecion_individual'):
                         context.update({'tipo': 'selecion_individual'})
