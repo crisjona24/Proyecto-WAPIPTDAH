@@ -1828,7 +1828,7 @@ def send_email_sala(ob1, ob2):
             f'\nLa sala creada de nombre: {ob1.nombre_sala}. ' \
             f'\nRecibimos una confirmación de resolución de sala del estudiante: {ob1.paciente.nombre_usuario} {ob1.paciente.apellido_usuario}. ' \
             f'\nLa sala resuelta esta formada por las siguientes indicaciones: ' \
-            f'\n\n{ob1.anotacione}'\
+            f'\n\n{ob1.anotaciones}'\
             f'\n\nLa misma cuenta con un estado de: ' \
             f'\n' \
             f'\nResuelto ' \
